@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
 		: {};
 	const viteEnv = loadEnv(mode, monorepoRoot, "VITE_");
 
-	const port = Number(viteEnv.VITE_PORT ?? rootEnv.VITE_PORT) || 3000;
+	const port = Number(viteEnv.VITE_PORT ?? rootEnv.VITE_PORT) || 5173;
 	const apiPort = Number(rootEnv.PORT) || 4000;
 	const apiProxyTarget =
 		viteEnv.VITE_API_PROXY_TARGET ??
@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => {
 		envDir: monorepoRoot,
 		server: {
 			port,
-			strictPort: true,
+			strictPort: false,
 			proxy: {
 				"/api": {
 					target: apiProxyTarget,

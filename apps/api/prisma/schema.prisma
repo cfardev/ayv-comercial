@@ -1,0 +1,16 @@
+generator client {
+	provider = "prisma-client"
+	output   = "../src/generated/prisma"
+}
+
+datasource db {
+	provider = "postgresql"
+}
+
+/// Ancla inicial para la primera migración; reemplazar o extender con modelos de dominio.
+model SchemaMeta {
+	id        Int      @id @default(autoincrement())
+	createdAt DateTime @default(now())
+
+	@@map("schema_meta")
+}

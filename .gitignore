@@ -1,6 +1,7 @@
 node_modules
 dist
 .turbo
+**/src/generated/prisma
 coverage
 *.log
 npm-debug.log*

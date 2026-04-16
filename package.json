@@ -9,12 +9,22 @@
 		"dev": "turbo run dev --log-order stream",
 		"lint": "turbo run lint",
 		"check": "biome check .",
-		"format": "biome format --write ."
+		"format": "biome format --write .",
+		"db:generate": "pnpm --filter @ayv-comercial/api run db:generate",
+		"db:migrate": "pnpm --filter @ayv-comercial/api run db:migrate",
+		"db:push": "pnpm --filter @ayv-comercial/api run db:push",
+		"db:studio": "pnpm --filter @ayv-comercial/api run db:studio"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"packageManager": "pnpm@10.32.1",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"prisma",
+			"@prisma/engines"
+		]
+	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
 		"turbo": "^2.7.5"
