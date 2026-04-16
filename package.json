@@ -5,6 +5,7 @@
 	"description": "Monorepo backoffice — Turborepo + pnpm",
 	"scripts": {
 		"build": "turbo run build",
+		"start": "pnpm --filter @ayv-comercial/client run build && pnpm --filter @ayv-comercial/api run build && pnpm --filter @ayv-comercial/api run start:prod",
 		"dev": "turbo run dev --log-order stream",
 		"lint": "turbo run lint",
 		"check": "biome check .",

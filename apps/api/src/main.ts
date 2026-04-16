@@ -8,7 +8,6 @@ async function bootstrap() {
 	app.setGlobalPrefix("api");
 	await app.listen(port);
 
-	const url = `http://localhost:${port}/api`;
-	Logger.log(`listening on ${url}`, "Bootstrap");
+	Logger.log(`Server on port ${port}`, "Bootstrap")
 }
 bootstrap();

@@ -41,6 +41,10 @@ export default defineConfig(({ mode }) => {
 		`http://localhost:${apiPort}`;
 
 	return {
+		build: {
+			outDir: path.join(monorepoRoot, "dist/client"),
+			emptyOutDir: true,
+		},
 		clearScreen: false,
 		envDir: monorepoRoot,
 		server: {
