@@ -126,7 +126,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 													AYV Comercial
 												</span>
 												<span className="text-xs text-muted-foreground">
-													Distribuidora
+													Inventario y Facturación
 												</span>
 											</div>
 										</div>
