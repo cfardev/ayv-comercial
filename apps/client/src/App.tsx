@@ -1,19 +1,58 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
-import { CargoPage } from "@/pages/cargo-page";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
-import { ReportesPage } from "@/pages/reportes-page";
 
-export function App() {
+export default function App() {
 	return (
-		<Routes>
-			<Route element={<DashboardLayout />}>
-				<Route index element={<DashboardHomePage />} />
-				<Route path="cargo" element={<CargoPage />} />
-				<Route path="reportes" element={<ReportesPage />} />
-			</Route>
-			<Route path="*" element={<Navigate to="/" replace />} />
-		</Routes>
+		<BrowserRouter>
+			<Routes>
+				<Route
+					path="/*"
+					element={
+						<DashboardLayout>
+							<Routes>
+								<Route index element={<DashboardHomePage />} />
+								<Route
+									path="pedidos"
+									element={<Placeholder title="Pedidos" />}
+								/>
+								<Route
+									path="inventario"
+									element={<Placeholder title="Inventario" />}
+								/>
+								<Route
+									path="despachos"
+									element={<Placeholder title="Despachos" />}
+								/>
+								<Route
+									path="productos"
+									element={<Placeholder title="Productos" />}
+								/>
+								<Route
+									path="clientes"
+									element={<Placeholder title="Clientes" />}
+								/>
+								<Route
+									path="reportes"
+									element={<Placeholder title="Reportes" />}
+								/>
+								<Route
+									path="configuracion"
+									element={<Placeholder title="Configuracion" />}
+								/>
+							</Routes>
+						</DashboardLayout>
+					}
+				/>
+			</Routes>
+		</BrowserRouter>
+	);
+}
+
+function Placeholder({ title }: { title: string }) {
+	return (
+		<div className="flex flex-1 items-center justify-center rounded-lg border border-dashed p-8">
+			<p className="text-muted-foreground">{title} — proximamente</p>
+		</div>
 	);
 }

@@ -10,7 +10,6 @@ import { defineConfig, loadEnv } from "vite";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const monorepoRoot = path.resolve(__dirname, "../..");
 
-/** Una línea fija con el puerto para que se vea bien con `turbo run dev` (sin depender del banner por defecto). */
 function logClientUrl(): Plugin {
 	return {
 		name: "log-client-url",
@@ -26,7 +25,6 @@ function logClientUrl(): Plugin {
 	};
 }
 
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => {
 	const rootEnvPath = path.join(monorepoRoot, ".env");
 	const rootEnv = existsSync(rootEnvPath)
