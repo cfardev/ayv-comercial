@@ -44,6 +44,19 @@ Ejemplos: `feat(web): add product filters`, `fix(api): validate JWT expiry`, `ch
 
 Al implementar scripts, alinear `package.json` raíz y workspaces para que `pnpm` + Turborepo reflejen esta separación (por ejemplo `dev` que orqueste ambos, `build` que compile frontend y empaquete lo que Nest sirve).
 
+## PostgreSQL local (Docker)
+
+Opcional: **Docker** con **Compose v2** (`docker compose`) para una instancia de desarrollo sin instalar PostgreSQL en el host.
+
+| Acción | Comando |
+|--------|---------|
+| Levantar en segundo plano | `docker compose up -d` |
+| Parar (conserva datos en volumen) | `docker compose down` |
+| Parar y borrar el volumen de datos | `docker compose down -v` |
+
+- **Compose** lee un `.env` en la raíz del repo (mismo archivo que usa el monorepo) para `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_DB`. Valores por defecto si no están definidos: usuario `ayv`, contraseña `ayv`, base `ayv` (ver `.env.example`).
+- **`DATABASE_URL`** en el `.env` raíz debe usar las mismas credenciales y host `localhost`, puerto `5432` (ejemplo en `.env.example`). No commitear secretos reales; solo valores de desarrollo en el ejemplo.
+
 ## Qué priorizar en PRs / revisiones
 
 - Cambios acotados al workspace afectado; evitar refactors masivos no pedidos.
