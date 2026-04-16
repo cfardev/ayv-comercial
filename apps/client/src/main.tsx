@@ -1,7 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { App } from "./App";
 import "./index.css";
-
 
 const rootEl = document.getElementById("root");
 if (!rootEl) {
@@ -10,6 +12,10 @@ if (!rootEl) {
 
 createRoot(rootEl).render(
 	<StrictMode>
-		<h1>Hello World</h1>
+		<BrowserRouter>
+			<TooltipProvider>
+				<App />
+			</TooltipProvider>
+		</BrowserRouter>
 	</StrictMode>,
 );

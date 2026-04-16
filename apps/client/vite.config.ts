@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { parse } from "dotenv";
 import type { Plugin } from "vite";
@@ -41,6 +42,11 @@ export default defineConfig(({ mode }) => {
 		`http://localhost:${apiPort}`;
 
 	return {
+		resolve: {
+			alias: {
+				"@": path.resolve(__dirname, "./src"),
+			},
+		},
 		build: {
 			outDir: path.join(monorepoRoot, "dist/client"),
 			emptyOutDir: true,
@@ -57,6 +63,6 @@ export default defineConfig(({ mode }) => {
 				},
 			},
 		},
-		plugins: [react(), logClientUrl()],
+		plugins: [react(), tailwindcss(), logClientUrl()],
 	};
 });
