@@ -1,17 +1,32 @@
-import type { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
 import {
 	IconBox,
 	IconBuildingWarehouse,
 	IconChartBar,
-	IconPackages,
 	IconFileInvoice,
 	IconLayoutDashboard,
 	IconLogout,
+	IconPackages,
 	IconSettings,
 	IconTruck,
 	IconUsers,
 } from "@tabler/icons-react";
+import type { ReactNode } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbList,
+	BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
 	Sidebar,
 	SidebarContent,
@@ -28,20 +43,6 @@ import {
 	SidebarRail,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbList,
-	BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const navOperaciones = [
@@ -109,7 +110,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
 	return (
 		<TooltipProvider>
-			<SidebarProvider>
+			<SidebarProvider className="h-svh min-h-0 overflow-hidden">
 				<Sidebar>
 					<SidebarHeader>
 						<SidebarMenu>
@@ -191,8 +192,8 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 					</SidebarFooter>
 					<SidebarRail />
 				</Sidebar>
-				<SidebarInset>
-					<header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+				<SidebarInset className="min-h-0 overflow-hidden">
+					<header className="sticky top-0 z-10 flex h-12 shrink-0 items-center gap-2 border-b bg-background px-4">
 						<SidebarTrigger className="-ml-1" />
 						<Breadcrumb>
 							<BreadcrumbList>
@@ -201,8 +202,13 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 								</BreadcrumbItem>
 							</BreadcrumbList>
 						</Breadcrumb>
+						<div className="ml-auto">
+							<ModeToggle />
+						</div>
 					</header>
-					<main className="flex-1 overflow-auto p-4 lg:p-6">{children}</main>
+					<main className="min-h-0 flex-1 overflow-auto p-4 lg:p-6">
+						{children}
+					</main>
 				</SidebarInset>
 			</SidebarProvider>
 		</TooltipProvider>
