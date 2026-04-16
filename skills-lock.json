@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "1b6f82e889d19d305e38e35594de08eca0242321f353cafa4cf5e61dd3aa1a73"
     },
+    "prisma-expert": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "61edd53dd0b0f13c5902fef69336a16b2968aac386c0a29de6d595b3504297e1"
+    },
     "turborepo": {
       "source": "vercel/turborepo",
       "sourceType": "github",
