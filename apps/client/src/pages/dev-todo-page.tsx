@@ -79,6 +79,7 @@ export function DevTodoPage() {
 	});
 
 	const addTodoMutation = useMutation({
+		mutationKey: ["todos", "mutations", "add"],
 		mutationFn: createTodo,
 		onSuccess: async () => {
 			setTitle("");
@@ -87,6 +88,7 @@ export function DevTodoPage() {
 	});
 
 	const toggleTodoMutation = useMutation({
+		mutationKey: ["todos", "mutations", "toggle"],
 		mutationFn: updateTodo,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
@@ -94,6 +96,7 @@ export function DevTodoPage() {
 	});
 
 	const removeTodoMutation = useMutation({
+		mutationKey: ["todos", "mutations", "remove"],
 		mutationFn: removeTodo,
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
