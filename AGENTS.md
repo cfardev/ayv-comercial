@@ -8,12 +8,43 @@ Monorepo con **Turborepo** y **pnpm**: backoffice para una distribuidora de **el
 |------|----------|
 | Monorepo / tareas | Turborepo |
 | Paquetes | pnpm (workspaces) |
-| Frontend | React |
-| Backend | Node.js + NestJS |
+| Frontend | `apps/client`: React 19 + Vite (detalle abajo) |
+| Backend | `apps/api`: NestJS + Express + Prisma (detalle abajo) |
 | Base de datos | PostgreSQL |
 | ORM | Prisma |
+| Validación (cliente) | **Zod** |
+| Validación (API) | **class-validator** + **class-transformer** + **`ValidationPipe`** de Nest (DTOs con decoradores) |
 | Autenticación | JWT |
 | Lint / formato | Biome (una sola config en la raíz del repo) |
+
+### Frontend (`apps/client`)
+
+| Pieza | Tecnología |
+|-------|------------|
+| Bundler / dev server | **Vite** (`@vitejs/plugin-react`) |
+| UI | **shadcn/ui** (CLI `shadcn`, estilo Radix Vega en `components.json`) |
+| Primitivos accesibles | **Radix UI** (`radix-ui`) |
+| Iconos | **Tabler** (`@tabler/icons-react`) |
+| Estilos | **Tailwind CSS 4** (`tailwindcss`, `@tailwindcss/vite`), **tw-animate-css** |
+| Tema claro/oscuro | **next-themes** (atributo `class` + `.dark` en `index.css`) |
+| Routing | **react-router-dom** |
+| Esquemas / validación (formularios, etc.) | **Zod** |
+| Utilidades CSS / variantes | `class-variance-authority`, `clsx`, `tailwind-merge` |
+| Tipografía | Figtree Variable (`@fontsource-variable/figtree`) |
+
+### Backend (`apps/api`)
+
+| Pieza | Tecnología |
+|-------|------------|
+| Runtime | **Node.js** (módulos **ESM**: `type: "module"` en `package.json`) |
+| Framework | **NestJS** 11 (`@nestjs/core`, `@nestjs/common`, `@nestjs/platform-express`) |
+| HTTP | **Express** (stack por defecto de Nest vía `platform-express`) |
+| Configuración | **@nestjs/config**, **dotenv** |
+| Archivos estáticos / SPA | **@nestjs/serve-static** (alinear con el build de `apps/client` en prod) |
+| PostgreSQL | Driver **`pg`** (node-postgres) |
+| ORM | **Prisma 7** (`@prisma/client`, adaptador **`@prisma/adapter-pg`**, CLI `prisma` en dev) |
+| Validación (entrada HTTP) | **class-validator** + **class-transformer**; **`ValidationPipe`** global o por ruta sobre DTOs |
+| Reactividad / DI (Nest) | **RxJS**, **reflect-metadata** |
 
 ## Convenciones (obligatorias para cambios)
 
@@ -28,19 +59,30 @@ Mensajes de commit en inglés, imperativo, una idea por commit:
 
 `type(optional-scope): short description`
 
-- **type** (comunes): `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`.
+- **type** (comunes): `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `build`, `ci`, `chore`.
 - **scope**: opcional; en este monorepo conviene el workspace afectado (`api`, `web`, nombre del paquete, etc.) cuando ayude a filtrar historial.
 - **description**: corta (~50 caracteres), sin punto final; cuerpo opcional para el “por qué” o detalles.
 - **Cambios incompatibles**: `feat(api)!: ...` o pie `BREAKING CHANGE:` en el cuerpo del mensaje.
 
 Ejemplos: `feat(web): add product filters`, `fix(api): validate JWT expiry`, `chore: bump turbo`.
 
+## Versionado del proyecto
+
+- **SemVer** (`MAJOR.MINOR.PATCH`) para lo que se publique o etiquete como release del producto (imagen Docker, artefacto desplegable, tag `v*.*.*` en git).
+- **Versión canónica del monorepo**: el campo `version` del `package.json` en la **raíz** (`ayv-comercial`). Es la referencia para comunicar “qué versión del sistema” se despliega; alinearla con tags y notas de release cuando existan.
+- **Automático (CI)**: en cada push a **main** o **master**, el workflow **Release** (`.github/workflows/release.yml`) ejecuta **semantic-release** (no en cada commit local: solo al integrar en la rama por defecto): lee los commits desde el último tag `v*`, infiere el bump según **Conventional Commits** (`fix` → patch, `feat` → minor, `!` / `BREAKING CHANGE:` → major; `chore`/`docs`/… no disparan release por sí solos salvo reglas del analizador), actualiza `version` en la raíz, sincroniza `apps/api` y `apps/client` vía `scripts/sync-workspace-versions.mjs`, genera/actualiza **`CHANGELOG.md`**, hace commit con `[skip ci]` y crea el tag **`vX.Y.Z`**. No hace `npm publish` (repo privado).
+- **Local**: `pnpm release:dry-run` para ver qué versión saldría sin escribir ni pushear; `pnpm release` solo si tienes remoto y token configurados (lo habitual es dejar que lo haga GitHub Actions).
+- **Workspaces**: `apps/api` y `apps/client` siguen la **misma** `version` que la raíz tras cada release automático; no editar a mano salvo excepción documentada.
+- **Cambios incompatibles**: reflejarlos en el mensaje de commit (`!` o `BREAKING CHANGE:`) para que el próximo release suba **MAJOR**.
+- **Dependencias**: bumps de librerías no cuentan como “feature” del producto; usar `chore`/`build`/`ci` para que no inflen la versión de usuario salvo que el equipo decida contarlos (por defecto no disparan release relevante).
+- **CI/CD**: nombrar artefactos o imágenes con la versión del tag o del `package.json` raíz tras el workflow.
+
 ## Desarrollo vs producción
 
 | Modo | Objetivo |
 |------|----------|
-| **Dev** | Levantar **NestJS** y la app **React** en paralelo (hot reload en cada capa). |
-| **Prod** | Build estático del frontend React; **NestJS** sirve los assets del build (SPA/API bajo el mismo origen según diseño). |
+| **Dev** | Levantar **NestJS** y el cliente **Vite** (`apps/client`) en paralelo (hot reload en cada capa). |
+| **Prod** | Build estático del frontend (`vite build`); **NestJS** sirve los assets del build (SPA/API bajo el mismo origen según diseño). |
 
 Al implementar scripts, alinear `package.json` raíz y workspaces para que `pnpm` + Turborepo reflejen esta separación (por ejemplo `dev` que orqueste ambos, `build` que compile frontend y empaquete lo que Nest sirve).
 

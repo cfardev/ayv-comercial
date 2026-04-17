@@ -13,7 +13,9 @@
 		"db:generate": "pnpm --filter @ayv-comercial/api run db:generate",
 		"db:migrate": "pnpm --filter @ayv-comercial/api run db:migrate",
 		"db:push": "pnpm --filter @ayv-comercial/api run db:push",
-		"db:studio": "pnpm --filter @ayv-comercial/api run db:studio"
+		"db:studio": "pnpm --filter @ayv-comercial/api run db:studio",
+		"release": "semantic-release",
+		"release:dry-run": "semantic-release --dry-run"
 	},
 	"keywords": [],
 	"author": "",
@@ -27,6 +29,11 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
+		"@semantic-release/changelog": "^6.0.3",
+		"@semantic-release/exec": "^7.1.0",
+		"@semantic-release/git": "^10.0.1",
+		"@semantic-release/npm": "^13.1.5",
+		"semantic-release": "^24.2.9",
 		"turbo": "^2.7.5"
 	}
 }
