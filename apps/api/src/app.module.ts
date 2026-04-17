@@ -1,8 +1,10 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { APP_FILTER } from "@nestjs/core";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { AppController } from "./app.controller.js";
 import { AppService } from "./app.service.js";
+import { CatchEverythingFilter } from "./common/filters/catch-everything.filter.js";
 import { PrismaModule } from "./common/prisma/prisma.module.js";
 import {
 	CLIENT_DIST_PATH,
@@ -22,6 +24,12 @@ import {
 		}),
 	],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [
+		AppService,
+		{
+			provide: APP_FILTER,
+			useClass: CatchEverythingFilter,
+		},
+	],
 })
 export class AppModule {}

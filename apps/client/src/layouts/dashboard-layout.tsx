@@ -106,7 +106,7 @@ function NavGroup({
 export function DashboardLayout({ children }: { children: ReactNode }) {
 	const location = useLocation();
 	const currentPath = location.pathname;
-	const pageTitle = pageTitles[currentPath] ?? "AYV Comercial";
+	const pageTitle = pageTitles[currentPath] ?? "A&V";
 
 	return (
 		<TooltipProvider>
@@ -123,7 +123,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 											</div>
 											<div className="flex flex-col leading-none">
 												<span className="font-semibold text-sm">
-													AYV Comercial
+													A&amp;V
 												</span>
 												<span className="text-xs text-muted-foreground">
 													Inventario y Facturación

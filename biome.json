@@ -53,6 +53,16 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": ["apps/api/**/*.filter.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useImportType": "off"
+					}
+				}
+			}
 		}
 	]
 }
