@@ -8,8 +8,8 @@ Monorepo con **Turborepo** y **pnpm**: backoffice para una distribuidora de **el
 |------|----------|
 | Monorepo / tareas | Turborepo |
 | Paquetes | pnpm (workspaces) |
-| Frontend | `apps/client`: React 19 + Vite (detalle abajo) |
-| Backend | `apps/api`: NestJS + Express + Prisma (detalle abajo) |
+| Frontend | `apps/client`: React 19 + Vite + **TypeScript** (detalle abajo) |
+| Backend | `apps/api`: NestJS + Express + Prisma + **TypeScript** (detalle abajo) |
 | Base de datos | PostgreSQL |
 | ORM | Prisma |
 | Validación (cliente) | **Zod** |
@@ -51,6 +51,7 @@ Monorepo con **Turborepo** y **pnpm**: backoffice para una distribuidora de **el
 - **Turborepo**: pipelines, caché y dependencias entre apps/paquetes vía `turbo.json` y `package.json` de cada workspace; preferir `pnpm turbo` / filtros (`--filter`) según corresponda.
 - **Variables de entorno**: un único `.env` compartido a nivel de raíz del monorepo (o documentar en `.env.example` qué claves usa cada app). No duplicar secretos por paquete salvo que el stack lo exija explícitamente.
 - **Skills del proyecto**: viven en `.agents/skills/` (compartidas; no duplicar lógica en copias locales fuera del repo).
+- **Lenguaje**: usar **TypeScript** tanto en `apps/client` como en `apps/api`; evitar JavaScript sin tipado salvo scripts puntuales.
 - **Código**: respetar Biome; no introducir ESLint/Prettier paralelos salvo decisión explícita del equipo.
 
 ## Conventional commits

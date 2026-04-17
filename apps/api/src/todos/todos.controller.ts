@@ -7,8 +7,8 @@ import {
 	Patch,
 	Post,
 } from "@nestjs/common";
-import type { CreateTodoDto } from "./dto/create-todo.dto.js";
-import type { UpdateTodoDto } from "./dto/update-todo.dto.js";
+import { CreateTodoDto } from "./dto/create-todo.dto.js";
+import { UpdateTodoDto } from "./dto/update-todo.dto.js";
 import { TodosService } from "./todos.service.js";
 
 @Controller("todos")
