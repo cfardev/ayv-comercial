@@ -81,25 +81,70 @@ export function DevTodoPage() {
 	const addTodoMutation = useMutation({
 		mutationKey: ["todos", "mutations", "add"],
 		mutationFn: createTodo,
-		onSuccess: async () => {
+		onMutate: async (title) => {
+			await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY });
+			const previous = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY);
+			const optimisticTodo: Todo = {
+				id: `temp-${Date.now()}`,
+				title,
+				done: false,
+				createdAt: new Date().toISOString(),
+			};
+			queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old) =>
+				old ? [...old, optimisticTodo] : [optimisticTodo],
+			);
 			setTitle("");
-			await queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
+			return { previous };
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous !== undefined) {
+				queryClient.setQueryData(TODOS_QUERY_KEY, context.previous);
+			}
+		},
+		onSettled: () => {
+			void queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
 		},
 	});
 
 	const toggleTodoMutation = useMutation({
 		mutationKey: ["todos", "mutations", "toggle"],
 		mutationFn: updateTodo,
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
+		onMutate: async (newTodo) => {
+			await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY });
+			const previous = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY);
+			queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old) =>
+				old?.map((t) => (t.id === newTodo.id ? { ...t, done: newTodo.done } : t)),
+			);
+			return { previous };
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous !== undefined) {
+				queryClient.setQueryData(TODOS_QUERY_KEY, context.previous);
+			}
+		},
+		onSettled: () => {
+			void queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
 		},
 	});
 
 	const removeTodoMutation = useMutation({
 		mutationKey: ["todos", "mutations", "remove"],
 		mutationFn: removeTodo,
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
+		onMutate: async (id) => {
+			await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY });
+			const previous = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY);
+			queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old) =>
+				old?.filter((t) => t.id !== id),
+			);
+			return { previous };
+		},
+		onError: (_err, _vars, context) => {
+			if (context?.previous !== undefined) {
+				queryClient.setQueryData(TODOS_QUERY_KEY, context.previous);
+			}
+		},
+		onSettled: () => {
+			void queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
 		},
 	});
 
@@ -118,7 +163,7 @@ export function DevTodoPage() {
 		e.preventDefault();
 		const nextTitle = title.trim();
 		if (!nextTitle || addTodoMutation.isPending) return;
-		addTodoMutation.mutate(nextTitle);
+		void addTodoMutation.mutate(nextTitle);
 	}
 
 	function toggleDone(todo: Todo) {
@@ -140,7 +185,12 @@ export function DevTodoPage() {
 		<div className="mx-auto max-w-lg space-y-4">
 			<Card>
 				<CardHeader>
-					<CardTitle>TODO (dev)</CardTitle>
+					<div className="flex items-center gap-2">
+						<CardTitle>TODO (dev)</CardTitle>
+						{isRefetching && (
+							<span className="text-muted-foreground text-xs">Actualizando…</span>
+						)}
+					</div>
 					<CardDescription>
 						Lista persistente vía API — prueba crear, marcar y borrar.
 					</CardDescription>
@@ -161,10 +211,6 @@ export function DevTodoPage() {
 
 					{errorMessage ? (
 						<p className="text-destructive text-sm">{errorMessage}</p>
-					) : null}
-
-					{isRefetching ? (
-						<p className="text-muted-foreground text-sm">Actualizando…</p>
 					) : null}
 
 					{isLoading ? (
