@@ -2,6 +2,7 @@ node_modules
 dist
 .turbo
 **/src/generated/prisma
+**/generated/prisma
 coverage
 *.log
 npm-debug.log*
@@ -19,3 +20,5 @@ pnpm-debug.log*
 .env.development.local.example
 .env.test.local.example
 .env.production.local.example
+
+opencode.json

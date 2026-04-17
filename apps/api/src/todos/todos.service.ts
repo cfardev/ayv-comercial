@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../common/prisma/prisma.service.js";
-import { Prisma } from "../generated/prisma/client.js";
+import { Prisma } from "../../generated/prisma/client.js";
 import type { CreateTodoDto } from "./dto/create-todo.dto.js";
 import type { UpdateTodoDto } from "./dto/update-todo.dto.js";
 
