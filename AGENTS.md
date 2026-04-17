@@ -71,12 +71,13 @@ Ejemplos: `feat(web): add product filters`, `fix(api): validate JWT expiry`, `ch
 
 - **SemVer** (`MAJOR.MINOR.PATCH`) para lo que se publique o etiquete como release del producto (imagen Docker, artefacto desplegable, tag `v*.*.*` en git).
 - **Versión canónica del monorepo**: el campo `version` del `package.json` en la **raíz** (`ayv-comercial`). Es la referencia para comunicar “qué versión del sistema” se despliega; alinearla con tags y notas de release cuando existan.
-- **Automático (CI)**: en cada push a **main** o **master**, el workflow **Release** (`.github/workflows/release.yml`) ejecuta **semantic-release** (no en cada commit local: solo al integrar en la rama por defecto): lee los commits desde el último tag `v*`, infiere el bump según **Conventional Commits** (`fix` → patch, `feat` → minor, `!` / `BREAKING CHANGE:` → major; `chore`/`docs`/… no disparan release por sí solos salvo reglas del analizador), actualiza `version` en la raíz, sincroniza `apps/api` y `apps/client` vía `scripts/sync-workspace-versions.mjs`, genera/actualiza **`CHANGELOG.md`**, hace commit con `[skip ci]` y crea el tag **`vX.Y.Z`**. No hace `npm publish` (repo privado).
-- **Local**: `pnpm release:dry-run` para ver qué versión saldría sin escribir ni pushear; `pnpm release` solo si tienes remoto y token configurados (lo habitual es dejar que lo haga GitHub Actions).
-- **Workspaces**: `apps/api` y `apps/client` siguen la **misma** `version` que la raíz tras cada release automático; no editar a mano salvo excepción documentada.
+- **Sin automatización de release**: este repo no usa **semantic-release**, ni scripts, ni workflows automáticos para versionar/publicar.
+- **Responsabilidad del agente**: cuando se pida versionar o preparar un release, el agente debe encargarse del proceso manual completo: calcular el bump (según Conventional Commits o instrucción explícita), actualizar la `version` en `package.json` raíz y en `apps/api/package.json` + `apps/client/package.json`, y actualizar `CHANGELOG.md` si aplica.
+- **Workspaces**: `apps/api` y `apps/client` deben mantener la **misma** `version` que la raíz en cada release; no editar versiones de forma aislada salvo excepción documentada.
+- **Ejecución controlada**: no crear tags remotos ni hacer push de release sin solicitud explícita del usuario.
 - **Cambios incompatibles**: reflejarlos en el mensaje de commit (`!` o `BREAKING CHANGE:`) para que el próximo release suba **MAJOR**.
 - **Dependencias**: bumps de librerías no cuentan como “feature” del producto; usar `chore`/`build`/`ci` para que no inflen la versión de usuario salvo que el equipo decida contarlos (por defecto no disparan release relevante).
-- **CI/CD**: nombrar artefactos o imágenes con la versión del tag o del `package.json` raíz tras el workflow.
+- **CI/CD**: nombrar artefactos o imágenes con la versión del tag o del `package.json` raíz definido para el release en curso.
 
 ## Desarrollo vs producción
 
