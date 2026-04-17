@@ -14,3 +14,12 @@ model SchemaMeta {
 
 	@@map("schema_meta")
 }
+
+model Todo {
+	id        String   @id @default(cuid())
+	title     String
+	done      Boolean  @default(false)
+	createdAt DateTime @default(now())
+
+	@@map("todos")
+}

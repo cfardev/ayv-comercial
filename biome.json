@@ -46,6 +46,24 @@
 		},
 		{
 			"includes": ["apps/api/**/*.controller.ts"],
+			"javascript": {
+				"parser": {
+					"unsafeParameterDecoratorsEnabled": true
+				}
+			},
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnusedFunctionParameters": "off"
+					},
+					"style": {
+						"useImportType": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["apps/api/**/*.filter.ts"],
 			"linter": {
 				"rules": {
 					"style": {
@@ -55,7 +73,7 @@
 			}
 		},
 		{
-			"includes": ["apps/api/**/*.filter.ts"],
+			"includes": ["apps/api/**/*.service.ts"],
 			"linter": {
 				"rules": {
 					"style": {

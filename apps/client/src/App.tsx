@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
+import { DevTodoPage } from "@/pages/dev-todo-page";
 
 export default function App() {
 	return (
@@ -40,6 +41,7 @@ export default function App() {
 									path="configuracion"
 									element={<Placeholder title="Configuracion" />}
 								/>
+								<Route path="dev/todo" element={<DevTodoPage />} />
 							</Routes>
 						</DashboardLayout>
 					}

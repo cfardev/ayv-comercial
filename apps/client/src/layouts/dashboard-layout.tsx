@@ -2,6 +2,7 @@ import {
 	IconBox,
 	IconBuildingWarehouse,
 	IconChartBar,
+	IconChecklist,
 	IconFileInvoice,
 	IconLayoutDashboard,
 	IconLogout,
@@ -60,6 +61,7 @@ const navCatalogo = [
 const navReportes = [
 	{ title: "Reportes", url: "/reportes", icon: IconChartBar },
 	{ title: "Configuracion", url: "/configuracion", icon: IconSettings },
+	{ title: "TODO (dev)", url: "/dev/todo", icon: IconChecklist },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -71,6 +73,7 @@ const pageTitles: Record<string, string> = {
 	"/clientes": "Clientes",
 	"/reportes": "Reportes",
 	"/configuracion": "Configuracion",
+	"/dev/todo": "TODO (dev)",
 };
 
 function NavGroup({
@@ -122,9 +125,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 												<IconBuildingWarehouse className="size-4" />
 											</div>
 											<div className="flex flex-col leading-none">
-												<span className="font-semibold text-sm">
-													A&amp;V
-												</span>
+												<span className="font-semibold text-sm">A&amp;V</span>
 												<span className="text-xs text-muted-foreground">
 													Inventario y Facturación
 												</span>
