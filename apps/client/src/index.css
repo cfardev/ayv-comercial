@@ -123,6 +123,50 @@
 	--sidebar-ring: oklch(0.55 0.22 277);
 }
 
+@keyframes slide-in-from-top {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slide-out-to-top {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
+
+@keyframes slide-in-from-bottom {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slide-out-to-bottom {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+}
+
 @layer base {
 	* {
 		@apply border-border outline-ring/50;
@@ -133,4 +177,12 @@
 	html {
 		@apply font-sans;
 	}
+}
+
+.animate-in {
+	animation: slide-in-from-top 300ms ease-out;
+}
+
+.animate-out {
+	animation: slide-out-to-top 250ms ease-in forwards;
 }

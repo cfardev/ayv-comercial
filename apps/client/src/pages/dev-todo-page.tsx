@@ -2,6 +2,7 @@ import { IconTrash } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
 	Card,
 	CardContent,
@@ -16,7 +17,11 @@ type Todo = {
 	title: string;
 	done: boolean;
 	createdAt: string;
+	isNew?: boolean;
 };
+
+type NewTodoIds = Set<string>;
+type RemovingTodoIds = Set<string>;
 
 type UpdateTodoInput = {
 	id: string;
@@ -72,6 +77,10 @@ async function removeTodo(id: string) {
 export function DevTodoPage() {
 	const queryClient = useQueryClient();
 	const [title, setTitle] = useState("");
+	const [newTodoIds, setNewTodoIds] = useState<NewTodoIds>(new Set());
+	const [removingTodoIds, setRemovingTodoIds] = useState<RemovingTodoIds>(
+		new Set(),
+	);
 
 	const todosQuery = useQuery({
 		queryKey: TODOS_QUERY_KEY,
@@ -81,15 +90,18 @@ export function DevTodoPage() {
 	const addTodoMutation = useMutation({
 		mutationKey: ["todos", "mutations", "add"],
 		mutationFn: createTodo,
-		onMutate: async (title) => {
+		onMutate: async (newTitle) => {
 			await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY });
 			const previous = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY);
+			const tempId = `temp-${Date.now()}`;
 			const optimisticTodo: Todo = {
-				id: `temp-${Date.now()}`,
-				title,
+				id: tempId,
+				title: newTitle,
 				done: false,
 				createdAt: new Date().toISOString(),
+				isNew: true,
 			};
+			setNewTodoIds((prev) => new Set(prev).add(tempId));
 			queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old) =>
 				old ? [...old, optimisticTodo] : [optimisticTodo],
 			);
@@ -100,6 +112,16 @@ export function DevTodoPage() {
 			if (context?.previous !== undefined) {
 				queryClient.setQueryData(TODOS_QUERY_KEY, context.previous);
 			}
+			setNewTodoIds((prev) => {
+				const next = new Set(prev);
+				return next;
+			});
+		},
+		onSuccess: () => {
+			setNewTodoIds((prev) => {
+				const next = new Set(prev);
+				return next;
+			});
 		},
 		onSettled: () => {
 			void queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
@@ -113,7 +135,9 @@ export function DevTodoPage() {
 			await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY });
 			const previous = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY);
 			queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old) =>
-				old?.map((t) => (t.id === newTodo.id ? { ...t, done: newTodo.done } : t)),
+				old?.map((t) =>
+					t.id === newTodo.id ? { ...t, done: newTodo.done } : t,
+				),
 			);
 			return { previous };
 		},
@@ -133,17 +157,24 @@ export function DevTodoPage() {
 		onMutate: async (id) => {
 			await queryClient.cancelQueries({ queryKey: TODOS_QUERY_KEY });
 			const previous = queryClient.getQueryData<Todo[]>(TODOS_QUERY_KEY);
-			queryClient.setQueryData<Todo[]>(TODOS_QUERY_KEY, (old) =>
-				old?.filter((t) => t.id !== id),
-			);
+			setRemovingTodoIds((prev) => new Set(prev).add(id));
 			return { previous };
 		},
 		onError: (_err, _vars, context) => {
 			if (context?.previous !== undefined) {
 				queryClient.setQueryData(TODOS_QUERY_KEY, context.previous);
 			}
+			setRemovingTodoIds((prev) => {
+				const next = new Set(prev);
+				return next;
+			});
 		},
-		onSettled: () => {
+		onSettled: (_data, _error, id) => {
+			setRemovingTodoIds((prev) => {
+				const next = new Set(prev);
+				next.delete(id);
+				return next;
+			});
 			void queryClient.invalidateQueries({ queryKey: TODOS_QUERY_KEY });
 		},
 	});
@@ -188,7 +219,9 @@ export function DevTodoPage() {
 					<div className="flex items-center gap-2">
 						<CardTitle>TODO (dev)</CardTitle>
 						{isRefetching && (
-							<span className="text-muted-foreground text-xs">Actualizando…</span>
+							<span className="text-muted-foreground text-xs">
+								Actualizando…
+							</span>
 						)}
 					</div>
 					<CardDescription>
@@ -220,18 +253,22 @@ export function DevTodoPage() {
 					) : (
 						<ul className="space-y-2">
 							{todos.map((todo) => {
+								const isNewTodo = newTodoIds.has(todo.id);
+								const isRemovingTodo = removingTodoIds.has(todo.id);
 								const isTogglingTodo =
 									toggleTodoMutation.isPending &&
 									toggleTodoMutation.variables?.id === todo.id;
-								const isRemovingTodo =
-									removeTodoMutation.isPending &&
-									removeTodoMutation.variables === todo.id;
-								const isTodoPending = isTogglingTodo || isRemovingTodo;
+								const isTodoPending =
+									isTogglingTodo || isRemovingTodo || isNewTodo;
 
 								return (
 									<li
 										key={todo.id}
-										className="flex items-center gap-3 rounded-md border p-2"
+										className={cn(
+											"flex items-center gap-3 rounded-md border p-2",
+											isNewTodo && "animate-in",
+											isRemovingTodo && "animate-out",
+										)}
 									>
 										<input
 											type="checkbox"

@@ -14,12 +14,12 @@ import { TodosModule } from "./todos/todos.module.js";
 
 @Module({
 	imports: [
-		PrismaModule,
-		TodosModule,
 		ConfigModule.forRoot({
 			isGlobal: true,
 			envFilePath: MONOREPO_ROOT_ENV_FILE,
 		}),
+		PrismaModule,
+		TodosModule,
 		ServeStaticModule.forRoot({
 			rootPath: CLIENT_DIST_PATH,
 			exclude: ["/api", "/api/*path"],
