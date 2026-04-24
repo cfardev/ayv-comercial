@@ -10,7 +10,6 @@ import {
 	CLIENT_DIST_PATH,
 	MONOREPO_ROOT_ENV_FILE,
 } from "./common/utils/monorepo-paths.js";
-import { TodosModule } from "./todos/todos.module.js";
 
 @Module({
 	imports: [
@@ -19,7 +18,6 @@ import { TodosModule } from "./todos/todos.module.js";
 			envFilePath: MONOREPO_ROOT_ENV_FILE,
 		}),
 		PrismaModule,
-		TodosModule,
 		ServeStaticModule.forRoot({
 			rootPath: CLIENT_DIST_PATH,
 			exclude: ["/api", "/api/*path"],
