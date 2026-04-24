@@ -8,14 +8,14 @@ Registrar, consultar, modificar y desactivar usuarios que accederán al sistema,
 
 ## Actores
 
-- Administrador
-- Sistema de usuarios
+- A: Administrador
+- A: Sistema de usuarios
 
 ## Precondiciones
 
-- El actor está autenticado en el sistema.
-- El actor tiene permiso para gestionar usuarios.
-- Existe al menos un rol definido en el sistema (referencia CU03).
+- A: El actor está autenticado en el sistema.
+- A: El actor tiene permiso para gestionar usuarios.
+- A: Existe al menos un rol definido en el sistema (referencia CU03).
 
 ## Disparador
 
@@ -68,50 +68,50 @@ El actor selecciona la opción "Gestión de usuarios" desde su menú de administ
 
 ### FA1 - Correo o usuario duplicado
 
-- Si el correo o nombre de usuario ya existe, el sistema muestra un mensaje de error indicando cuál campo está duplicado y no permite el registro.
+- A: Si el correo o nombre de usuario ya existe, el sistema muestra un mensaje de error indicando cuál campo está duplicado y no permite el registro.
 
 ### FA2 - Datos incompletos en registro/edición
 
-- Si faltan campos obligatorios, el sistema muestra validaciones en el formulario y no envía la solicitud.
+- A: Si faltan campos obligatorios, el sistema muestra validaciones en el formulario y no envía la solicitud.
 
 ### FA3 - Desactivar su propia cuenta
 
-- Si el actor intenta desactivarse a sí mismo, el sistema muestra un error indicando que no puede realizar esta acción sobre su propia cuenta.
+- A: Si el actor intenta desactivarse a sí mismo, el sistema muestra un error indicando que no puede realizar esta acción sobre su propia cuenta.
 
 ### FA4 - Contraseña débil
 
-- Si la contraseña no cumple con requisitos mínimos (8 caracteres, mayúscula, número), el sistema muestra el requisito específico y no permite el registro.
+- A: Si la contraseña no cumple con requisitos mínimos (8 caracteres, mayúscula, número), el sistema muestra el requisito específico y no permite el registro.
 
 ## Postcondiciones
 
-- Registro exitoso: el nuevo usuario queda creado con estado activo y puede iniciar sesión.
-- Edición exitosa: los cambios quedan aplicados al usuario.
-- Desactivación exitosa: el usuario no puede iniciar sesión; sus datos permanecen en la base de datos.
-- En cualquier caso fallido, no se modifica el estado del usuario.
+- A: Registro exitoso: el nuevo usuario queda creado con estado activo y puede iniciar sesión.
+- A: Edición exitosa: los cambios quedan aplicados al usuario.
+- A: Desactivación exitosa: el usuario no puede iniciar sesión; sus datos permanecen en la base de datos.
+- A: En cualquier caso fallido, no se modifica el estado del usuario.
 
 ## Reglas de negocio
 
-- Todo usuario debe tener un rol asignado.
-- No puede haber dos usuarios con el mismo correo electrónico.
-- No puede haber dos usuarios con el mismo nombre de usuario.
-- Los usuarios desactivados no pueden iniciar sesión.
-- Un usuario administrador no puede ser desactivado por sí mismo.
-- La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula y un número.
+- A: Todo usuario debe tener un rol asignado.
+- A: No puede haber dos usuarios con el mismo correo electrónico.
+- A: No puede haber dos usuarios con el mismo nombre de usuario.
+- A: Los usuarios desactivados no pueden iniciar sesión.
+- A: Un usuario administrador no puede ser desactivado por sí mismo.
+- A: La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula y un número.
 
 ## Reglas de seguridad
 
-- Las contraseñas se almacenan utilizando hashbcrypt con costo 12.
-- No se muestra el mensaje de error diferenciado para correo o usuario inexistente (prevenir enumeración).
-- Solo usuarios con rol administrador pueden crear, editar o desactivar usuarios.
-- Todas las operaciones de gestión de usuarios quedan registradas con usuario responsable, fecha y hora.
+- A: Las contraseñas se almacenan utilizando hashbcrypt con costo 12.
+- A: No se muestra el mensaje de error diferenciado para correo o usuario inexistente (prevenir enumeración).
+- A: Solo usuarios con rol administrador pueden crear, editar o desactivar usuarios.
+- A: Todas las operaciones de gestión de usuarios quedan registradas con usuario responsable, fecha y hora.
 
 ## Criterios de aceptación
 
-- Un administrador puede crear un nuevo usuario con datos válidos y recibe confirmación.
-- Un administrador puede editar los datos de un usuario existente.
-- Un administrador puede desactivar un usuario y este pierde acceso.
-- Un administrador puede reactivar un usuario inactivo.
-- Un usuario inactivo no puede iniciar sesión.
-- El sistema rechaza registro con correo o usuario duplicado.
-- El sistema muestra errores claros cuando los campos no cumplen validación.
-- Un usuario no puede desactivarse a sí mismo.
+- A: Un administrador puede crear un nuevo usuario con datos válidos y recibe confirmación.
+- A: Un administrador puede editar los datos de un usuario existente.
+- A: Un administrador puede desactivar un usuario y este pierde acceso.
+- A: Un administrador puede reactivar un usuario inactivo.
+- A: Un usuario inactivo no puede iniciar sesión.
+- A: El sistema rechaza registro con correo o usuario duplicado.
+- A: El sistema muestra errores claros cuando los campos no cumplen validación.
+- A: Un usuario no puede desactivarse a sí mismo.

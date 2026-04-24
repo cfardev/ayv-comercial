@@ -1,25 +1,265 @@
 generator client {
-	provider = "prisma-client"
-	output   = "../generated/prisma"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-	provider = "postgresql"
+  provider = "postgresql"
 }
 
-/// Ancla inicial para la primera migración; reemplazar o extender con modelos de dominio.
-model SchemaMeta {
-	id        Int      @id @default(autoincrement())
-	createdAt DateTime @default(now())
-
-	@@map("schema_meta")
+enum UserStatus {
+  ACTIVE
+  INACTIVE
 }
 
-model Todo {
-	id        String   @id @default(cuid())
-	title     String
-	done      Boolean  @default(false)
-	createdAt DateTime @default(now())
+enum RoleName {
+  ADMIN
+  SELLER
+  INVENTORY_MANAGER
+  DISPATCH_MANAGER
+  OWNER_MANAGER
+}
 
-	@@map("todos")
+enum MovementType {
+  ENTRY
+  EXIT
+  ADJUSTMENT
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PREPARATION
+  READY
+  DELIVERED
+}
+
+enum InvoiceStatus {
+  ACTIVE
+  ANNULLED
+}
+
+model User {
+  id        String     @id @default(cuid()) @map("id")
+  name      String     @map("name")
+  email     String     @unique @map("email")
+  username  String     @unique @map("username")
+  password  String     @map("password")
+  status    UserStatus @default(ACTIVE) @map("status")
+  roleId    String     @map("role_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  role               Role                @relation(fields: [roleId], references: [id])
+  sales              Sale[]
+  inventoryMovements InventoryMovement[]
+
+  @@index([email])
+  @@index([username])
+  @@index([roleId])
+  @@map("users")
+}
+
+model Role {
+  id        String    @id @default(cuid()) @map("id")
+  name      RoleName  @unique @map("name")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  permissions RolePermission[]
+  users       User[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String    @id @default(cuid()) @map("id")
+  name        String    @unique @map("name")
+  description String?   @map("description")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id            String @id @default(cuid()) @map("id")
+  roleId        String @map("role_id")
+  permissionId  String @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model Category {
+  id          String   @id @default(cuid()) @map("id")
+  name        String   @unique @map("name")
+  description String?  @map("description")
+  status      Boolean  @default(true) @map("status")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@index([name])
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(cuid()) @map("id")
+  name        String   @map("name")
+  description String?  @map("description")
+  cost        Decimal  @db.Decimal(12, 2) @map("cost")
+  price       Decimal  @db.Decimal(12, 2) @map("price")
+  status      Boolean  @default(true) @map("status")
+  categoryId  String   @map("category_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  category           Category           @relation(fields: [categoryId], references: [id])
+  inventory          Inventory[]
+  inventoryMovements InventoryMovement[]
+  saleItems          SaleItem[]
+
+  @@index([categoryId])
+  @@index([name])
+  @@map("products")
+}
+
+model Inventory {
+  id         String   @id @default(cuid()) @map("id")
+  productId  String   @map("product_id")
+  quantity   Int      @default(0) @map("quantity")
+  location   String   @map("location")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, location])
+  @@index([productId])
+  @@map("inventory")
+}
+
+model InventoryMovement {
+  id               String        @id @default(cuid()) @map("id")
+  productId        String        @map("product_id")
+  type             MovementType  @map("type")
+  quantity         Int           @map("quantity")
+  previousQuantity Int?          @map("previous_quantity")
+  newQuantity      Int?          @map("new_quantity")
+  reason           String?       @map("reason")
+  userId           String        @map("user_id")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("inventory_movements")
+}
+
+model Client {
+  id        String   @id @default(cuid()) @map("id")
+  name      String   @map("name")
+  email     String?  @map("email")
+  phone     String?  @map("phone")
+  address   String?  @map("address")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sales  Sale[]
+  orders Order[]
+
+  @@index([name])
+  @@map("clients")
+}
+
+model Sale {
+  id        String   @id @default(cuid()) @map("id")
+  total     Decimal  @db.Decimal(12, 2) @map("total")
+  clientId  String   @map("client_id")
+  sellerId  String   @map("seller_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  client  Client     @relation(fields: [clientId], references: [id])
+  seller  User       @relation(fields: [sellerId], references: [id])
+  items   SaleItem[]
+  invoice Invoice?
+
+  @@index([clientId])
+  @@index([sellerId])
+  @@index([createdAt])
+  @@map("sales")
+}
+
+model SaleItem {
+  id          String   @id @default(cuid()) @map("id")
+  saleId      String   @map("sale_id")
+  productId   String   @map("product_id")
+  quantity    Int      @map("quantity")
+  unitPrice   Decimal  @db.Decimal(12, 2) @map("unit_price")
+  subtotal    Decimal  @db.Decimal(12, 2) @map("subtotal")
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([saleId])
+  @@index([productId])
+  @@map("sale_items")
+}
+
+model Invoice {
+  id               String        @id @default(cuid()) @map("id")
+  number           String        @unique @map("number")
+  saleId           String        @unique @map("sale_id")
+  status           InvoiceStatus @default(ACTIVE) @map("status")
+  annulmentReason  String?       @map("annulment_reason")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  sale Sale @relation(fields: [saleId], references: [id])
+
+  @@index([saleId])
+  @@index([number])
+  @@index([status])
+  @@map("invoices")
+}
+
+model Order {
+  id        String      @id @default(cuid()) @map("id")
+  clientId  String      @map("client_id")
+  total     Decimal     @db.Decimal(12, 2) @map("total")
+  status    OrderStatus @default(PENDING) @map("status")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  client         Client           @relation(fields: [clientId], references: [id])
+  dispatchOrders DispatchOrder[]
+
+  @@index([clientId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model DispatchOrder {
+  id            String    @id @default(cuid()) @map("id")
+  orderId       String    @map("order_id")
+  destination   String    @map("destination")
+  packages      Int       @map("packages")
+  carrier       String?   @map("carrier")
+  departureDate DateTime? @map("departure_date")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@map("dispatch_orders")
 }

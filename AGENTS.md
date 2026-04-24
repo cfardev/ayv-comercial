@@ -53,6 +53,8 @@ Monorepo con **Turborepo** y **pnpm**: backoffice para una distribuidora de **el
 - **Skills del proyecto**: viven en `.agents/skills/` (compartidas; no duplicar lógica en copias locales fuera del repo).
 - **Lenguaje**: usar **TypeScript** tanto en `apps/client` como en `apps/api`; evitar JavaScript sin tipado salvo scripts puntuales.
 - **Código**: respetar Biome; no introducir ESLint/Prettier paralelos salvo decisión explícita del equipo.
+- **Idioma del código**: TODO el código, nombres de variables, funciones, modelos, campos, mensajes de error, comentarios y configuraciones deben estar en **inglés**. Las únicas excepciones son textos hardcoded que se muestran directamente al usuario final (labels UI, mensajes de validación, etc.) — estos pueden estar en español si el proyecto lo requiere.
+- **Prisma schema**: usar `camelCase` en los modelos y campos del schema (API TypeScript); usar `@map` a nivel de cada campo y `@@map` en el modelo para mapear a `lower_snake_case` en PostgreSQL. Todo modelo debe tener su `@@map` explícito.
 
 ## Conventional commits
 

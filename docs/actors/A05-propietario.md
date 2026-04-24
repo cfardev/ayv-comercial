@@ -1,4 +1,4 @@
-# Actor 05: Propietario o Gerente
+# Actor 05: Propietario
 
 ## Descripción
 

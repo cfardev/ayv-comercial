@@ -12,6 +12,7 @@
 		"format": "biome format --write .",
 		"db:generate": "pnpm --filter @ayv-comercial/api run db:generate",
 		"db:migrate": "pnpm --filter @ayv-comercial/api run db:migrate",
+		"db:migrate:dev": "pnpm --filter @ayv-comercial/api run db:migrate:dev",
 		"db:push": "pnpm --filter @ayv-comercial/api run db:push",
 		"db:studio": "pnpm --filter @ayv-comercial/api run db:studio"
 	},
