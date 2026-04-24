@@ -1,7 +1,7 @@
-import { PrismaClient } from "../generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
-import type { RoleName, UserStatus } from "../generated/prisma/client.js";
 import bcrypt from "bcryptjs";
+import type { RoleName, UserStatus } from "../generated/prisma/client.js";
+import { PrismaClient } from "../generated/prisma/client.js";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {

@@ -1,14 +1,17 @@
 import {
-	IconArrowUpRight,
-	IconArrowDownRight,
-	IconPackage,
-	IconCurrencyDollar,
-	IconTruck,
 	IconAlertTriangle,
+	IconArrowDownRight,
+	IconArrowUpRight,
 	IconCircleCheck,
 	IconClock,
+	IconCurrencyDollar,
 	IconMapPin,
+	IconPackage,
+	IconTruck,
 } from "@tabler/icons-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -16,8 +19,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import {
 	Table,
 	TableBody,
@@ -26,9 +29,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 
 /* ── hardcoded data ─────────────────────────────────────── */
 
