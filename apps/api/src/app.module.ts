@@ -26,6 +26,7 @@ import {
 			imports: [ConfigModule],
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => ({
+				forRoutes: ["*path"],
 				pinoHttp: createPinoHttpOptions(configService),
 			}),
 		}),
