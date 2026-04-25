@@ -46,7 +46,7 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		build: {
-			outDir: path.join(monorepoRoot, "dist/client"),
+			outDir: path.join(__dirname, "dist"),
 			emptyOutDir: true,
 		},
 		clearScreen: false,

@@ -4,7 +4,6 @@ import {
 	type ExceptionFilter,
 	HttpException,
 	HttpStatus,
-	Logger,
 } from "@nestjs/common";
 import { HttpAdapterHost } from "@nestjs/core";
 
@@ -16,8 +15,6 @@ type HttpExceptionResponse = {
 
 @Catch()
 export class CatchEverythingFilter implements ExceptionFilter {
-	private readonly logger = new Logger(CatchEverythingFilter.name);
-
 	constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
 	catch(exception: unknown, host: ArgumentsHost): void {
@@ -25,6 +22,7 @@ export class CatchEverythingFilter implements ExceptionFilter {
 		const ctx = host.switchToHttp();
 		const request = ctx.getRequest<{
 			method?: string;
+			id?: string | number;
 			params?: Record<string, unknown>;
 			query?: Record<string, unknown>;
 		}>();
@@ -36,6 +34,7 @@ export class CatchEverythingFilter implements ExceptionFilter {
 
 		const path = httpAdapter.getRequestUrl(request);
 		const method = request.method ?? "UNKNOWN";
+		const requestId = request.id;
 		const isProduction = process.env.NODE_ENV === "production";
 
 		const responseBody: Record<string, unknown> = {
@@ -43,6 +42,7 @@ export class CatchEverythingFilter implements ExceptionFilter {
 			timestamp: new Date().toISOString(),
 			path,
 			method,
+			requestId,
 		};
 
 		if (exception instanceof HttpException) {
@@ -63,11 +63,6 @@ export class CatchEverythingFilter implements ExceptionFilter {
 			responseBody.message = "Internal server error";
 			responseBody.error = "UnknownError";
 		}
-
-		this.logger.error(
-			`${method} ${path} -> ${httpStatus}`,
-			exception instanceof Error ? exception.stack : JSON.stringify(exception),
-		);
 
 		if (!isProduction) {
 			responseBody.context = {

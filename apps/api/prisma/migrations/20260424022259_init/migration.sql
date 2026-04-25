@@ -1,10 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `schema_meta` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `todos` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 
@@ -20,21 +13,17 @@ CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'IN_PREPARATION', 'READY', 'DELIVE
 -- CreateEnum
 CREATE TYPE "InvoiceStatus" AS ENUM ('ACTIVE', 'ANNULLED');
 
--- DropTable
-DROP TABLE "schema_meta";
-
--- DropTable
-DROP TABLE "todos";
-
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
-    "nombre" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "role_id" TEXT NOT NULL,
+    "failed_attempts" INTEGER NOT NULL DEFAULT 0,
+    "lockout_until" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -44,7 +33,7 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "roles" (
     "id" TEXT NOT NULL,
-    "nombre" "RoleName" NOT NULL,
+    "name" "RoleName" NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -54,8 +43,8 @@ CREATE TABLE "roles" (
 -- CreateTable
 CREATE TABLE "permissions" (
     "id" TEXT NOT NULL,
-    "nombre" TEXT NOT NULL,
-    "descripcion" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "permissions_pkey" PRIMARY KEY ("id")
@@ -73,9 +62,9 @@ CREATE TABLE "role_permissions" (
 -- CreateTable
 CREATE TABLE "categories" (
     "id" TEXT NOT NULL,
-    "nombre" TEXT NOT NULL,
-    "descripcion" TEXT,
-    "estado" BOOLEAN NOT NULL DEFAULT true,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "status" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -85,11 +74,11 @@ CREATE TABLE "categories" (
 -- CreateTable
 CREATE TABLE "products" (
     "id" TEXT NOT NULL,
-    "nombre" TEXT NOT NULL,
-    "descripcion" TEXT,
-    "costo" DECIMAL(12,2) NOT NULL,
-    "precio" DECIMAL(12,2) NOT NULL,
-    "estado" BOOLEAN NOT NULL DEFAULT true,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "cost" DECIMAL(12,2) NOT NULL,
+    "price" DECIMAL(12,2) NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT true,
     "category_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -101,7 +90,7 @@ CREATE TABLE "products" (
 CREATE TABLE "inventory" (
     "id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
-    "cantidad" INTEGER NOT NULL DEFAULT 0,
+    "quantity" INTEGER NOT NULL DEFAULT 0,
     "location" TEXT NOT NULL,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -112,10 +101,10 @@ CREATE TABLE "inventory" (
 CREATE TABLE "inventory_movements" (
     "id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
-    "tipo" "MovementType" NOT NULL,
-    "cantidad" INTEGER NOT NULL,
-    "cantidad_anterior" INTEGER,
-    "cantidad_nueva" INTEGER,
+    "type" "MovementType" NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "previous_quantity" INTEGER,
+    "new_quantity" INTEGER,
     "reason" TEXT,
     "user_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -126,10 +115,10 @@ CREATE TABLE "inventory_movements" (
 -- CreateTable
 CREATE TABLE "clients" (
     "id" TEXT NOT NULL,
-    "nombre" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "email" TEXT,
-    "telefono" TEXT,
-    "direccion" TEXT,
+    "phone" TEXT,
+    "address" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -153,8 +142,8 @@ CREATE TABLE "sale_items" (
     "id" TEXT NOT NULL,
     "sale_id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
-    "cantidad" INTEGER NOT NULL,
-    "precio_unitario" DECIMAL(12,2) NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "unit_price" DECIMAL(12,2) NOT NULL,
     "subtotal" DECIMAL(12,2) NOT NULL,
 
     CONSTRAINT "sale_items_pkey" PRIMARY KEY ("id")
@@ -163,10 +152,10 @@ CREATE TABLE "sale_items" (
 -- CreateTable
 CREATE TABLE "invoices" (
     "id" TEXT NOT NULL,
-    "numero" TEXT NOT NULL,
+    "number" TEXT NOT NULL,
     "sale_id" TEXT NOT NULL,
-    "estado" "InvoiceStatus" NOT NULL DEFAULT 'ACTIVE',
-    "razon_anulacion" TEXT,
+    "status" "InvoiceStatus" NOT NULL DEFAULT 'ACTIVE',
+    "annulment_reason" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -178,7 +167,7 @@ CREATE TABLE "orders" (
     "id" TEXT NOT NULL,
     "client_id" TEXT NOT NULL,
     "total" DECIMAL(12,2) NOT NULL,
-    "estado" "OrderStatus" NOT NULL DEFAULT 'PENDING',
+    "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -189,10 +178,10 @@ CREATE TABLE "orders" (
 CREATE TABLE "dispatch_orders" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
-    "destino" TEXT NOT NULL,
-    "bultos" INTEGER NOT NULL,
-    "transportista" TEXT,
-    "fecha_salida" TIMESTAMP(3),
+    "destination" TEXT NOT NULL,
+    "packages" INTEGER NOT NULL,
+    "carrier" TEXT,
+    "departure_date" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -215,25 +204,25 @@ CREATE INDEX "users_username_idx" ON "users"("username");
 CREATE INDEX "users_role_id_idx" ON "users"("role_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "roles_nombre_key" ON "roles"("nombre");
+CREATE UNIQUE INDEX "roles_name_key" ON "roles"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "permissions_nombre_key" ON "permissions"("nombre");
+CREATE UNIQUE INDEX "permissions_name_key" ON "permissions"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "role_permissions_role_id_permission_id_key" ON "role_permissions"("role_id", "permission_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "categories_nombre_key" ON "categories"("nombre");
+CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
 -- CreateIndex
-CREATE INDEX "categories_nombre_idx" ON "categories"("nombre");
+CREATE INDEX "categories_name_idx" ON "categories"("name");
 
 -- CreateIndex
 CREATE INDEX "products_category_id_idx" ON "products"("category_id");
 
 -- CreateIndex
-CREATE INDEX "products_nombre_idx" ON "products"("nombre");
+CREATE INDEX "products_name_idx" ON "products"("name");
 
 -- CreateIndex
 CREATE INDEX "inventory_product_id_idx" ON "inventory"("product_id");
@@ -251,7 +240,7 @@ CREATE INDEX "inventory_movements_created_at_idx" ON "inventory_movements"("crea
 CREATE INDEX "inventory_movements_user_id_idx" ON "inventory_movements"("user_id");
 
 -- CreateIndex
-CREATE INDEX "clients_nombre_idx" ON "clients"("nombre");
+CREATE INDEX "clients_name_idx" ON "clients"("name");
 
 -- CreateIndex
 CREATE INDEX "sales_client_id_idx" ON "sales"("client_id");
@@ -269,7 +258,7 @@ CREATE INDEX "sale_items_sale_id_idx" ON "sale_items"("sale_id");
 CREATE INDEX "sale_items_product_id_idx" ON "sale_items"("product_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "invoices_numero_key" ON "invoices"("numero");
+CREATE UNIQUE INDEX "invoices_number_key" ON "invoices"("number");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "invoices_sale_id_key" ON "invoices"("sale_id");
@@ -278,16 +267,16 @@ CREATE UNIQUE INDEX "invoices_sale_id_key" ON "invoices"("sale_id");
 CREATE INDEX "invoices_sale_id_idx" ON "invoices"("sale_id");
 
 -- CreateIndex
-CREATE INDEX "invoices_numero_idx" ON "invoices"("numero");
+CREATE INDEX "invoices_number_idx" ON "invoices"("number");
 
 -- CreateIndex
-CREATE INDEX "invoices_estado_idx" ON "invoices"("estado");
+CREATE INDEX "invoices_status_idx" ON "invoices"("status");
 
 -- CreateIndex
 CREATE INDEX "orders_client_id_idx" ON "orders"("client_id");
 
 -- CreateIndex
-CREATE INDEX "orders_estado_idx" ON "orders"("estado");
+CREATE INDEX "orders_status_idx" ON "orders"("status");
 
 -- CreateIndex
 CREATE INDEX "orders_created_at_idx" ON "orders"("created_at");
