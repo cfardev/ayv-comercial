@@ -2,7 +2,6 @@ import {
 	IconBox,
 	IconBuildingWarehouse,
 	IconChartBar,
-	IconChecklist,
 	IconFileInvoice,
 	IconLayoutDashboard,
 	IconLogout,
@@ -45,6 +44,16 @@ import {
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAuth } from "@/lib/auth-context";
+
+function getInitials(name: string): string {
+	return name
+		.split(" ")
+		.map((n) => n[0])
+		.slice(0, 2)
+		.join("")
+		.toUpperCase();
+}
 
 const navOperaciones = [
 	{ title: "Panel", url: "/", icon: IconLayoutDashboard },
@@ -61,7 +70,6 @@ const navCatalogo = [
 const navReportes = [
 	{ title: "Reportes", url: "/reportes", icon: IconChartBar },
 	{ title: "Configuracion", url: "/configuracion", icon: IconSettings },
-	{ title: "TODO (dev)", url: "/dev/todo", icon: IconChecklist },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -73,7 +81,7 @@ const pageTitles: Record<string, string> = {
 	"/clientes": "Clientes",
 	"/reportes": "Reportes",
 	"/configuracion": "Configuracion",
-	"/dev/todo": "TODO (dev)",
+	"/dev/todo": "TODO",
 };
 
 function NavGroup({
@@ -110,6 +118,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 	const location = useLocation();
 	const currentPath = location.pathname;
 	const pageTitle = pageTitles[currentPath] ?? "A&V";
+	const { user, logout } = useAuth();
 
 	return (
 		<TooltipProvider>
@@ -160,14 +169,16 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 									<DropdownMenuTrigger asChild>
 										<SidebarMenuButton size="lg">
 											<Avatar className="size-7">
-												<AvatarFallback className="text-xs">CA</AvatarFallback>
+												<AvatarFallback className="text-xs">
+													{user ? getInitials(user.name) : "??"}
+												</AvatarFallback>
 											</Avatar>
 											<div className="flex flex-col leading-none">
 												<span className="text-sm font-medium">
-													Carlos Admin
+													{user?.name ?? "Cargando..."}
 												</span>
 												<span className="text-xs text-muted-foreground">
-													admin@ayv.com
+													{user?.email ?? ""}
 												</span>
 											</div>
 										</SidebarMenuButton>
@@ -177,11 +188,16 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 										className="w-[--radix-popper-anchor-width]"
 									>
 										<DropdownMenuGroup>
-											<DropdownMenuItem>
-												<IconSettings data-icon="inline-start" />
-												Configuracion
+											<DropdownMenuItem asChild>
+												<Link to="/configuracion">
+													<IconSettings data-icon="inline-start" />
+													Configuracion
+												</Link>
 											</DropdownMenuItem>
-											<DropdownMenuItem>
+											<DropdownMenuItem
+												onClick={logout}
+												className="cursor-pointer"
+											>
 												<IconLogout data-icon="inline-start" />
 												Cerrar sesion
 											</DropdownMenuItem>

@@ -38,6 +38,18 @@ enum InvoiceStatus {
   ANNULLED
 }
 
+model LoginAttempt {
+  id        String   @id @default(cuid()) @map("id")
+  ip        String   @map("ip")
+  userId    String?  @map("user_id")
+  success   Boolean  @default(false) @map("success")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([ip])
+  @@index([createdAt])
+  @@map("login_attempts")
+}
+
 model User {
   id        String     @id @default(cuid()) @map("id")
   name      String     @map("name")
@@ -46,8 +58,10 @@ model User {
   password  String     @map("password")
   status    UserStatus @default(ACTIVE) @map("status")
   roleId    String     @map("role_id")
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  failedAttempts Int      @default(0) @map("failed_attempts")
+  lockoutUntil   DateTime? @map("lockout_until")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
 
   role               Role                @relation(fields: [roleId], references: [id])
   sales              Sale[]
