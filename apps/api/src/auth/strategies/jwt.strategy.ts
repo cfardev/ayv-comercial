@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+// biome-ignore lint/style/useImportType: required as runtime DI token metadata.
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";

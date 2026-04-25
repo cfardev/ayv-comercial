@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import bcrypt from "bcryptjs";
+import { PinoLogger } from "nestjs-pino";
 import { PrismaService } from "../common/prisma/prisma.service.js";
 import type { LoginResponseDto } from "./dto/login-response.dto.js";
 
@@ -16,7 +17,10 @@ export class AuthService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly jwtService: JwtService,
-	) {}
+		private readonly logger: PinoLogger,
+	) {
+		this.logger.setContext(AuthService.name);
+	}
 
 	async validateUser(email: string, password: string, ip: string) {
 		const user = await this.prisma.user.findFirst({
@@ -27,6 +31,7 @@ export class AuthService {
 		});
 
 		if (!user) {
+			this.logger.warn({ email, ip }, "Login failed: user not found");
 			await this.prisma.loginAttempt.create({
 				data: { ip, success: false },
 			});
@@ -34,6 +39,10 @@ export class AuthService {
 		}
 
 		if (user.status === "INACTIVE") {
+			this.logger.warn(
+				{ userId: user.id, ip },
+				"Login blocked: inactive account",
+			);
 			await this.prisma.loginAttempt.create({
 				data: { ip, userId: user.id, success: false },
 			});
@@ -44,6 +53,10 @@ export class AuthService {
 		if (user.lockoutUntil && user.lockoutUntil > now) {
 			const remaining = Math.ceil(
 				(user.lockoutUntil.getTime() - now.getTime()) / 60000,
+			);
+			this.logger.warn(
+				{ userId: user.id, ip, remainingMinutes: remaining },
+				"Login blocked: account locked",
 			);
 			await this.prisma.loginAttempt.create({
 				data: { ip, userId: user.id, success: false },
@@ -61,6 +74,16 @@ export class AuthService {
 			if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
 				lockoutUntil = new Date(now.getTime() + LOCKOUT_MINUTES * 60 * 1000);
 			}
+
+			this.logger.warn(
+				{
+					userId: user.id,
+					ip,
+					failedAttempts: newFailedAttempts,
+					isLocked: lockoutUntil !== null,
+				},
+				"Login failed: invalid password",
+			);
 
 			await this.prisma.user.update({
 				where: { id: user.id },
@@ -85,6 +108,8 @@ export class AuthService {
 			});
 		}
 
+		this.logger.info({ userId: user.id, ip }, "Credentials validated");
+
 		return user;
 	}
 
@@ -100,6 +125,11 @@ export class AuthService {
 		await this.prisma.loginAttempt.create({
 			data: { ip, userId: user.id, success: true },
 		});
+
+		this.logger.info(
+			{ userId: user.id, roleName: user.role.name, ip },
+			"Login succeeded",
+		);
 
 		const payload = {
 			sub: user.id,

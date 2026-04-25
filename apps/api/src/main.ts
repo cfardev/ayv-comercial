@@ -1,11 +1,14 @@
 import "reflect-metadata";
-import { Logger, ValidationPipe } from "@nestjs/common";
+import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { Logger, LoggerErrorInterceptor } from "nestjs-pino";
 import { AppModule } from "./app.module.js";
 
 async function bootstrap() {
 	const port = Number(process.env.PORT) || 4000;
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, { bufferLogs: true });
+	app.useLogger(app.get(Logger));
+	app.useGlobalInterceptors(new LoggerErrorInterceptor());
 	app.enableShutdownHooks();
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -17,6 +20,6 @@ async function bootstrap() {
 	app.setGlobalPrefix("api");
 	await app.listen(port);
 
-	Logger.log(`Server on port ${port}`, "Bootstrap");
+	app.get(Logger).log(`Server on port ${port}`, "Bootstrap");
 }
 bootstrap();

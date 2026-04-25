@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import type { Request } from "express";
 import { Strategy } from "passport-local";
+// biome-ignore lint/style/useImportType: required as runtime DI token metadata.
 import { AuthService } from "../auth.service.js";
 
 @Injectable()
