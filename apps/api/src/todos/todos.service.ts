@@ -1,55 +1,68 @@
+import { randomUUID } from "node:crypto";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../common/prisma/prisma.service.js";
-import { Prisma } from "../../generated/prisma/client.js";
 import type { CreateTodoDto } from "./dto/create-todo.dto.js";
 import type { UpdateTodoDto } from "./dto/update-todo.dto.js";
 
+type TodoItem = {
+	id: string;
+	title: string;
+	done: boolean;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
 @Injectable()
 export class TodosService {
-	constructor(private readonly prisma: PrismaService) {}
+	private readonly todos = new Map<string, TodoItem>();
 
 	findAll() {
-		return this.prisma.todo.findMany({
-			orderBy: { createdAt: "desc" },
-		});
+		return [...this.todos.values()].sort(
+			(a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+		);
 	}
 
 	create(dto: CreateTodoDto) {
-		return this.prisma.todo.create({
-			data: { title: dto.title },
-		});
+		const now = new Date();
+		const todo: TodoItem = {
+			id: randomUUID(),
+			title: dto.title,
+			done: false,
+			createdAt: now,
+			updatedAt: now,
+		};
+
+		this.todos.set(todo.id, todo);
+
+		return todo;
 	}
 
-	async update(id: string, dto: UpdateTodoDto) {
-		try {
-			return await this.prisma.todo.update({
-				where: { id },
-				data: dto,
-			});
-		} catch (e) {
-			if (
-				e instanceof Prisma.PrismaClientKnownRequestError &&
-				e.code === "P2025"
-			) {
-				throw new NotFoundException();
-			}
-			throw e;
+	update(id: string, dto: UpdateTodoDto) {
+		const currentTodo = this.todos.get(id);
+
+		if (!currentTodo) {
+			throw new NotFoundException();
 		}
+
+		const updatedTodo: TodoItem = {
+			...currentTodo,
+			...dto,
+			updatedAt: new Date(),
+		};
+
+		this.todos.set(id, updatedTodo);
+
+		return updatedTodo;
 	}
 
-	async remove(id: string) {
-		try {
-			return await this.prisma.todo.delete({
-				where: { id },
-			});
-		} catch (e) {
-			if (
-				e instanceof Prisma.PrismaClientKnownRequestError &&
-				e.code === "P2025"
-			) {
-				throw new NotFoundException();
-			}
-			throw e;
+	remove(id: string) {
+		const currentTodo = this.todos.get(id);
+
+		if (!currentTodo) {
+			throw new NotFoundException();
 		}
+
+		this.todos.delete(id);
+
+		return currentTodo;
 	}
 }
