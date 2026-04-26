@@ -4,16 +4,16 @@ import type {
 } from "../../../../generated/prisma/client.js";
 
 export class UserEntity {
-	id: string;
-	fullName: string;
-	email: string;
-	status: UserStatus;
-	role: {
+	id!: string;
+	fullName!: string;
+	email!: string;
+	status!: UserStatus;
+	role!: {
 		id: string;
 		name: RoleName;
 	};
-	failedAttempts: number;
-	lockoutUntil: Date | null;
-	createdAt: Date;
-	updatedAt: Date;
+	failedAttempts!: number;
+	lockoutUntil!: Date | null;
+	createdAt!: Date;
+	updatedAt!: Date;
 }

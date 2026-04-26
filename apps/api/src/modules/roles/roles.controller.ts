@@ -5,9 +5,9 @@ import { RolesGuard } from "../../auth/guards/roles.guard.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 
 class RoleDto {
-	id: string;
-	name: RoleName;
-	createdAt: Date;
+	id!: string;
+	name!: RoleName;
+	createdAt!: Date;
 }
 
 @Controller("roles")
