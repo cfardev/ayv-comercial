@@ -3,6 +3,7 @@ import { ProtectedRoute } from "@/components/protected-route";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
 import { LoginPage } from "@/pages/login-page";
+import { UsersPage } from "@/pages/usuarios-page";
 
 function Placeholder({ title }: { title: string }) {
 	return (
@@ -22,6 +23,7 @@ function DashboardRoutes() {
 				<Route path="despachos" element={<Placeholder title="Despachos" />} />
 				<Route path="productos" element={<Placeholder title="Productos" />} />
 				<Route path="clientes" element={<Placeholder title="Clientes" />} />
+				<Route path="usuarios" element={<UsersPage />} />
 				<Route path="reportes" element={<Placeholder title="Reportes" />} />
 				<Route
 					path="configuracion"

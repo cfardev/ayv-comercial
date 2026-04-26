@@ -1,7 +1,10 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
+import { config } from "dotenv";
 import type { RoleName, UserStatus } from "../generated/prisma/client.js";
 import { PrismaClient } from "../generated/prisma/client.js";
+
+config();
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -13,14 +16,33 @@ const prisma = new PrismaClient({ adapter });
 
 const BCRYPT_ROUNDS = 12;
 
+const ROLES: RoleName[] = [
+	"ADMIN",
+	"SELLER",
+	"INVENTORY_MANAGER",
+	"DISPATCH_MANAGER",
+	"OWNER_MANAGER",
+];
+
 async function main() {
 	const password = await bcrypt.hash("admin1234", BCRYPT_ROUNDS);
 
-	const role = await prisma.role.upsert({
+	for (const roleName of ROLES) {
+		await prisma.role.upsert({
+			where: { name: roleName },
+			update: {},
+			create: { name: roleName },
+		});
+	}
+
+	const role = await prisma.role.findUnique({
 		where: { name: "ADMIN" as RoleName },
-		update: {},
-		create: { name: "ADMIN" as RoleName },
 	});
+
+	if (!role) {
+		console.error("ADMIN role not found after creation");
+		return;
+	}
 
 	const adminExists = await prisma.user.findUnique({
 		where: { email: "admin@test.com" },
@@ -35,7 +57,6 @@ async function main() {
 		data: {
 			name: "Admin",
 			email: "admin@test.com",
-			username: "admin",
 			password,
 			status: "ACTIVE" as UserStatus,
 			roleId: role.id,

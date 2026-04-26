@@ -69,6 +69,7 @@ const navCatalogo = [
 
 const navReportes = [
 	{ title: "Reportes", url: "/reportes", icon: IconChartBar },
+	{ title: "Usuarios", url: "/usuarios", icon: IconUsers },
 	{ title: "Configuracion", url: "/configuracion", icon: IconSettings },
 ];
 
@@ -79,6 +80,7 @@ const pageTitles: Record<string, string> = {
 	"/despachos": "Despachos",
 	"/productos": "Productos",
 	"/clientes": "Clientes",
+	"/usuarios": "Usuarios",
 	"/reportes": "Reportes",
 	"/configuracion": "Configuracion",
 	"/dev/todo": "TODO",

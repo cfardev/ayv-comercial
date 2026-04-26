@@ -50,11 +50,27 @@ model LoginAttempt {
   @@map("login_attempts")
 }
 
+model UserAuditLog {
+  id        String   @id @default(cuid()) @map("id")
+  userId    String   @map("user_id")
+  actorId   String   @map("actor_id")
+  action    String   @map("action")
+  details   Json?    @map("details")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User @relation("AuditLogUser", fields: [userId], references: [id])
+  actor  User @relation("AuditLogActor", fields: [actorId], references: [id])
+
+  @@index([userId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("user_audit_logs")
+}
+
 model User {
   id        String     @id @default(cuid()) @map("id")
   name      String     @map("name")
   email     String     @unique @map("email")
-  username  String     @unique @map("username")
   password  String     @map("password")
   status    UserStatus @default(ACTIVE) @map("status")
   roleId    String     @map("role_id")
@@ -66,9 +82,10 @@ model User {
   role               Role                @relation(fields: [roleId], references: [id])
   sales              Sale[]
   inventoryMovements InventoryMovement[]
+  auditLogs          UserAuditLog[]      @relation("AuditLogUser")
+  performedActions   UserAuditLog[]      @relation("AuditLogActor")
 
   @@index([email])
-  @@index([username])
   @@index([roleId])
   @@map("users")
 }

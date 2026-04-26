@@ -16,7 +16,8 @@
 		"prisma:migrate": "pnpm --filter @ayv-comercial/api run prisma:migrate",
 		"prisma:migrate:dev": "pnpm --filter @ayv-comercial/api run prisma:migrate:dev",
 		"prisma:push": "pnpm --filter @ayv-comercial/api run prisma:push",
-		"prisma:studio": "pnpm --filter @ayv-comercial/api run prisma:studio"
+		"prisma:studio": "pnpm --filter @ayv-comercial/api run prisma:studio",
+		"prisma:seed": "tsx apps/api/prisma/seed.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -48,6 +49,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
+		"tsx": "^4.21.0",
 		"turbo": "^2.7.5"
 	}
 }
