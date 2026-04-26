@@ -10,7 +10,7 @@ import type { Options } from "pino-http";
 
 type RequestWithId = IncomingMessage & {
 	headers: IncomingHttpHeaders;
-	id?: string | number;
+	id?: string | number | object;
 	originalUrl?: string;
 	params?: Record<string, unknown>;
 	query?: Record<string, unknown>;

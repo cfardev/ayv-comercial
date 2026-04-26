@@ -6,6 +6,7 @@ import { AuthController } from "./auth.controller.js";
 import { AuthService } from "./auth.service.js";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard.js";
 import { LocalAuthGuard } from "./guards/local-auth.guard.js";
+import { RolesGuard } from "./guards/roles.guard.js";
 import { JwtStrategy } from "./strategies/jwt.strategy.js";
 import { LocalStrategy } from "./strategies/local.strategy.js";
 
@@ -30,7 +31,8 @@ import { LocalStrategy } from "./strategies/local.strategy.js";
 		JwtStrategy,
 		JwtAuthGuard,
 		LocalAuthGuard,
+		RolesGuard,
 	],
-	exports: [AuthService, JwtAuthGuard],
+	exports: [AuthService, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}

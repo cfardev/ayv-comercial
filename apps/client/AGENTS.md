@@ -76,3 +76,7 @@ src/
 - `routes/` holds route definitions
 - Use `react-router-dom` v7 patterns
 - Lazy load route modules with `React.lazy` + `Suspense`
+
+## UI Conventions
+
+- All clickable elements (buttons, links, interactive cards, etc.) must include `cursor-pointer` utility class

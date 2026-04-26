@@ -116,7 +116,7 @@ export class AuthService {
 	async login(
 		user: {
 			id: string;
-			name: string;
+			fullName: string;
 			email: string;
 			role: { name: string };
 		},
@@ -143,7 +143,7 @@ export class AuthService {
 			expiresIn: 86400,
 			user: {
 				id: user.id,
-				name: user.name,
+				fullName: user.fullName,
 				email: user.email,
 				role: { name: user.role.name as never },
 			},
