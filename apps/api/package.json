@@ -66,6 +66,8 @@
 		"@types/express": "^5.0.0",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^24.0.0",
+		"@types/passport-jwt": "^4.0.1",
+		"@types/passport-local": "^1.0.38",
 		"@types/pg": "^8.15.4",
 		"jest": "^30.0.0",
 		"prisma": "^7",
