@@ -2,7 +2,7 @@ import type { RoleName } from "../../../generated/prisma/client.js";
 
 export class LoginResponseUserDto {
 	id: string;
-	name: string;
+	fullName: string;
 	email: string;
 	role: {
 		name: RoleName;

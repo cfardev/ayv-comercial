@@ -14,11 +14,33 @@ CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'IN_PREPARATION', 'READY', 'DELIVE
 CREATE TYPE "InvoiceStatus" AS ENUM ('ACTIVE', 'ANNULLED');
 
 -- CreateTable
+CREATE TABLE "login_attempts" (
+    "id" TEXT NOT NULL,
+    "ip" TEXT NOT NULL,
+    "user_id" TEXT,
+    "success" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "login_attempts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_audit_logs" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "actor_id" TEXT NOT NULL,
+    "action" TEXT NOT NULL,
+    "details" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "user_audit_logs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "full_name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "role_id" TEXT NOT NULL,
@@ -189,16 +211,25 @@ CREATE TABLE "dispatch_orders" (
 );
 
 -- CreateIndex
+CREATE INDEX "login_attempts_ip_idx" ON "login_attempts"("ip");
+
+-- CreateIndex
+CREATE INDEX "login_attempts_created_at_idx" ON "login_attempts"("created_at");
+
+-- CreateIndex
+CREATE INDEX "user_audit_logs_user_id_idx" ON "user_audit_logs"("user_id");
+
+-- CreateIndex
+CREATE INDEX "user_audit_logs_actor_id_idx" ON "user_audit_logs"("actor_id");
+
+-- CreateIndex
+CREATE INDEX "user_audit_logs_created_at_idx" ON "user_audit_logs"("created_at");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
-
--- CreateIndex
 CREATE INDEX "users_email_idx" ON "users"("email");
-
--- CreateIndex
-CREATE INDEX "users_username_idx" ON "users"("username");
 
 -- CreateIndex
 CREATE INDEX "users_role_id_idx" ON "users"("role_id");
@@ -283,6 +314,12 @@ CREATE INDEX "orders_created_at_idx" ON "orders"("created_at");
 
 -- CreateIndex
 CREATE INDEX "dispatch_orders_order_id_idx" ON "dispatch_orders"("order_id");
+
+-- AddForeignKey
+ALTER TABLE "user_audit_logs" ADD CONSTRAINT "user_audit_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_audit_logs" ADD CONSTRAINT "user_audit_logs_actor_id_fkey" FOREIGN KEY ("actor_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

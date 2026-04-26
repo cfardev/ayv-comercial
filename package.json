@@ -17,7 +17,8 @@
 		"prisma:migrate:dev": "pnpm --filter @ayv-comercial/api run prisma:migrate:dev",
 		"prisma:push": "pnpm --filter @ayv-comercial/api run prisma:push",
 		"prisma:studio": "pnpm --filter @ayv-comercial/api run prisma:studio",
-		"prisma:seed": "tsx apps/api/prisma/seed.ts"
+		"prisma:seed": "tsx apps/api/prisma/seed.ts",
+		"prisma:reset": "pnpm run prisma:migrate:dev -- --name reset && pnpm run prisma:seed"
 	},
 	"keywords": [],
 	"author": "",

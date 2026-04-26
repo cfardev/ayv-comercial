@@ -53,7 +53,7 @@ export function UserFormDialog({
 	const form = useForm<CreateUserForm | UpdateUserForm>({
 		resolver: zodResolver(isEditing ? updateUserSchema : createUserSchema),
 		defaultValues: {
-			name: user?.name ?? "",
+			fullName: user?.fullName ?? "",
 			email: user?.email ?? "",
 			password: "",
 			roleId: user?.role.id ?? "",
@@ -63,7 +63,7 @@ export function UserFormDialog({
 	useEffect(() => {
 		if (open) {
 			form.reset({
-				name: user?.name ?? "",
+				fullName: user?.fullName ?? "",
 				email: user?.email ?? "",
 				password: "",
 				roleId: user?.role.id ?? "",
@@ -90,15 +90,15 @@ export function UserFormDialog({
 				</DialogHeader>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
 					<div className="space-y-2">
-						<Label htmlFor="name">Nombre completo</Label>
+						<Label htmlFor="fullName">Nombre completo</Label>
 						<Input
-							id="name"
+							id="fullName"
 							placeholder="Juan Pérez"
-							{...form.register("name")}
+							{...form.register("fullName")}
 						/>
-						{form.formState.errors.name && (
+						{form.formState.errors.fullName && (
 							<p className="text-xs text-destructive">
-								{form.formState.errors.name.message as string}
+								{form.formState.errors.fullName.message as string}
 							</p>
 						)}
 					</div>
@@ -127,9 +127,9 @@ export function UserFormDialog({
 								placeholder="••••••••"
 								{...form.register("password")}
 							/>
-							{form.formState.errors.password && (
+							{"password" in form.formState.errors && (
 								<p className="text-xs text-destructive">
-									{form.formState.errors.password.message as string}
+									{form.formState.errors.password?.message as string}
 								</p>
 							)}
 						</div>

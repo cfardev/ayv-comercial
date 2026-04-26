@@ -15,7 +15,7 @@ export interface Role {
 
 export interface User {
 	id: string;
-	name: string;
+	fullName: string;
 	email: string;
 	status: UserStatus;
 	role: Role;
@@ -42,14 +42,14 @@ export interface UserFilters {
 }
 
 export interface CreateUserPayload {
-	name: string;
+	fullName: string;
 	email: string;
 	password: string;
 	roleId: string;
 }
 
 export interface UpdateUserPayload {
-	name?: string;
+	fullName?: string;
 	email?: string;
 	roleId?: string;
 }

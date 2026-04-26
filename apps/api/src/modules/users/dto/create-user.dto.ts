@@ -3,11 +3,11 @@ import { IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
 export class CreateUserDto {
 	@IsString()
 	@IsNotEmpty()
-	name: string;
+	fullName!: string;
 
 	@IsString()
 	@IsNotEmpty()
-	email: string;
+	email!: string;
 
 	@IsString()
 	@MinLength(8)
@@ -17,9 +17,9 @@ export class CreateUserDto {
 	@Matches(/[0-9]/, {
 		message: "La contraseña debe contener al menos un número",
 	})
-	password: string;
+	password!: string;
 
 	@IsString()
 	@IsNotEmpty()
-	roleId: string;
+	roleId!: string;
 }

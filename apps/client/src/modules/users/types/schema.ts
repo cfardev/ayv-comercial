@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createUserSchema = z.object({
-	name: z.string().min(1, "El nombre es requerido"),
+	fullName: z.string().min(1, "El nombre es requerido"),
 	email: z.string().email("Correo electrónico inválido"),
 	password: z
 		.string()
@@ -12,7 +12,7 @@ export const createUserSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-	name: z.string().min(1, "El nombre es requerido").optional(),
+	fullName: z.string().min(1, "El nombre es requerido").optional(),
 	email: z.string().email("Correo electrónico inválido").optional(),
 	roleId: z.string().min(1, "El rol es requerido").optional(),
 });

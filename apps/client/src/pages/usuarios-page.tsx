@@ -267,10 +267,10 @@ export function UsersPage() {
 					}
 					description={
 						confirmDialog.action === "deactivate"
-							? `¿Estás seguro de que deseas desactivar a ${confirmDialog.user.name}? El usuario perderá acceso al sistema.`
+							? `¿Estás seguro de que deseas desactivar a ${confirmDialog.user.fullName}? El usuario perderá acceso al sistema.`
 							: confirmDialog.action === "reactivate"
-								? `¿Estás seguro de que deseas reactivar a ${confirmDialog.user.name}? El usuario recuperará acceso al sistema.`
-								: `¿Estás seguro de que deseas eliminar permanentemente a ${confirmDialog.user.name}? Esta acción no se puede deshacer.`
+								? `¿Estás seguro de que deseas reactivar a ${confirmDialog.user.fullName}? El usuario recuperará acceso al sistema.`
+								: `¿Estás seguro de que deseas eliminar permanentemente a ${confirmDialog.user.fullName}? Esta acción no se puede deshacer.`
 					}
 					confirmLabel={
 						confirmDialog.action === "deactivate"

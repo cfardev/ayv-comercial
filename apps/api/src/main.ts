@@ -12,9 +12,7 @@ async function bootstrap() {
 	app.enableShutdownHooks();
 	app.useGlobalPipes(
 		new ValidationPipe({
-			whitelist: false,
-			forbidNonWhitelisted: false,
-			transform: true,
+			forbidNonWhitelisted: true,
 		}),
 	);
 	app.setGlobalPrefix("api");

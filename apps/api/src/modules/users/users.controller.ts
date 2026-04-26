@@ -43,6 +43,8 @@ export class UsersController {
 		@Body() dto: CreateUserDto,
 		@Req() req: AuthenticatedRequest,
 	): Promise<UserEntity> {
+		console.log(dto);
+
 		return this.usersService.create(dto, req.user.userId);
 	}
 

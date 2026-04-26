@@ -4,7 +4,8 @@ import {
 	IconTrash,
 	IconUserCheck,
 } from "@tabler/icons-react";
-import { Badge, type BadgeVariant } from "@/components/ui/badge";
+import type { VariantProps } from "class-variance-authority";
+import { Badge, type badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Table,
@@ -24,8 +25,11 @@ const roleLabels: Record<string, string> = {
 	OWNER_MANAGER: "Gestor de Propietarios",
 };
 
-const statusVariants: Record<string, BadgeVariant> = {
-	ACTIVE: "success",
+const statusVariants: Record<
+	string,
+	VariantProps<typeof badgeVariants>["variant"]
+> = {
+	ACTIVE: "default",
 	INACTIVE: "destructive",
 };
 
@@ -91,7 +95,7 @@ export function UsersTable({
 				<TableBody>
 					{users.map((user) => (
 						<TableRow key={user.id}>
-							<TableCell className="font-medium">{user.name}</TableCell>
+							<TableCell className="font-medium">{user.fullName}</TableCell>
 							<TableCell>{user.email}</TableCell>
 							<TableCell>
 								{roleLabels[user.role.name] ?? user.role.name}

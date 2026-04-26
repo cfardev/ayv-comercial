@@ -46,8 +46,8 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/lib/auth-context";
 
-function getInitials(name: string): string {
-	return name
+function getInitials(fullName: string): string {
+	return fullName
 		.split(" ")
 		.map((n) => n[0])
 		.slice(0, 2)
@@ -172,12 +172,12 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 										<SidebarMenuButton size="lg">
 											<Avatar className="size-7">
 												<AvatarFallback className="text-xs">
-													{user ? getInitials(user.name) : "??"}
+													{user ? getInitials(user.fullName) : "??"}
 												</AvatarFallback>
 											</Avatar>
 											<div className="flex flex-col leading-none">
 												<span className="text-sm font-medium">
-													{user?.name ?? "Cargando..."}
+													{user?.fullName ?? "Cargando..."}
 												</span>
 												<span className="text-xs text-muted-foreground">
 													{user?.email ?? ""}

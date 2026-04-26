@@ -22,11 +22,10 @@ export class UsersService {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async create(dto: CreateUserDto, actorId: string): Promise<UserEntity> {
-		console.log("CREATE USER DTO:", JSON.stringify(dto));
-
 		const existingEmail = await this.prisma.user.findUnique({
 			where: { email: dto.email },
 		});
+
 		if (existingEmail) {
 			throw new BadRequestException("El correo electrónico ya está en uso");
 		}
@@ -42,7 +41,7 @@ export class UsersService {
 
 		const user = await this.prisma.user.create({
 			data: {
-				name: dto.name,
+				fullName: dto.fullName,
 				email: dto.email,
 				password: hashedPassword,
 				roleId: dto.roleId,
@@ -154,7 +153,7 @@ export class UsersService {
 		const updatedUser = await this.prisma.user.update({
 			where: { id },
 			data: {
-				...(dto.name && { name: dto.name }),
+				...(dto.fullName && { fullName: dto.fullName }),
 				...(dto.email && { email: dto.email }),
 				...(dto.roleId && { roleId: dto.roleId }),
 			},

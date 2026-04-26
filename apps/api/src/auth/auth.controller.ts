@@ -28,7 +28,7 @@ export class AuthController {
 	): Promise<LoginResponseDto> {
 		const user = req.user as {
 			id: string;
-			name: string;
+			fullName: string;
 			email: string;
 			role: { name: string };
 		};
