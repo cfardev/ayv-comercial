@@ -7,6 +7,7 @@ import {
 import type { VariantProps } from "class-variance-authority";
 import { Badge, type badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Table,
 	TableBody,
@@ -65,8 +66,46 @@ export function UsersTable({
 }: UsersTableProps) {
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center py-8">
-				<p className="text-muted-foreground">Cargando...</p>
+			<div className="rounded-md border">
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Nombre</TableHead>
+							<TableHead>Correo</TableHead>
+							<TableHead>Rol</TableHead>
+							<TableHead>Estado</TableHead>
+							<TableHead>Fecha de creación</TableHead>
+							<TableHead className="w-[120px]">Acciones</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{Array.from({ length: 6 }).map(() => (
+							<TableRow key={crypto.randomUUID()}>
+								<TableCell className="font-medium">
+									<Skeleton className="h-4 w-32" />
+								</TableCell>
+								<TableCell>
+									<Skeleton className="h-4 w-40" />
+								</TableCell>
+								<TableCell>
+									<Skeleton className="h-4 w-28" />
+								</TableCell>
+								<TableCell>
+									<Skeleton className="h-4 w-16" />
+								</TableCell>
+								<TableCell>
+									<Skeleton className="h-4 w-24" />
+								</TableCell>
+								<TableCell>
+									<div className="flex items-center gap-1">
+										<Skeleton className="size-8 rounded-md" />
+										<Skeleton className="size-8 rounded-md" />
+									</div>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
 			</div>
 		);
 	}

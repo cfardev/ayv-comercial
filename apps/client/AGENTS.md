@@ -80,3 +80,9 @@ src/
 ## UI Conventions
 
 - All clickable elements (buttons, links, interactive cards, etc.) must include `cursor-pointer` utility class
+
+### Async Data Loading
+
+- For async data fetching, prefer `Skeleton` placeholders over generic "Loading..." text.
+- Skeleton layouts should mirror the final UI structure (tables, lists, cards) to reduce visual shift when data resolves.
+- Use `isPending` (from TanStack Query) to show skeleton; `isFetching` indicates background refetch and may skip skeleton if cached data is already visible.
