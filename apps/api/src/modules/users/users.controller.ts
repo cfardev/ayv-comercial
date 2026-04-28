@@ -13,8 +13,9 @@ import {
 	UseGuards,
 } from "@nestjs/common";
 import type { Request } from "express";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
-import { RolesGuard } from "../../auth/guards/roles.guard.js";
+import { RequirePermissions } from "../../auth/decorators/require-permissions.decorator.js";
+import { PermissionsGuard } from "../../auth/guards/permissions.guard.js";
+import { PERMISSION_KEYS } from "../../auth/permissions/permission-keys.js";
 import type { CreateUserDto } from "./dto/create-user.dto.js";
 import { ListUsersDto } from "./dto/list-users.dto.js";
 import type { UpdateUserDto } from "./dto/update-user.dto.js";
@@ -29,45 +30,57 @@ interface AuthenticatedRequest extends Request {
 	user: {
 		userId: string;
 		email: string;
+		roleSlug: string;
 		roleName: string;
 	};
 }
 
 @Controller("users")
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(PermissionsGuard)
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
 	@Post()
+	@RequirePermissions(PERMISSION_KEYS.USERS_CREATE)
 	async create(
 		@Body() dto: CreateUserDto,
 		@Req() req: AuthenticatedRequest,
 	): Promise<UserEntity> {
-		console.log(dto);
-
 		return this.usersService.create(dto, req.user.userId);
 	}
 
 	@Get()
+	@RequirePermissions(PERMISSION_KEYS.USERS_READ)
 	async findAll(
 		@Query() query: ListUsersDto,
 	): Promise<PaginatedResult<UserEntity>> {
 		const filters: UserFilters = {
 			search: query.search,
 			status: query.status as UserFilters["status"],
-			roleId: query.roleId,
+			role: query.role,
 			page: Number(query.page) || 1,
 			limit: Number(query.limit) || 20,
 		};
 		return this.usersService.findAll(filters);
 	}
 
+	@Get(":id/can-hard-delete")
+	@RequirePermissions(PERMISSION_KEYS.USERS_READ)
+	async canHardDelete(
+		@Param("id") id: string,
+	): Promise<{ canDelete: boolean }> {
+		const canDelete = await this.usersService.canHardDelete(id);
+		return { canDelete };
+	}
+
 	@Get(":id")
+	@RequirePermissions(PERMISSION_KEYS.USERS_READ)
 	async findOne(@Param("id") id: string): Promise<UserEntity> {
 		return this.usersService.findOne(id);
 	}
 
 	@Patch(":id")
+	@RequirePermissions(PERMISSION_KEYS.USERS_UPDATE)
 	async update(
 		@Param("id") id: string,
 		@Body() dto: UpdateUserDto,
@@ -78,6 +91,7 @@ export class UsersController {
 
 	@Post(":id/deactivate")
 	@HttpCode(HttpStatus.OK)
+	@RequirePermissions(PERMISSION_KEYS.USERS_DEACTIVATE)
 	async deactivate(
 		@Param("id") id: string,
 		@Req() req: AuthenticatedRequest,
@@ -87,6 +101,7 @@ export class UsersController {
 
 	@Post(":id/reactivate")
 	@HttpCode(HttpStatus.OK)
+	@RequirePermissions(PERMISSION_KEYS.USERS_REACTIVATE)
 	async reactivate(
 		@Param("id") id: string,
 		@Req() req: AuthenticatedRequest,
@@ -94,16 +109,9 @@ export class UsersController {
 		return this.usersService.reactivate(id, req.user.userId);
 	}
 
-	@Get(":id/can-hard-delete")
-	async canHardDelete(
-		@Param("id") id: string,
-	): Promise<{ canDelete: boolean }> {
-		const canDelete = await this.usersService.canHardDelete(id);
-		return { canDelete };
-	}
-
 	@Delete(":id")
 	@HttpCode(HttpStatus.NO_CONTENT)
+	@RequirePermissions(PERMISSION_KEYS.USERS_DELETE)
 	async hardDelete(
 		@Param("id") id: string,
 		@Req() req: AuthenticatedRequest,

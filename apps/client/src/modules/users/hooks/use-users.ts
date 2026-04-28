@@ -3,7 +3,6 @@ import { authFetch } from "@/lib/auth-fetch.js";
 import type {
 	CreateUserPayload,
 	PaginatedResponse,
-	Role,
 	UpdateUserPayload,
 	User,
 	UserFilters,
@@ -18,7 +17,7 @@ async function fetchUsers(
 	if (filters.search) params.set("search", filters.search);
 	if (filters.status && filters.status !== "ALL")
 		params.set("status", filters.status);
-	if (filters.roleId) params.set("roleId", filters.roleId);
+	if (filters.role) params.set("role", filters.role);
 	if (filters.page) params.set("page", String(filters.page));
 	if (filters.limit) params.set("limit", String(filters.limit));
 
@@ -26,15 +25,6 @@ async function fetchUsers(
 	if (!res.ok) {
 		const data = await res.json().catch(() => ({}));
 		throw new Error(data.message ?? "Error al obtener usuarios");
-	}
-	return res.json();
-}
-
-async function fetchRoles(): Promise<Role[]> {
-	const res = await authFetch(`${API_BASE}/roles`);
-	if (!res.ok) {
-		const data = await res.json().catch(() => ({}));
-		throw new Error(data.message ?? "Error al obtener roles");
 	}
 	return res.json();
 }
@@ -98,13 +88,6 @@ export function useUsers(filters: UserFilters) {
 	return useQuery({
 		queryKey: ["users", filters],
 		queryFn: () => fetchUsers(filters),
-	});
-}
-
-export function useRoles() {
-	return useQuery({
-		queryKey: ["roles"],
-		queryFn: fetchRoles,
 	});
 }
 

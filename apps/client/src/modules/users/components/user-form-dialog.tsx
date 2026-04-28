@@ -19,23 +19,19 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import type { Role, User } from "../types/api.js";
+import {
+	USER_ROLE_OPTIONS,
+	USER_ROLE_VALUES,
+	type UserRole,
+} from "@/lib/user-roles.js";
+import type { User } from "../types/api.js";
 import type { CreateUserForm, UpdateUserForm } from "../types/schema.js";
 import { createUserSchema, updateUserSchema } from "../types/schema.js";
-
-const roleLabels: Record<string, string> = {
-	ADMIN: "Administrador",
-	SELLER: "Vendedor",
-	INVENTORY_MANAGER: "Gestor de Inventario",
-	DISPATCH_MANAGER: "Gestor de Despachos",
-	OWNER_MANAGER: "Gestor de Propietarios",
-};
 
 interface UserFormDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	user?: User | null;
-	roles: Role[];
 	onSubmit: (data: CreateUserForm | UpdateUserForm) => void;
 	isLoading?: boolean;
 }
@@ -44,7 +40,6 @@ export function UserFormDialog({
 	open,
 	onOpenChange,
 	user,
-	roles,
 	onSubmit,
 	isLoading,
 }: UserFormDialogProps) {
@@ -56,7 +51,7 @@ export function UserFormDialog({
 			fullName: user?.fullName ?? "",
 			email: user?.email ?? "",
 			password: "",
-			roleId: user?.role.id ?? "",
+			role: user?.role.slug ?? USER_ROLE_VALUES[1],
 		},
 	});
 
@@ -66,7 +61,7 @@ export function UserFormDialog({
 				fullName: user?.fullName ?? "",
 				email: user?.email ?? "",
 				password: "",
-				roleId: user?.role.id ?? "",
+				role: user?.role.slug ?? USER_ROLE_VALUES[1],
 			});
 		}
 	}, [open, user, form]);
@@ -136,25 +131,29 @@ export function UserFormDialog({
 					)}
 
 					<div className="space-y-2">
-						<Label htmlFor="roleId">Rol</Label>
+						<Label htmlFor="role">Rol</Label>
 						<Select
-							value={form.watch("roleId")}
-							onValueChange={(value) => form.setValue("roleId", value)}
+							value={form.watch("role")}
+							onValueChange={(value) =>
+								form.setValue("role", value as UserRole, {
+									shouldValidate: true,
+								})
+							}
 						>
 							<SelectTrigger>
 								<SelectValue placeholder="Seleccionar rol" />
 							</SelectTrigger>
 							<SelectContent>
-								{roles.map((role) => (
-									<SelectItem key={role.id} value={role.id}>
-										{roleLabels[role.name] ?? role.name}
+								{USER_ROLE_OPTIONS.map((opt) => (
+									<SelectItem key={opt.value} value={opt.value}>
+										{opt.label}
 									</SelectItem>
 								))}
 							</SelectContent>
 						</Select>
-						{form.formState.errors.roleId && (
+						{form.formState.errors.role && (
 							<p className="text-xs text-destructive">
-								{form.formState.errors.roleId.message as string}
+								{form.formState.errors.role.message as string}
 							</p>
 						)}
 					</div>

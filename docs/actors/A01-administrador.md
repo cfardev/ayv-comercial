@@ -7,7 +7,7 @@ Es la persona encargada de la administración general del sistema. Tiene acceso 
 ## Responsabilidades
 
 - Garantizar la correcta configuración del sistema
-- Administrar usuarios y roles del sistema
+- Administrar usuarios del sistema (asignación de roles predefinidos)
 - Mantener el catálogo de productos y categorías actualizado
 - Controlar la integridad del inventario
 
@@ -16,7 +16,7 @@ Es la persona encargada de la administración general del sistema. Tiene acceso 
 | Acción | Permitido |
 |--------|-----------|
 | Gestionar usuarios | Sí |
-| Asignar roles y permisos | Sí |
+| Asignar rol predefinido a usuarios | Sí |
 | Gestionar categorías | Sí |
 | Gestionar productos | Sí |
 | Actualizar costos y precios | Sí |
@@ -44,7 +44,7 @@ Es la persona encargada de la administración general del sistema. Tiene acceso 
 |-------------|-------------|
 | CU01 | Inicio de sesión |
 | CU02 | Gestión de usuarios |
-| CU03 | Gestión de roles y permisos |
+| CU03 | Roles y permisos (modelo estático; sin pantalla de administración) |
 | CU04 | Gestión de categorías |
 | CU05 | Gestión de productos |
 | CU06 | Actualización de costo y precio de producto |

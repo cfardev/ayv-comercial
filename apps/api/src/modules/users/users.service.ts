@@ -5,7 +5,8 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import bcrypt from "bcryptjs";
-import type { UserStatus } from "../../../generated/prisma/client.js";
+import { UserRole, UserStatus } from "../../../generated/prisma/client.js";
+import { userRoleToResponse } from "../../common/constants/user-role-labels.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import type { CreateUserDto } from "./dto/create-user.dto.js";
 import type { UpdateUserDto } from "./dto/update-user.dto.js";
@@ -17,9 +18,28 @@ import type {
 
 const BCRYPT_ROUNDS = 12;
 
+type UserRow = {
+	id: string;
+	fullName: string;
+	email: string;
+	status: UserStatus;
+	role: UserRole;
+	failedAttempts: number;
+	lockoutUntil: Date | null;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
 @Injectable()
 export class UsersService {
 	constructor(private readonly prisma: PrismaService) {}
+
+	private toUserEntity(user: UserRow): UserEntity {
+		return {
+			...user,
+			role: userRoleToResponse(user.role),
+		};
+	}
 
 	async create(dto: CreateUserDto, actorId: string): Promise<UserEntity> {
 		const existingEmail = await this.prisma.user.findUnique({
@@ -30,13 +50,6 @@ export class UsersService {
 			throw new BadRequestException("El correo electrónico ya está en uso");
 		}
 
-		const role = await this.prisma.role.findUnique({
-			where: { id: dto.roleId },
-		});
-		if (!role) {
-			throw new BadRequestException("El rol especificado no existe");
-		}
-
 		const hashedPassword = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
 
 		const user = await this.prisma.user.create({
@@ -44,10 +57,9 @@ export class UsersService {
 				fullName: dto.fullName,
 				email: dto.email,
 				password: hashedPassword,
-				roleId: dto.roleId,
+				role: dto.role,
 				status: "ACTIVE" as UserStatus,
 			},
-			include: { role: true },
 		});
 
 		await this.prisma.userAuditLog.create({
@@ -57,22 +69,22 @@ export class UsersService {
 				action: "CREATE",
 				details: {
 					email: user.email,
-					roleName: role.name,
+					role: dto.role,
 				},
 			},
 		});
 
-		return user as UserEntity;
+		return this.toUserEntity(user);
 	}
 
 	async findAll(filters: UserFilters): Promise<PaginatedResult<UserEntity>> {
-		const { search, status, roleId, page, limit } = filters;
+		const { search, status, role, page, limit } = filters;
 
 		const where: Record<string, unknown> = {};
 
 		if (search) {
 			where.OR = [
-				{ name: { contains: search, mode: "insensitive" } },
+				{ fullName: { contains: search, mode: "insensitive" } },
 				{ email: { contains: search, mode: "insensitive" } },
 			];
 		}
@@ -81,14 +93,13 @@ export class UsersService {
 			where.status = status;
 		}
 
-		if (roleId) {
-			where.roleId = roleId;
+		if (role) {
+			where.role = role;
 		}
 
 		const [data, total] = await Promise.all([
 			this.prisma.user.findMany({
 				where,
-				include: { role: true },
 				skip: (page - 1) * limit,
 				take: limit,
 				orderBy: { createdAt: "desc" },
@@ -97,7 +108,7 @@ export class UsersService {
 		]);
 
 		return {
-			data: data as UserEntity[],
+			data: data.map((u) => this.toUserEntity(u)),
 			total,
 			page,
 			limit,
@@ -108,14 +119,13 @@ export class UsersService {
 	async findOne(id: string): Promise<UserEntity> {
 		const user = await this.prisma.user.findUnique({
 			where: { id },
-			include: { role: true },
 		});
 
 		if (!user) {
 			throw new NotFoundException("Usuario no encontrado");
 		}
 
-		return user as UserEntity;
+		return this.toUserEntity(user);
 	}
 
 	async update(
@@ -125,7 +135,6 @@ export class UsersService {
 	): Promise<UserEntity> {
 		const user = await this.prisma.user.findUnique({
 			where: { id },
-			include: { role: true },
 		});
 
 		if (!user) {
@@ -141,23 +150,13 @@ export class UsersService {
 			}
 		}
 
-		if (dto.roleId) {
-			const role = await this.prisma.role.findUnique({
-				where: { id: dto.roleId },
-			});
-			if (!role) {
-				throw new BadRequestException("El rol especificado no existe");
-			}
-		}
-
 		const updatedUser = await this.prisma.user.update({
 			where: { id },
 			data: {
 				...(dto.fullName && { fullName: dto.fullName }),
 				...(dto.email && { email: dto.email }),
-				...(dto.roleId && { roleId: dto.roleId }),
+				...(dto.role !== undefined && { role: dto.role }),
 			},
-			include: { role: true },
 		});
 
 		await this.prisma.userAuditLog.create({
@@ -169,7 +168,7 @@ export class UsersService {
 			},
 		});
 
-		return updatedUser as UserEntity;
+		return this.toUserEntity(updatedUser);
 	}
 
 	async deactivate(id: string, actorId: string): Promise<UserEntity> {
@@ -179,7 +178,6 @@ export class UsersService {
 
 		const user = await this.prisma.user.findUnique({
 			where: { id },
-			include: { role: true },
 		});
 
 		if (!user) {
@@ -190,7 +188,7 @@ export class UsersService {
 			throw new BadRequestException("El usuario ya está inactivo");
 		}
 
-		if (user.role.name === "ADMIN") {
+		if (user.role === UserRole.ADMIN) {
 			throw new ForbiddenException(
 				"No se puede desactivar un usuario administrador",
 			);
@@ -199,7 +197,6 @@ export class UsersService {
 		const deactivatedUser = await this.prisma.user.update({
 			where: { id },
 			data: { status: "INACTIVE" as UserStatus },
-			include: { role: true },
 		});
 
 		await this.prisma.userAuditLog.create({
@@ -211,13 +208,12 @@ export class UsersService {
 			},
 		});
 
-		return deactivatedUser as UserEntity;
+		return this.toUserEntity(deactivatedUser);
 	}
 
 	async reactivate(id: string, actorId: string): Promise<UserEntity> {
 		const user = await this.prisma.user.findUnique({
 			where: { id },
-			include: { role: true },
 		});
 
 		if (!user) {
@@ -231,7 +227,6 @@ export class UsersService {
 		const reactivatedUser = await this.prisma.user.update({
 			where: { id },
 			data: { status: "ACTIVE" as UserStatus },
-			include: { role: true },
 		});
 
 		await this.prisma.userAuditLog.create({
@@ -243,7 +238,7 @@ export class UsersService {
 			},
 		});
 
-		return reactivatedUser as UserEntity;
+		return this.toUserEntity(reactivatedUser);
 	}
 
 	async canHardDelete(id: string): Promise<boolean> {
@@ -273,6 +268,12 @@ export class UsersService {
 
 		if (!user) {
 			throw new NotFoundException("Usuario no encontrado");
+		}
+
+		if (user.role === UserRole.ADMIN) {
+			throw new ForbiddenException(
+				"No se puede eliminar permanentemente un usuario administrador",
+			);
 		}
 
 		if (user.status !== "INACTIVE") {

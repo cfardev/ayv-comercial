@@ -6,7 +6,8 @@ import { AuthController } from "./auth.controller.js";
 import { AuthService } from "./auth.service.js";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard.js";
 import { LocalAuthGuard } from "./guards/local-auth.guard.js";
-import { RolesGuard } from "./guards/roles.guard.js";
+import { PermissionsGuard } from "./guards/permissions.guard.js";
+import { UserPermissionsService } from "./permissions/user-permissions.service.js";
 import { JwtStrategy } from "./strategies/jwt.strategy.js";
 import { LocalStrategy } from "./strategies/local.strategy.js";
 
@@ -27,12 +28,18 @@ import { LocalStrategy } from "./strategies/local.strategy.js";
 	controllers: [AuthController],
 	providers: [
 		AuthService,
+		UserPermissionsService,
 		LocalStrategy,
 		JwtStrategy,
 		JwtAuthGuard,
 		LocalAuthGuard,
-		RolesGuard,
+		PermissionsGuard,
 	],
-	exports: [AuthService, JwtAuthGuard, RolesGuard],
+	exports: [
+		AuthService,
+		JwtAuthGuard,
+		UserPermissionsService,
+		PermissionsGuard,
+	],
 })
 export class AuthModule {}

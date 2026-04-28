@@ -45,6 +45,21 @@
 			}
 		},
 		{
+			"includes": ["apps/api/**/*.guard.ts"],
+			"javascript": {
+				"parser": {
+					"unsafeParameterDecoratorsEnabled": true
+				}
+			},
+			"linter": {
+				"rules": {
+					"style": {
+						"useImportType": "off"
+					}
+				}
+			}
+		},
+		{
 			"includes": ["apps/api/**/*.controller.ts"],
 			"javascript": {
 				"parser": {

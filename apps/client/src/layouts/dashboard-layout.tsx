@@ -45,6 +45,10 @@ import {
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/lib/auth-context";
+import {
+	hasPermissionOrSystemAdmin,
+	PERMISSION_KEYS,
+} from "@/lib/permission-keys";
 
 function getInitials(fullName: string): string {
 	return fullName
@@ -65,12 +69,6 @@ const navOperaciones = [
 const navCatalogo = [
 	{ title: "Productos", url: "/productos", icon: IconBox },
 	{ title: "Clientes", url: "/clientes", icon: IconUsers },
-];
-
-const navReportes = [
-	{ title: "Reportes", url: "/reportes", icon: IconChartBar },
-	{ title: "Usuarios", url: "/usuarios", icon: IconUsers },
-	{ title: "Configuracion", url: "/configuracion", icon: IconSettings },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -121,6 +119,18 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 	const currentPath = location.pathname;
 	const pageTitle = pageTitles[currentPath] ?? "A&V";
 	const { user, logout } = useAuth();
+
+	const navReportes: (typeof navOperaciones)[number][] = [
+		{ title: "Reportes", url: "/reportes", icon: IconChartBar },
+		...(hasPermissionOrSystemAdmin(
+			user?.permissions,
+			PERMISSION_KEYS.USERS_READ,
+			user?.role?.slug,
+		)
+			? [{ title: "Usuarios", url: "/usuarios", icon: IconUsers }]
+			: []),
+		{ title: "Configuracion", url: "/configuracion", icon: IconSettings },
+	];
 
 	return (
 		<TooltipProvider>

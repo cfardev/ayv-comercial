@@ -1,24 +1,13 @@
-export type RoleName =
-	| "ADMIN"
-	| "SELLER"
-	| "INVENTORY_MANAGER"
-	| "DISPATCH_MANAGER"
-	| "OWNER_MANAGER";
+import type { UserRole } from "@/lib/user-roles.js";
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
-
-export interface Role {
-	id: string;
-	name: RoleName;
-	createdAt: string;
-}
 
 export interface User {
 	id: string;
 	fullName: string;
 	email: string;
 	status: UserStatus;
-	role: Role;
+	role: { slug: UserRole; name: string };
 	failedAttempts: number;
 	lockoutUntil: string | null;
 	createdAt: string;
@@ -36,7 +25,7 @@ export interface PaginatedResponse<T> {
 export interface UserFilters {
 	search?: string;
 	status?: UserStatus | "ALL";
-	roleId?: string;
+	role?: UserRole;
 	page?: number;
 	limit?: number;
 }
@@ -45,11 +34,11 @@ export interface CreateUserPayload {
 	fullName: string;
 	email: string;
 	password: string;
-	roleId: string;
+	role: UserRole;
 }
 
 export interface UpdateUserPayload {
 	fullName?: string;
 	email?: string;
-	roleId?: string;
+	role?: UserRole;
 }

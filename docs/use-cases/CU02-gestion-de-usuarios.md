@@ -15,7 +15,7 @@ Registrar, consultar, modificar y desactivar usuarios que accederán al sistema,
 
 - A: El actor está autenticado en el sistema.
 - A: El actor tiene permiso para gestionar usuarios.
-- A: Existe al menos un rol definido en el sistema (referencia CU03).
+- A: El conjunto de roles del sistema está definido de forma estática (enum `UserRole` en el esquema de datos; ver CU03).
 
 ## Disparador
 

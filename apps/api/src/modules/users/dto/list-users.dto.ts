@@ -1,4 +1,5 @@
 import { IsEnum, IsOptional, IsString } from "class-validator";
+import { UserRole } from "../../../../generated/prisma/client.js";
 
 export enum UserStatusFilter {
 	ACTIVE = "ACTIVE",
@@ -16,8 +17,8 @@ export class ListUsersDto {
 	status?: UserStatusFilter;
 
 	@IsOptional()
-	@IsString()
-	roleId?: string;
+	@IsEnum(UserRole)
+	role?: UserRole;
 
 	@IsOptional()
 	@IsString()

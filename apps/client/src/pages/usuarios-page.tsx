@@ -10,6 +10,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import type { UserRole } from "@/lib/user-roles.js";
+import { USER_ROLE_OPTIONS } from "@/lib/user-roles.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
 import { UserFormDialog } from "@/modules/users/components/user-form-dialog.js";
 import { UsersTable } from "@/modules/users/components/users-table.js";
@@ -18,7 +20,6 @@ import {
 	useDeactivateUser,
 	useHardDeleteUser,
 	useReactivateUser,
-	useRoles,
 	useUpdateUser,
 	useUsers,
 } from "@/modules/users/hooks/use-users.js";
@@ -34,18 +35,10 @@ const statusOptions: { value: UserStatus | "ALL"; label: string }[] = [
 	{ value: "INACTIVE", label: "Inactivos" },
 ];
 
-const roleLabels: Record<string, string> = {
-	ADMIN: "Administrador",
-	SELLER: "Vendedor",
-	INVENTORY_MANAGER: "Gestor de Inventario",
-	DISPATCH_MANAGER: "Gestor de Despachos",
-	OWNER_MANAGER: "Gestor de Propietarios",
-};
-
 export function UsersPage() {
 	const [search, setSearch] = useState("");
 	const [status, setStatus] = useState<UserStatus | "ALL">("ACTIVE");
-	const [roleFilter, setRoleFilter] = useState<string>("ALL");
+	const [roleFilter, setRoleFilter] = useState<UserRole | "ALL">("ALL");
 	const [page, setPage] = useState(1);
 
 	const [formOpen, setFormOpen] = useState(false);
@@ -59,12 +52,10 @@ export function UsersPage() {
 	const { data: usersData, isLoading: usersLoading } = useUsers({
 		search: search || undefined,
 		status,
-		roleId: roleFilter !== "ALL" ? roleFilter : undefined,
+		role: roleFilter !== "ALL" ? roleFilter : undefined,
 		page,
 		limit: 20,
 	});
-
-	const { data: rolesData } = useRoles();
 
 	const createUser = useCreateUser();
 	const updateUser = useUpdateUser();
@@ -193,7 +184,7 @@ export function UsersPage() {
 					<Select
 						value={roleFilter}
 						onValueChange={(value) => {
-							setRoleFilter(value);
+							setRoleFilter(value as UserRole | "ALL");
 							setPage(1);
 						}}
 					>
@@ -202,9 +193,9 @@ export function UsersPage() {
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="ALL">Todos los roles</SelectItem>
-							{rolesData?.map((role) => (
-								<SelectItem key={role.id} value={role.id}>
-									{roleLabels[role.name] ?? role.name}
+							{USER_ROLE_OPTIONS.map((opt) => (
+								<SelectItem key={opt.value} value={opt.value}>
+									{opt.label}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -249,7 +240,6 @@ export function UsersPage() {
 				open={formOpen}
 				onOpenChange={setFormOpen}
 				user={editingUser}
-				roles={rolesData ?? []}
 				onSubmit={handleFormSubmit}
 				isLoading={createUser.isPending || updateUser.isPending}
 			/>

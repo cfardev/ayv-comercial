@@ -1,4 +1,5 @@
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
+import { UserRole } from "../../../../generated/prisma/client.js";
 
 export class UpdateUserDto {
 	@IsOptional()
@@ -10,6 +11,6 @@ export class UpdateUserDto {
 	email?: string;
 
 	@IsOptional()
-	@IsString()
-	roleId?: string;
+	@IsEnum(UserRole)
+	role?: UserRole;
 }

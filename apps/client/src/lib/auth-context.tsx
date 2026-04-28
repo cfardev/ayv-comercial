@@ -8,12 +8,15 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface User {
+export interface AuthUser {
 	id: string;
 	fullName: string;
 	email: string;
-	role: { name: string };
+	role: { name: string; slug: string };
+	permissions: string[];
 }
+
+type User = AuthUser;
 
 interface AuthState {
 	user: User | null;
@@ -37,7 +40,18 @@ function getStoredAuth(): AuthState | null {
 			localStorage.removeItem(AUTH_STORAGE_KEY);
 			return null;
 		}
-		return { user: parsed.user, accessToken: parsed.accessToken };
+		const user = parsed.user as AuthUser;
+		return {
+			user: {
+				...user,
+				permissions: user.permissions ?? [],
+				role: {
+					...user.role,
+					slug: user.role?.slug ?? user.role?.name ?? "",
+				},
+			},
+			accessToken: parsed.accessToken,
+		};
 	} catch {
 		return null;
 	}
@@ -78,7 +92,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				throw new Error(data.message ?? "Credenciales inválidas");
 			}
 
-			const data = (await res.json()) as { accessToken: string; user: User };
+			const data = (await res.json()) as {
+				accessToken: string;
+				user: AuthUser;
+			};
 			const newState = { user: data.user, accessToken: data.accessToken };
 			storeAuth(newState);
 			setState(newState);

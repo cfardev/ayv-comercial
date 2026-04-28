@@ -6,8 +6,11 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import bcrypt from "bcryptjs";
 import { PinoLogger } from "nestjs-pino";
+import type { UserRole } from "../../generated/prisma/client.js";
+import { userRoleToResponse } from "../common/constants/user-role-labels.js";
 import { PrismaService } from "../common/prisma/prisma.service.js";
 import type { LoginResponseDto } from "./dto/login-response.dto.js";
+import { UserPermissionsService } from "./permissions/user-permissions.service.js";
 
 const LOCKOUT_MINUTES = 15;
 const MAX_FAILED_ATTEMPTS = 5;
@@ -17,6 +20,7 @@ export class AuthService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly jwtService: JwtService,
+		private readonly userPermissions: UserPermissionsService,
 		private readonly logger: PinoLogger,
 	) {
 		this.logger.setContext(AuthService.name);
@@ -27,7 +31,6 @@ export class AuthService {
 			where: {
 				email,
 			},
-			include: { role: true },
 		});
 
 		if (!user) {
@@ -118,7 +121,7 @@ export class AuthService {
 			id: string;
 			fullName: string;
 			email: string;
-			role: { name: string };
+			role: UserRole;
 		},
 		ip: string,
 	) {
@@ -126,15 +129,22 @@ export class AuthService {
 			data: { ip, userId: user.id, success: true },
 		});
 
+		const rolePayload = userRoleToResponse(user.role);
+
 		this.logger.info(
-			{ userId: user.id, roleName: user.role.name, ip },
+			{ userId: user.id, roleSlug: rolePayload.slug, ip },
 			"Login succeeded",
+		);
+
+		const permissions = await this.userPermissions.getPermissionNamesForUser(
+			user.id,
 		);
 
 		const payload = {
 			sub: user.id,
 			email: user.email,
-			roleName: user.role.name,
+			roleSlug: rolePayload.slug,
+			roleName: rolePayload.slug,
 		};
 		const accessToken = this.jwtService.sign(payload);
 
@@ -145,7 +155,8 @@ export class AuthService {
 				id: user.id,
 				fullName: user.fullName,
 				email: user.email,
-				role: { name: user.role.name as never },
+				role: { name: rolePayload.name, slug: rolePayload.slug },
+				permissions,
 			},
 		};
 
@@ -155,7 +166,6 @@ export class AuthService {
 	async getUserById(userId: string) {
 		return this.prisma.user.findUnique({
 			where: { id: userId },
-			include: { role: true },
 		});
 	}
 }

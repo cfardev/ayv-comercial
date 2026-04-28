@@ -1,0 +1,15 @@
+/** Stable permission keys (English) — align with seed and guards. */
+export const PERMISSION_KEYS = {
+	USERS_READ: "users:read",
+	USERS_CREATE: "users:create",
+	USERS_UPDATE: "users:update",
+	USERS_DEACTIVATE: "users:deactivate",
+	USERS_REACTIVATE: "users:reactivate",
+	USERS_DELETE: "users:delete",
+} as const;
+
+export type PermissionKey =
+	(typeof PERMISSION_KEYS)[keyof typeof PERMISSION_KEYS];
+
+export const ALL_PERMISSION_VALUES: PermissionKey[] =
+	Object.values(PERMISSION_KEYS);

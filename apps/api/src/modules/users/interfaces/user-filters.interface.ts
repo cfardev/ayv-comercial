@@ -1,9 +1,12 @@
-import type { UserStatus } from "../../../../generated/prisma/client.js";
+import type {
+	UserRole,
+	UserStatus,
+} from "../../../../generated/prisma/client.js";
 
 export interface UserFilters {
 	search?: string;
 	status?: UserStatus | "ALL";
-	roleId?: string;
+	role?: UserRole;
 	page: number;
 	limit: number;
 }

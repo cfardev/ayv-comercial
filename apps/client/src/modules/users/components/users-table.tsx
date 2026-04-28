@@ -18,14 +18,6 @@ import {
 } from "@/components/ui/table";
 import type { User } from "../types/api.js";
 
-const roleLabels: Record<string, string> = {
-	ADMIN: "Administrador",
-	SELLER: "Vendedor",
-	INVENTORY_MANAGER: "Gestor de Inventario",
-	DISPATCH_MANAGER: "Gestor de Despachos",
-	OWNER_MANAGER: "Gestor de Propietarios",
-};
-
 const statusVariants: Record<
 	string,
 	VariantProps<typeof badgeVariants>["variant"]
@@ -136,9 +128,7 @@ export function UsersTable({
 						<TableRow key={user.id}>
 							<TableCell className="font-medium">{user.fullName}</TableCell>
 							<TableCell>{user.email}</TableCell>
-							<TableCell>
-								{roleLabels[user.role.name] ?? user.role.name}
-							</TableCell>
+							<TableCell>{user.role.name}</TableCell>
 							<TableCell>
 								<Badge variant={statusVariants[user.status]}>
 									{statusLabels[user.status]}
@@ -155,7 +145,7 @@ export function UsersTable({
 									>
 										<IconEdit className="size-4" />
 									</Button>
-									{user.status === "ACTIVE" && user.role.name !== "ADMIN" && (
+									{user.status === "ACTIVE" && user.role.slug !== "ADMIN" && (
 										<Button
 											variant="ghost"
 											size="icon"

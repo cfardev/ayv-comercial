@@ -1,7 +1,4 @@
-import type {
-	RoleName,
-	UserStatus,
-} from "../../../../generated/prisma/client.js";
+import type { UserStatus } from "../../../../generated/prisma/client.js";
 
 export class UserEntity {
 	id!: string;
@@ -9,8 +6,8 @@ export class UserEntity {
 	email!: string;
 	status!: UserStatus;
 	role!: {
-		id: string;
-		name: RoleName;
+		name: string;
+		slug: string;
 	};
 	failedAttempts!: number;
 	lockoutUntil!: Date | null;

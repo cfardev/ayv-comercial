@@ -8,6 +8,7 @@ import {
 	UseGuards,
 } from "@nestjs/common";
 import type { Request } from "express";
+import type { UserRole } from "../../generated/prisma/client.js";
 import { AuthService } from "./auth.service.js";
 import { Public } from "./decorators/public.decorator.js";
 import { LoginRequestDto } from "./dto/login-request.dto.js";
@@ -30,7 +31,7 @@ export class AuthController {
 			id: string;
 			fullName: string;
 			email: string;
-			role: { name: string };
+			role: UserRole;
 		};
 		const ip =
 			(req.headers["x-forwarded-for"] as string)?.split(",")[0].trim() ??
