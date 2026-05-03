@@ -55,6 +55,7 @@ Monorepo con **Turborepo** y **pnpm**: backoffice para una distribuidora de **el
 - **Código**: respetar Biome; no introducir ESLint/Prettier paralelos salvo decisión explícita del equipo.
 - **Idioma del código**: TODO el código, nombres de variables, funciones, modelos, campos, mensajes de error, comentarios y configuraciones deben estar en **inglés**. Las únicas excepciones son textos hardcoded que se muestran directamente al usuario final (labels UI, mensajes de validación, etc.) — estos pueden estar en español si el proyecto lo requiere.
 - **Prisma schema**: usar `camelCase` en los modelos y campos del schema (API TypeScript); usar `@map` a nivel de cada campo y `@@map` en el modelo para mapear a `lower_snake_case` en PostgreSQL. Todo modelo debe tener su `@@map` explícito.
+- **Hard delete / soft delete**: cuando exista un selector para filtrar registros activos e inactivos, usar **Activos** como valor por defecto en lugar de **Todos**.
 
 ## Conventional commits
 

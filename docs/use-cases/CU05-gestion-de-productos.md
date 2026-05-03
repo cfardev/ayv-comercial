@@ -118,3 +118,4 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - A: El sistema rechaza el registro con código duplicado.
 - A: El sistema muestra advertencias cuando el precio de venta es menor al costo.
 - A: Los productos desactivados no aparecen en el catálogo de ventas.
+- A: Los productos cuya categoría está inactiva no son visibles en el catálogo de ventas (reflejo de CU04 CA6).

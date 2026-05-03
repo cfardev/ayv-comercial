@@ -15,6 +15,7 @@ import {
 	CLIENT_DIST_PATH,
 	MONOREPO_ROOT_ENV_FILE,
 } from "./common/utils/monorepo-paths.js";
+import { CategoriesModule } from "./modules/categories/categories.module.js";
 import { UsersModule } from "./modules/users/users.module.js";
 
 @Module({
@@ -40,6 +41,7 @@ import { UsersModule } from "./modules/users/users.module.js";
 		PrismaModule,
 		AuthModule,
 		UsersModule,
+		CategoriesModule,
 		ServeStaticModule.forRoot({
 			rootPath: CLIENT_DIST_PATH,
 			exclude: ["/api", "/api/*path"],

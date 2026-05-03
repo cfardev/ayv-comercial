@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/components/protected-route";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
+import { CategoriasPage } from "@/pages/categorias-page";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
 import { LoginPage } from "@/pages/login-page";
 import { UsersPage } from "@/pages/usuarios-page";
@@ -23,6 +24,7 @@ function DashboardRoutes() {
 				<Route path="despachos" element={<Placeholder title="Despachos" />} />
 				<Route path="productos" element={<Placeholder title="Productos" />} />
 				<Route path="clientes" element={<Placeholder title="Clientes" />} />
+				<Route path="categorias" element={<CategoriasPage />} />
 				<Route path="usuarios" element={<UsersPage />} />
 				<Route path="reportes" element={<Placeholder title="Reportes" />} />
 				<Route
