@@ -3,8 +3,8 @@ export default {
   // Mirrors .github/workflows/verify.yml: lint + build on commit; typecheck deferred to pre-push
 
   // biome check --write on staged files (lint step)
-  "*.{ts,tsx,js,mjs,json}": ["biome check --write"],
+  "**/*.{ts,tsx,js,mjs,json}": ["biome check --write --no-errors-on-unmatched"],
 
   // build runs project-wide when any TS file is staged
-  "*.{ts,tsx}": [() => "pnpm build"],
+  "**/*.{ts,tsx}": [() => "pnpm build"],
 };
