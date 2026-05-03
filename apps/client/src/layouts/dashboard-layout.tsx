@@ -1,6 +1,7 @@
 import {
 	IconBox,
 	IconBuildingWarehouse,
+	IconCategory,
 	IconChartBar,
 	IconFileInvoice,
 	IconLayoutDashboard,
@@ -68,6 +69,7 @@ const navOperaciones = [
 
 const navCatalogo = [
 	{ title: "Productos", url: "/productos", icon: IconBox },
+	{ title: "Categorías", url: "/categorias", icon: IconCategory },
 	{ title: "Clientes", url: "/clientes", icon: IconUsers },
 ];
 
@@ -77,6 +79,7 @@ const pageTitles: Record<string, string> = {
 	"/inventario": "Inventario",
 	"/despachos": "Despachos",
 	"/productos": "Productos",
+	"/categorias": "Categorías",
 	"/clientes": "Clientes",
 	"/usuarios": "Usuarios",
 	"/reportes": "Reportes",
