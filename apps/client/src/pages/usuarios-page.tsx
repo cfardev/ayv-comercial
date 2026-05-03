@@ -10,6 +10,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { useDebounce } from "@/hooks/use-debounce.js";
 import type { UserRole } from "@/lib/user-roles.js";
 import { USER_ROLE_OPTIONS } from "@/lib/user-roles.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
@@ -37,6 +38,7 @@ const statusOptions: { value: UserStatus | "ALL"; label: string }[] = [
 
 export function UsersPage() {
 	const [search, setSearch] = useState("");
+	const debouncedSearch = useDebounce(search, 300);
 	const [status, setStatus] = useState<UserStatus | "ALL">("ACTIVE");
 	const [roleFilter, setRoleFilter] = useState<UserRole | "ALL">("ALL");
 	const [page, setPage] = useState(1);
@@ -50,7 +52,7 @@ export function UsersPage() {
 	}>({ open: false, user: null, action: null });
 
 	const { data: usersData, isLoading: usersLoading } = useUsers({
-		search: search || undefined,
+		search: debouncedSearch || undefined,
 		status,
 		role: roleFilter !== "ALL" ? roleFilter : undefined,
 		page,
