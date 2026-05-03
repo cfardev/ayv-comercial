@@ -4,6 +4,7 @@
 	"private": true,
 	"description": "Monorepo backoffice — Turborepo + pnpm",
 	"scripts": {
+		"prepare": "husky",
 		"build": "turbo run build",
 		"start": "pnpm --filter @ayv-comercial/client run build && pnpm --filter @ayv-comercial/api run build && pnpm --filter @ayv-comercial/api run start:prod",
 		"dev": "turbo run dev --log-order stream",
@@ -50,6 +51,10 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
+		"@commitlint/cli": "^20.5.3",
+		"@commitlint/config-conventional": "^20.5.3",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.4.0",
 		"tsx": "^4.21.0",
 		"turbo": "^2.7.5",
 		"typescript": "~6.0.2"
