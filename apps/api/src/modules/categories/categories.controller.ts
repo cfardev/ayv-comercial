@@ -16,8 +16,8 @@ import { RequirePermissions } from "../../auth/decorators/require-permissions.de
 import { PermissionsGuard } from "../../auth/guards/permissions.guard.js";
 import { PERMISSION_KEYS } from "../../auth/permissions/permission-keys.js";
 import { CategoriesService } from "./categories.service.js";
-import { ListCategoriesDto } from "./dto/list-categories.dto.js";
 import { CreateCategoryDto } from "./dto/create-category.dto.js";
+import { ListCategoriesDto } from "./dto/list-categories.dto.js";
 import { UpdateCategoryDto } from "./dto/update-category.dto.js";
 import type { CategoryEntity } from "./entities/category.entity.js";
 import type { PaginatedResult } from "./interfaces/category-filters.interface.js";

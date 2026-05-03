@@ -1,8 +1,4 @@
-import {
-	IconEdit,
-	IconPower,
-	IconRefresh,
-} from "@tabler/icons-react";
+import { IconEdit, IconPower, IconRefresh } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -85,7 +81,10 @@ export function CategoriesTable({
 					</TableHeader>
 					<TableBody>
 						<TableRow>
-							<TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+							<TableCell
+								colSpan={7}
+								className="text-center text-muted-foreground py-8"
+							>
 								No se encontraron categorías.
 							</TableCell>
 						</TableRow>

@@ -7,8 +7,11 @@ import {
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import type { CreateCategoryDto } from "./dto/create-category.dto.js";
 import type { UpdateCategoryDto } from "./dto/update-category.dto.js";
-import type { CategoryFilters, PaginatedResult } from "./interfaces/category-filters.interface.js";
 import type { CategoryEntity } from "./entities/category.entity.js";
+import type {
+	CategoryFilters,
+	PaginatedResult,
+} from "./interfaces/category-filters.interface.js";
 
 const MAX_DEPTH = 2; // 0 = root, 1 = sub, 2 = sub-sub
 
@@ -18,20 +21,18 @@ export class CategoriesService {
 
 	// ─── Mappers ─────────────────────────────────────────────────────────────
 
-	private toCategoryEntity(
-		row: {
-			id: string;
-			name: string;
-			description: string | null;
-			status: boolean;
-			parentId: string | null;
-			depth: number;
-			createdAt: Date;
-			updatedAt: Date;
-			parent?: { id: string; name: string } | null;
-			_count?: { products: number; children: number };
-		},
-	): CategoryEntity {
+	private toCategoryEntity(row: {
+		id: string;
+		name: string;
+		description: string | null;
+		status: boolean;
+		parentId: string | null;
+		depth: number;
+		createdAt: Date;
+		updatedAt: Date;
+		parent?: { id: string; name: string } | null;
+		_count?: { products: number; children: number };
+	}): CategoryEntity {
 		return {
 			id: row.id,
 			name: row.name,
@@ -79,7 +80,6 @@ export class CategoriesService {
 		while (currentId) {
 			if (visited.has(currentId)) break; // cycle guard
 			visited.add(currentId);
-			// biome-ignore lint/nursery/noAwaitInLoop: sequential walk required
 			const cat: { parentId: string | null } | null =
 				await this.prisma.category.findUnique({
 					where: { id: currentId },
@@ -99,12 +99,10 @@ export class CategoriesService {
 			select: { id: true },
 		});
 		for (const child of children) {
-			// biome-ignore lint/nursery/noAwaitInLoop: sequential cascade required
 			await this.prisma.category.update({
 				where: { id: child.id },
 				data: { status: false },
 			});
-			// biome-ignore lint/nursery/noAwaitInLoop: sequential cascade required
 			await this.deactivateChildren(child.id);
 		}
 	}
@@ -170,7 +168,8 @@ export class CategoriesService {
 				_count: { select: { products: true, children: true } },
 			},
 		});
-		if (!row) throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
+		if (!row)
+			throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
 		return this.toCategoryEntity(row);
 	}
 
@@ -179,13 +178,16 @@ export class CategoriesService {
 		actorId: string,
 	): Promise<CategoryEntity> {
 		let depth = 0;
-		let parentId: string | null = dto.parentId ?? null;
+		const parentId: string | null = dto.parentId ?? null;
 
 		if (parentId) {
 			const parent = await this.prisma.category.findUnique({
 				where: { id: parentId },
 			});
-			if (!parent) throw new NotFoundException(`Categoría padre con id "${parentId}" no encontrada.`);
+			if (!parent)
+				throw new NotFoundException(
+					`Categoría padre con id "${parentId}" no encontrada.`,
+				);
 			if (!parent.status) {
 				throw new BadRequestException(
 					"La categoría padre está inactiva. Actívala primero antes de crear una subcategoría.",
@@ -233,12 +235,15 @@ export class CategoriesService {
 		actorId: string,
 	): Promise<CategoryEntity> {
 		const existing = await this.prisma.category.findUnique({ where: { id } });
-		if (!existing) throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
+		if (!existing)
+			throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
 
 		// Circular reference check: new parentId must not be self or a descendant
 		if (dto.parentId !== undefined && dto.parentId !== null) {
 			if (dto.parentId === id) {
-				throw new BadRequestException("Una categoría no puede ser su propio padre.");
+				throw new BadRequestException(
+					"Una categoría no puede ser su propio padre.",
+				);
 			}
 			const circular = await this.isDescendant(dto.parentId, id);
 			if (circular) {
@@ -258,7 +263,10 @@ export class CategoriesService {
 				const parent = await this.prisma.category.findUnique({
 					where: { id: newParentId },
 				});
-				if (!parent) throw new NotFoundException(`Categoría padre con id "${newParentId}" no encontrada.`);
+				if (!parent)
+					throw new NotFoundException(
+						`Categoría padre con id "${newParentId}" no encontrada.`,
+					);
 				if (parent.depth >= MAX_DEPTH) {
 					throw new BadRequestException(
 						`Se superó el límite de ${MAX_DEPTH + 1} niveles de jerarquía permitidos.`,
@@ -284,8 +292,12 @@ export class CategoriesService {
 			where: { id },
 			data: {
 				...(dto.name !== undefined ? { name: dto.name } : {}),
-				...(dto.description !== undefined ? { description: dto.description } : {}),
-				...(dto.parentId !== undefined ? { parentId: newParentId, depth: newDepth } : {}),
+				...(dto.description !== undefined
+					? { description: dto.description }
+					: {}),
+				...(dto.parentId !== undefined
+					? { parentId: newParentId, depth: newDepth }
+					: {}),
 			},
 			include: {
 				parent: { select: { id: true, name: true } },
@@ -315,7 +327,8 @@ export class CategoriesService {
 			where: { id },
 			include: { _count: { select: { products: true } } },
 		});
-		if (!existing) throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
+		if (!existing)
+			throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
 
 		if (!existing.status) {
 			throw new BadRequestException("La categoría ya está inactiva.");
@@ -359,7 +372,8 @@ export class CategoriesService {
 				_count: { select: { products: true, children: true } },
 			},
 		});
-		if (!existing) throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
+		if (!existing)
+			throw new NotFoundException(`Categoría con id "${id}" no encontrada.`);
 
 		if (existing.status) {
 			throw new BadRequestException("La categoría ya está activa.");

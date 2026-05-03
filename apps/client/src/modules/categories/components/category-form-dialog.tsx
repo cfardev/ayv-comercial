@@ -21,7 +21,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { Category } from "../types/api.js";
-import { categoryFormSchema, type CategoryFormValues } from "../types/schema.js";
+import {
+	type CategoryFormValues,
+	categoryFormSchema,
+} from "../types/schema.js";
 
 const NO_PARENT = "__none__";
 
@@ -64,7 +67,8 @@ export function CategoryFormDialog({
 			form.reset({
 				name: category?.name ?? "",
 				description: category?.description ?? "",
-				parentId: category?.parentId ?? undefined,			});
+				parentId: category?.parentId ?? undefined,
+			});
 		}
 	}, [open, category, form]);
 
@@ -138,10 +142,7 @@ export function CategoryFormDialog({
 						<Select
 							value={form.watch("parentId") ?? NO_PARENT}
 							onValueChange={(val) =>
-								form.setValue(
-									"parentId",
-									val === NO_PARENT ? undefined : val,
-								)
+								form.setValue("parentId", val === NO_PARENT ? undefined : val)
 							}
 						>
 							<SelectTrigger id="parentId" className="cursor-pointer">
@@ -152,7 +153,11 @@ export function CategoryFormDialog({
 									Sin categoría padre (raíz)
 								</SelectItem>
 								{validParents.map((c) => (
-									<SelectItem key={c.id} value={c.id} className="cursor-pointer">
+									<SelectItem
+										key={c.id}
+										value={c.id}
+										className="cursor-pointer"
+									>
 										{"  ".repeat(c.depth)}
 										{c.name}
 									</SelectItem>
@@ -170,7 +175,11 @@ export function CategoryFormDialog({
 						>
 							Cancelar
 						</Button>
-						<Button type="submit" disabled={isLoading} className="cursor-pointer">
+						<Button
+							type="submit"
+							disabled={isLoading}
+							className="cursor-pointer"
+						>
 							{isLoading
 								? isEditing
 									? "Guardando..."

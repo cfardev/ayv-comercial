@@ -67,7 +67,8 @@ async function updateCategory(
 	if (!res.ok) {
 		const error = await res.json().catch(() => ({}));
 		throw new Error(
-			(error as { message?: string }).message ?? "Error al actualizar categoría",
+			(error as { message?: string }).message ??
+				"Error al actualizar categoría",
 		);
 	}
 	return res.json() as Promise<Category>;
@@ -80,7 +81,8 @@ async function deactivateCategory(id: string): Promise<Category> {
 	if (!res.ok) {
 		const error = await res.json().catch(() => ({}));
 		throw new Error(
-			(error as { message?: string }).message ?? "Error al desactivar categoría",
+			(error as { message?: string }).message ??
+				"Error al desactivar categoría",
 		);
 	}
 	return res.json() as Promise<Category>;

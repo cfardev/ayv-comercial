@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/components/protected-route";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
+import { CategoriasPage } from "@/pages/categorias-page";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
 import { LoginPage } from "@/pages/login-page";
 import { UsersPage } from "@/pages/usuarios-page";
-import { CategoriasPage } from "@/pages/categorias-page";
 
 function Placeholder({ title }: { title: string }) {
 	return (
