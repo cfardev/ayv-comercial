@@ -17,7 +17,7 @@ docker compose up -d
 
 Con los valores por defecto del compose y de [`.env.example`](.env.example), la URL de conexión es:
 
-`postgresql://ayv:ayv@localhost:5432/ayv`
+`postgresql://ayv:ayv@localhost:5433/ayv`
 
 Copia `.env.example` a `.env` y ajusta `POSTGRES_*` y `DATABASE_URL` si cambias usuario, contraseña o nombre de base. Para borrar datos locales: `docker compose down -v`.
 
