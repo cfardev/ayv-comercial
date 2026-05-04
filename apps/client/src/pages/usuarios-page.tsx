@@ -250,21 +250,21 @@ export function UsersPage() {
 					onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}
 					title={
 						confirmDialog.action === "deactivate"
-							? "Desactivar usuario"
+							? "Eliminar usuario"
 							: confirmDialog.action === "reactivate"
 								? "Reactivar usuario"
 								: "Eliminar usuario"
 					}
 					description={
 						confirmDialog.action === "deactivate"
-							? `¿Estás seguro de que deseas desactivar a ${confirmDialog.user.fullName}? El usuario perderá acceso al sistema.`
+							? `¿Estás seguro de que deseas eliminar a ${confirmDialog.user.fullName}? El usuario perderá acceso al sistema.`
 							: confirmDialog.action === "reactivate"
 								? `¿Estás seguro de que deseas reactivar a ${confirmDialog.user.fullName}? El usuario recuperará acceso al sistema.`
 								: `¿Estás seguro de que deseas eliminar permanentemente a ${confirmDialog.user.fullName}? Esta acción no se puede deshacer.`
 					}
 					confirmLabel={
 						confirmDialog.action === "deactivate"
-							? "Desactivar"
+							? "Eliminar"
 							: confirmDialog.action === "reactivate"
 								? "Reactivar"
 								: "Eliminar"

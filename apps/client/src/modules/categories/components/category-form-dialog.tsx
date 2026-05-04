@@ -40,6 +40,7 @@ interface CategoryFormDialogProps {
 	category?: Category | null;
 	parentCategories: Category[];
 	onSubmit: (data: CategoryFormSubmitData) => void;
+	errorMessage?: string | null;
 	isLoading?: boolean;
 }
 
@@ -49,6 +50,7 @@ export function CategoryFormDialog({
 	category,
 	parentCategories,
 	onSubmit,
+	errorMessage,
 	isLoading,
 }: CategoryFormDialogProps) {
 	const isEditing = !!category;
@@ -72,7 +74,14 @@ export function CategoryFormDialog({
 		}
 	}, [open, category, form]);
 
+	useEffect(() => {
+		if (errorMessage) {
+			form.setError("root", { message: errorMessage });
+		}
+	}, [errorMessage, form]);
+
 	function handleSubmit(values: CategoryFormValues) {
+		form.clearErrors("root");
 		const parentId: string | null =
 			values.parentId === NO_PARENT || !values.parentId
 				? null
@@ -165,6 +174,12 @@ export function CategoryFormDialog({
 							</SelectContent>
 						</Select>
 					</div>
+
+					{form.formState.errors.root && (
+						<div className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+							{form.formState.errors.root.message}
+						</div>
+					)}
 
 					<DialogFooter>
 						<Button

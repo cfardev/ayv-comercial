@@ -1,4 +1,4 @@
-import { IconEdit, IconPower, IconRefresh } from "@tabler/icons-react";
+import { IconEdit, IconRefresh, IconTrash } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,7 +35,7 @@ function TableHeadRow() {
 			<TableHead>Categoría padre</TableHead>
 			<TableHead className="w-[140px]">Nivel</TableHead>
 			<TableHead className="w-[100px]">Estado</TableHead>
-			<TableHead className="w-[100px]">Acciones</TableHead>
+			<TableHead className="w-[140px]">Acciones</TableHead>
 		</TableRow>
 	);
 }
@@ -142,12 +142,13 @@ export function CategoriesTable({
 									{category.status ? (
 										<Button
 											variant="ghost"
-											size="icon"
+											size="sm"
 											className="cursor-pointer text-destructive hover:text-destructive"
 											onClick={() => onDeactivate(category)}
-											title="Desactivar"
+											title="Eliminar"
 										>
-											<IconPower className="h-4 w-4" />
+											<IconTrash className="h-4 w-4" />
+											Eliminar
 										</Button>
 									) : (
 										<Button
