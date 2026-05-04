@@ -1,9 +1,4 @@
-import {
-	IconEdit,
-	IconPower,
-	IconTrash,
-	IconUserCheck,
-} from "@tabler/icons-react";
+import { IconEdit, IconTrash, IconUserCheck } from "@tabler/icons-react";
 import type { VariantProps } from "class-variance-authority";
 import { Badge, type badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,7 +62,7 @@ export function UsersTable({
 							<TableHead>Rol</TableHead>
 							<TableHead>Estado</TableHead>
 							<TableHead>Fecha de creación</TableHead>
-							<TableHead className="w-[120px]">Acciones</TableHead>
+							<TableHead className="w-[160px]">Acciones</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -120,7 +115,7 @@ export function UsersTable({
 						<TableHead>Rol</TableHead>
 						<TableHead>Estado</TableHead>
 						<TableHead>Fecha de creación</TableHead>
-						<TableHead className="w-[120px]">Acciones</TableHead>
+						<TableHead className="w-[160px]">Acciones</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -148,11 +143,13 @@ export function UsersTable({
 									{user.status === "ACTIVE" && user.role.slug !== "ADMIN" && (
 										<Button
 											variant="ghost"
-											size="icon"
+											size="sm"
+											className="cursor-pointer text-destructive hover:text-destructive"
 											onClick={() => onDeactivate(user)}
-											title="Desactivar"
+											title="Eliminar"
 										>
-											<IconPower className="size-4" />
+											<IconTrash className="size-4 text-destructive" />
+											Eliminar
 										</Button>
 									)}
 									{user.status === "INACTIVE" && (
