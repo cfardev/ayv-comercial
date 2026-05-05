@@ -8,7 +8,7 @@ import {
 	Min,
 } from "class-validator";
 
-export class ListBrandsDto {
+export class ListBrandsPickerDto {
 	@IsOptional()
 	@IsString()
 	@MaxLength(200)

@@ -4,6 +4,7 @@ import { DashboardLayout } from "@/layouts/dashboard-layout";
 import { CategoriasPage } from "@/pages/categorias-page";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
 import { LoginPage } from "@/pages/login-page";
+import { MarcasPage } from "@/pages/marcas-page.js";
 import { ProductoCreatePage } from "@/pages/producto-create-page.js";
 import { ProductosPage } from "@/pages/productos-page.js";
 import { UsersPage } from "@/pages/usuarios-page.js";
@@ -28,6 +29,7 @@ function DashboardRoutes() {
 				<Route path="productos" element={<ProductosPage />} />
 				<Route path="clientes" element={<Placeholder title="Clientes" />} />
 				<Route path="categorias" element={<CategoriasPage />} />
+				<Route path="marcas" element={<MarcasPage />} />
 				<Route path="usuarios" element={<UsersPage />} />
 				<Route path="reportes" element={<Placeholder title="Reportes" />} />
 				<Route

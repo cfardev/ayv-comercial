@@ -12,4 +12,10 @@ export type OurFileRouter = {
 			maxFileCount: 10;
 		};
 	};
+	brandLogos: {
+		image: {
+			maxFileSize: "4MB";
+			maxFileCount: 1;
+		};
+	};
 };

@@ -8,6 +8,7 @@ import {
 	IconLogout,
 	IconPackages,
 	IconSettings,
+	IconTag,
 	IconTruck,
 	IconUsers,
 } from "@tabler/icons-react";
@@ -75,7 +76,7 @@ const navOperaciones: DashboardNavItem[] = [
 	{ title: "Despachos", url: "/despachos", icon: IconTruck },
 ];
 
-const navCatalogo: DashboardNavItem[] = [
+const navCatalogoBase: DashboardNavItem[] = [
 	{
 		title: "Productos",
 		url: "/productos",
@@ -84,7 +85,6 @@ const navCatalogo: DashboardNavItem[] = [
 			pathname === "/productos" || pathname.startsWith("/productos/"),
 	},
 	{ title: "Categorías", url: "/categorias", icon: IconCategory },
-	{ title: "Clientes", url: "/clientes", icon: IconUsers },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -95,6 +95,7 @@ const pageTitles: Record<string, string> = {
 	"/productos": "Productos",
 	"/productos/nuevo": "Nuevo producto",
 	"/categorias": "Categorías",
+	"/marcas": "Marcas",
 	"/clientes": "Clientes",
 	"/usuarios": "Usuarios",
 	"/reportes": "Reportes",
@@ -155,6 +156,18 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 			? [{ title: "Usuarios", url: "/usuarios", icon: IconUsers }]
 			: []),
 		{ title: "Configuracion", url: "/configuracion", icon: IconSettings },
+	];
+
+	const navCatalogo: DashboardNavItem[] = [
+		...navCatalogoBase,
+		...(hasPermissionOrSystemAdmin(
+			user?.permissions,
+			PERMISSION_KEYS.BRANDS_READ,
+			user?.role?.slug,
+		)
+			? [{ title: "Marcas", url: "/marcas", icon: IconTag }]
+			: []),
+		{ title: "Clientes", url: "/clientes", icon: IconUsers },
 	];
 
 	return (

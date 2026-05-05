@@ -76,11 +76,23 @@ export class ProductsService {
 		const existing = await tx.brand.findFirst({
 			where: { name },
 		});
-		if (existing) return existing.id;
+		if (existing) {
+			if (!existing.status) {
+				throw new BadRequestException(
+					`Ya existe una marca inactiva con el nombre "${name}". Reactívala desde la gestión de marcas o usa otro nombre.`,
+				);
+			}
+			return existing.id;
+		}
 
 		try {
 			const created = await tx.brand.create({
-				data: { name },
+				data: {
+					name,
+					description: null,
+					status: true,
+					logoUrl: null,
+				},
 			});
 			return created.id;
 		} catch (err: unknown) {
@@ -107,6 +119,11 @@ export class ProductsService {
 		const b = await tx.brand.findUnique({ where: { id: brandId } });
 		if (!b) {
 			throw new NotFoundException(`Marca con id "${brandId}" no encontrada.`);
+		}
+		if (!b.status) {
+			throw new BadRequestException(
+				"La marca seleccionada está inactiva. Elige una marca activa o crea una nueva.",
+			);
 		}
 		return b.id;
 	}

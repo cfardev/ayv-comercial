@@ -12,6 +12,7 @@
 			"outputs": ["tsconfig.tsbuildinfo", "node_modules/.tmp/*.tsbuildinfo"]
 		},
 		"dev": {
+			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},
