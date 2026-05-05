@@ -27,6 +27,7 @@ import {
 } from "@/modules/products/hooks/use-products.js";
 import type { Product } from "@/modules/products/types/api.js";
 import type { ProductFormValues } from "@/modules/products/types/schema.js";
+import { buildUpdateProductPayload } from "@/modules/products/utils/build-product-api-payload.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
 
 type StatusFilter = "ALL" | "true" | "false";
@@ -174,18 +175,7 @@ export function ProductosPage() {
 		try {
 			await updateProduct.mutateAsync({
 				id: productBeingEdited.id,
-				data: {
-					name: values.name,
-					description: values.description,
-					cost: values.cost,
-					price: values.price,
-					categoryId: values.categoryId,
-					images: values.images.map((img, i) => ({
-						url: img.url,
-						fileKey: img.fileKey,
-						sortOrder: img.sortOrder ?? i,
-					})),
-				},
+				data: buildUpdateProductPayload(values),
 			});
 			setEditDialogOpen(false);
 			setEditingProduct(null);

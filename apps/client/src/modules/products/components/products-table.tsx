@@ -23,7 +23,7 @@ interface ProductsTableProps {
 	isLoading?: boolean;
 }
 
-const COL_COUNT = 7;
+const COL_COUNT = 8;
 
 function TableHeadRow() {
 	return (
@@ -31,6 +31,7 @@ function TableHeadRow() {
 			<TableHead className="w-[72px]">Imagen</TableHead>
 			<TableHead>Nombre</TableHead>
 			<TableHead>Categoría</TableHead>
+			<TableHead>Marca</TableHead>
 			<TableHead className="text-right">Costo</TableHead>
 			<TableHead className="text-right">Precio</TableHead>
 			<TableHead className="w-[90px]">Estado</TableHead>
@@ -131,6 +132,9 @@ export function ProductsTable({
 								<TableCell className="font-medium">{product.name}</TableCell>
 								<TableCell className="text-muted-foreground">
 									{product.categoryName}
+								</TableCell>
+								<TableCell className="max-w-[160px] truncate text-muted-foreground">
+									{product.brandName ?? "—"}
 								</TableCell>
 								<TableCell className="text-right tabular-nums">
 									{formatMoney(product.cost)}

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authFetch } from "@/lib/auth-fetch.js";
+import { brandsQueryKeyRoot } from "@/modules/brands/hooks/use-brands.js";
 import type {
 	CreateProductPayload,
 	PaginatedResponse,
@@ -126,6 +127,7 @@ export function useCreateProduct() {
 		mutationFn: createProduct,
 		onSuccess: () => {
 			void qc.invalidateQueries({ queryKey: productsKey });
+			void qc.invalidateQueries({ queryKey: brandsQueryKeyRoot });
 		},
 	});
 }
@@ -137,6 +139,7 @@ export function useUpdateProduct() {
 			updateProduct(id, data),
 		onSuccess: () => {
 			void qc.invalidateQueries({ queryKey: productsKey });
+			void qc.invalidateQueries({ queryKey: brandsQueryKeyRoot });
 		},
 	});
 }

@@ -15,6 +15,8 @@ export class ProductEntity {
 	status!: boolean;
 	categoryId!: string;
 	categoryName!: string;
+	brandId!: string | null;
+	brandName!: string | null;
 	images!: ProductImageEntity[];
 	createdAt!: Date;
 	updatedAt!: Date;

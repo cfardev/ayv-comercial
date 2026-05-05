@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ComponentPropsWithoutRef } from "react";
 import { useEffect, useMemo } from "react";
-import { Controller, type Resolver, useForm } from "react-hook-form";
+import { Controller, type Resolver, useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -14,9 +14,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useCategories } from "@/modules/categories/hooks/use-categories.js";
 import type { Product } from "../types/api.js";
 import { type ProductFormValues, productFormSchema } from "../types/schema.js";
+import { BrandCombobox } from "./brand-combobox.js";
 import {
 	ProductImageDropzone,
 	type ProductImageValue,
@@ -73,6 +75,9 @@ export function ProductForm({
 			cost: 0.01,
 			price: 0.02,
 			categoryId: "",
+			brandMode: "existing",
+			brandId: "",
+			newBrandName: "",
 			images: [],
 		},
 	});
@@ -93,6 +98,9 @@ export function ProductForm({
 				cost: Number(product.cost),
 				price: Number(product.price),
 				categoryId: product.categoryId,
+				brandMode: product.brandId ? "existing" : "new",
+				brandId: product.brandId ?? "",
+				newBrandName: "",
 				images: imgs,
 			});
 		} else {
@@ -102,6 +110,9 @@ export function ProductForm({
 				cost: 0.01,
 				price: 0.02,
 				categoryId: categories[0]?.id ?? "",
+				brandMode: "existing",
+				brandId: "",
+				newBrandName: "",
 				images: [],
 			});
 		}
@@ -120,10 +131,27 @@ export function ProductForm({
 
 	const Footer = layout === "dialog" ? DialogFooter : PageFormFooter;
 
+	const brandMode = useWatch({
+		control: form.control,
+		name: "brandMode",
+		defaultValue: "existing",
+	});
+	const watchedBrandId = useWatch({
+		control: form.control,
+		name: "brandId",
+		defaultValue: "",
+	});
+
+	const brandFallbackLabel =
+		product?.brandId && product.brandId === watchedBrandId
+			? (product.brandName ?? "")
+			: undefined;
+
 	const nameId = `${idPrefix}-name`;
 	const descId = `${idPrefix}-desc`;
 	const costId = `${idPrefix}-cost`;
 	const priceId = `${idPrefix}-price`;
+	const newBrandId = `${idPrefix}-new-brand-name`;
 
 	return (
 		<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -208,6 +236,92 @@ export function ProductForm({
 					<p className="text-sm text-destructive">
 						{form.formState.errors.categoryId.message}
 					</p>
+				)}
+			</div>
+
+			<div className="space-y-3 rounded-lg border border-border/50 bg-muted/30 p-3">
+				<Label>
+					Marca <span className="text-destructive">*</span>
+				</Label>
+				<Controller
+					control={form.control}
+					name="brandMode"
+					render={({ field }) => (
+						<ToggleGroup
+							type="single"
+							variant="outline"
+							className="w-full justify-stretch sm:w-auto"
+							value={field.value}
+							onValueChange={(next) => {
+								if (!next) return;
+								field.onChange(next);
+								if (next === "existing") {
+									form.setValue("newBrandName", "");
+								} else {
+									form.setValue("brandId", "");
+								}
+								form.clearErrors(["brandId", "newBrandName"]);
+							}}
+							disabled={Boolean(isLoading)}
+						>
+							<ToggleGroupItem
+								value="existing"
+								aria-label="Marca existente"
+								className="cursor-pointer flex-1"
+							>
+								Marca existente
+							</ToggleGroupItem>
+							<ToggleGroupItem
+								value="new"
+								aria-label="Nueva marca"
+								className="cursor-pointer flex-1"
+							>
+								Nueva marca
+							</ToggleGroupItem>
+						</ToggleGroup>
+					)}
+				/>
+				{(brandMode ?? "existing") === "existing" ? (
+					<div className="space-y-2">
+						<Controller
+							control={form.control}
+							name="brandId"
+							render={({ field }) => (
+								<BrandCombobox
+									value={field.value}
+									onValueChange={(id) => {
+										field.onChange(id);
+										form.clearErrors("brandId");
+									}}
+									disabled={Boolean(isLoading)}
+									fallbackLabel={brandFallbackLabel}
+								/>
+							)}
+						/>
+						{form.formState.errors.brandId && (
+							<p className="text-sm text-destructive">
+								{form.formState.errors.brandId.message}
+							</p>
+						)}
+					</div>
+				) : (
+					<div className="space-y-2">
+						<Label htmlFor={newBrandId} className="sr-only">
+							Nueva marca
+						</Label>
+						<Input
+							id={newBrandId}
+							placeholder="Nombre de la nueva marca"
+							className="cursor-text"
+							disabled={Boolean(isLoading)}
+							{...form.register("newBrandName")}
+						/>
+						{form.formState.errors.newBrandName && (
+							<p className="text-sm text-destructive">
+								{form.formState.errors.newBrandName.message}
+							</p>
+						)}
+					</div>
 				)}
 			</div>
 

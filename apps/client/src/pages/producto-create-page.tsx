@@ -10,6 +10,7 @@ import {
 import { ProductForm } from "@/modules/products/components/product-form.js";
 import { useCreateProduct } from "@/modules/products/hooks/use-products.js";
 import type { ProductFormValues } from "@/modules/products/types/schema.js";
+import { buildCreateProductPayload } from "@/modules/products/utils/build-product-api-payload.js";
 
 export function ProductoCreatePage() {
 	const navigate = useNavigate();
@@ -30,18 +31,7 @@ export function ProductoCreatePage() {
 	async function onSubmitForm(values: ProductFormValues) {
 		setFormError(null);
 		try {
-			await createProduct.mutateAsync({
-				name: values.name,
-				description: values.description,
-				cost: values.cost,
-				price: values.price,
-				categoryId: values.categoryId,
-				images: values.images.map((img, i) => ({
-					url: img.url,
-					fileKey: img.fileKey,
-					sortOrder: img.sortOrder ?? i,
-				})),
-			});
+			await createProduct.mutateAsync(buildCreateProductPayload(values));
 			navigate("/productos");
 		} catch (e) {
 			setFormError(e instanceof Error ? e.message : "Error al guardar");

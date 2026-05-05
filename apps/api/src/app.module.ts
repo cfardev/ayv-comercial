@@ -15,6 +15,7 @@ import {
 	CLIENT_DIST_PATH,
 	MONOREPO_ROOT_ENV_FILE,
 } from "./common/utils/monorepo-paths.js";
+import { BrandsModule } from "./modules/brands/brands.module.js";
 import { CategoriesModule } from "./modules/categories/categories.module.js";
 import { ProductsModule } from "./modules/products/products.module.js";
 import { UploadthingModule } from "./modules/uploadthing/uploadthing.module.js";
@@ -45,6 +46,7 @@ import { UsersModule } from "./modules/users/users.module.js";
 		UsersModule,
 		CategoriesModule,
 		ProductsModule,
+		BrandsModule,
 		UploadthingModule,
 		ServeStaticModule.forRoot({
 			rootPath: CLIENT_DIST_PATH,

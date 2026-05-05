@@ -25,9 +25,11 @@ export class ProductsService {
 		price: Prisma.Decimal;
 		status: boolean;
 		categoryId: string;
+		brandId: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		category: { name: string };
+		brand: { name: string } | null;
 		images: {
 			id: string;
 			url: string;
@@ -48,6 +50,8 @@ export class ProductsService {
 			status: row.status,
 			categoryId: row.categoryId,
 			categoryName: row.category.name,
+			brandId: row.brandId,
+			brandName: row.brand?.name ?? null,
 			images: sortedImages.map((img) => ({
 				id: img.id,
 				url: img.url,
@@ -58,6 +62,53 @@ export class ProductsService {
 			createdAt: row.createdAt,
 			updatedAt: row.updatedAt,
 		};
+	}
+
+	private async ensureBrandByName(
+		tx: Prisma.TransactionClient,
+		rawName: string,
+	): Promise<string> {
+		const name = rawName.trim();
+		if (name.length === 0) {
+			throw new BadRequestException("El nombre de la marca es obligatorio.");
+		}
+
+		const existing = await tx.brand.findFirst({
+			where: { name },
+		});
+		if (existing) return existing.id;
+
+		try {
+			const created = await tx.brand.create({
+				data: { name },
+			});
+			return created.id;
+		} catch (err: unknown) {
+			const code =
+				typeof err === "object" && err !== null && "code" in err
+					? (err as { code?: string }).code
+					: undefined;
+			if (code === "P2002") {
+				const again = await tx.brand.findFirst({ where: { name } });
+				if (again) return again.id;
+			}
+			throw err;
+		}
+	}
+
+	private async resolveExistingBrandId(
+		tx: Prisma.TransactionClient,
+		brandId: string | undefined,
+	): Promise<string> {
+		if (!brandId) {
+			throw new BadRequestException("Debes seleccionar una marca existente.");
+		}
+
+		const b = await tx.brand.findUnique({ where: { id: brandId } });
+		if (!b) {
+			throw new NotFoundException(`Marca con id "${brandId}" no encontrada.`);
+		}
+		return b.id;
 	}
 
 	private assertPriceAboveCost(cost: number, price: number): void {
@@ -127,6 +178,7 @@ export class ProductsService {
 				orderBy: { name: "asc" },
 				include: {
 					category: { select: { name: true } },
+					brand: { select: { name: true } },
 					images: true,
 				},
 			}),
@@ -147,6 +199,7 @@ export class ProductsService {
 			where: { id },
 			include: {
 				category: { select: { name: true } },
+				brand: { select: { name: true } },
 				images: true,
 			},
 		});
@@ -161,6 +214,11 @@ export class ProductsService {
 		this.assertPriceAboveCost(dto.cost, dto.price);
 
 		const product = await this.prisma.$transaction(async (tx) => {
+			const resolvedBrandId =
+				dto.brandMode === "existing"
+					? await this.resolveExistingBrandId(tx, dto.brandId)
+					: await this.ensureBrandByName(tx, dto.newBrandName ?? "");
+
 			const p = await tx.product.create({
 				data: {
 					name: dto.name,
@@ -169,6 +227,7 @@ export class ProductsService {
 					price: new Prisma.Decimal(dto.price),
 					status: true,
 					categoryId: dto.categoryId,
+					brandId: resolvedBrandId,
 					images: {
 						create: dto.images.map((img, index) => ({
 							url: img.url,
@@ -179,6 +238,7 @@ export class ProductsService {
 				},
 				include: {
 					category: { select: { name: true } },
+					brand: { select: { name: true } },
 					images: true,
 				},
 			});
@@ -240,6 +300,15 @@ export class ProductsService {
 				});
 			}
 
+			let brandPatch: { brandId: string } | Record<string, never> = {};
+			if (dto.brandMode !== undefined) {
+				const resolvedBrandId =
+					dto.brandMode === "existing"
+						? await this.resolveExistingBrandId(tx, dto.brandId)
+						: await this.ensureBrandByName(tx, dto.newBrandName ?? "");
+				brandPatch = { brandId: resolvedBrandId };
+			}
+
 			return tx.product.update({
 				where: { id },
 				data: {
@@ -254,9 +323,11 @@ export class ProductsService {
 						? { price: new Prisma.Decimal(dto.price) }
 						: {}),
 					...(dto.categoryId !== undefined ? { categoryId } : {}),
+					...brandPatch,
 				},
 				include: {
 					category: { select: { name: true } },
+					brand: { select: { name: true } },
 					images: true,
 				},
 			});
@@ -285,6 +356,7 @@ export class ProductsService {
 			where: { id },
 			include: {
 				category: { select: { name: true } },
+				brand: { select: { name: true } },
 				images: true,
 			},
 		});
@@ -300,6 +372,7 @@ export class ProductsService {
 			data: { status: false },
 			include: {
 				category: { select: { name: true } },
+				brand: { select: { name: true } },
 				images: true,
 			},
 		});
@@ -321,6 +394,7 @@ export class ProductsService {
 			where: { id },
 			include: {
 				category: { select: { name: true } },
+				brand: { select: { name: true } },
 				images: true,
 			},
 		});
@@ -338,6 +412,7 @@ export class ProductsService {
 			data: { status: true },
 			include: {
 				category: { select: { name: true } },
+				brand: { select: { name: true } },
 				images: true,
 			},
 		});

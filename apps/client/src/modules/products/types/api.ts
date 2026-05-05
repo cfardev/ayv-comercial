@@ -15,6 +15,8 @@ export interface Product {
 	status: boolean;
 	categoryId: string;
 	categoryName: string;
+	brandId?: string | null;
+	brandName?: string | null;
 	images: ProductImage[];
 	createdAt: string;
 	updatedAt: string;
@@ -51,6 +53,9 @@ export interface CreateProductPayload {
 	price: number;
 	categoryId: string;
 	images: ProductImagePayload[];
+	brandMode: "existing" | "new";
+	brandId?: string;
+	newBrandName?: string;
 }
 
 export interface UpdateProductPayload {
@@ -60,4 +65,7 @@ export interface UpdateProductPayload {
 	price?: number;
 	categoryId?: string;
 	images?: ProductImagePayload[];
+	brandMode?: "existing" | "new";
+	brandId?: string;
+	newBrandName?: string;
 }
