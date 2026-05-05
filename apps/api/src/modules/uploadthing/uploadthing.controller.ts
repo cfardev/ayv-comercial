@@ -7,6 +7,26 @@ import { RequirePermissions } from "../../auth/decorators/require-permissions.de
 import { PermissionsGuard } from "../../auth/guards/permissions.guard.js";
 import { PERMISSION_KEYS } from "../../auth/permissions/permission-keys.js";
 
+/**
+ * Dev stream callbacks use `config.callbackUrl` or infer `origin + pathname`.
+ * Under Nest, pathname is often `/`, so UT posts to `http://localhost:4000/` and 404s.
+ * @see https://docs.uploadthing.com/api-reference/server#create-route-handler
+ */
+function resolveUploadThingCallbackUrl(
+	config: ConfigService,
+): string | undefined {
+	const explicit = config.get<string>("UPLOADTHING_CALLBACK_URL")?.trim();
+	if (explicit) {
+		return explicit.replace(/\/$/, "");
+	}
+	const nodeEnv = config.get<string>("NODE_ENV") ?? process.env.NODE_ENV;
+	if (nodeEnv !== "development" && nodeEnv !== "dev") {
+		return undefined;
+	}
+	const port = Number(config.get("PORT")) || 4000;
+	return `http://localhost:${port}/api/uploadthing`;
+}
+
 @Controller("uploadthing")
 @UseGuards(PermissionsGuard)
 @RequirePermissions(PERMISSION_KEYS.PRODUCTS_UPLOAD)
@@ -15,9 +35,13 @@ export class UploadthingController {
 
 	constructor(configService: ConfigService) {
 		const token = configService.get<string>("UPLOADTHING_TOKEN") ?? "";
+		const callbackUrl = resolveUploadThingCallbackUrl(configService);
 		this.uploadHandler = createRouteHandler({
 			router: uploadRouter,
-			config: { token: token || undefined },
+			config: {
+				token: token || undefined,
+				...(callbackUrl ? { callbackUrl } : {}),
+			},
 		});
 	}
 
