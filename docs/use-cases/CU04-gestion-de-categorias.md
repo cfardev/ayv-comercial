@@ -14,7 +14,6 @@ Crear, consultar, editar y desactivar categorías para clasificar y organizar lo
 
 - A: El actor está autenticado en el sistema.
 - A: El actor tiene permisos para gestionar categorías.
-- A: Existe al menos una categoría padre si se van a crear subcategorías.
 
 ## Disparador
 
@@ -25,26 +24,26 @@ El actor selecciona la opción "Gestión de categorías" desde el menú de inven
 ### Creación de categoría
 
 1. El actor accede al formulario de nueva categoría.
-2. El sistema presenta los campos: nombre, descripción, categoría padre (opcional), estado.
-3. El actor completa los campos obligatorios (nombre obligatorio; descripción y categoría padre opcionales).
-4. El sistema valida que el nombre no esté duplicado en el mismo nivel de jerarquía.
+2. El sistema presenta los campos: nombre, descripción, estado.
+3. El actor completa los campos obligatorios (nombre obligatorio; descripción opcional).
+4. El sistema valida que el nombre no esté duplicado respecto al resto de categorías.
 5. El sistema crea la categoría con estado activo y fecha de creación.
-6. El sistema muestra un mensaje de confirmación y actualiza el árbol de categorías.
+6. El sistema muestra un mensaje de confirmación y actualiza la lista de categorías.
 
 ### Consulta de categorías
 
 1. El actor accede a la lista de categorías.
-2. El sistema muestra la vista en árbol o tabla con columnas: nombre, descripción, categoría padre, cantidad de productos, estado.
+2. El sistema muestra una tabla con columnas: nombre, descripción, cantidad de productos, estado.
 3. El actor puede buscar por nombre o descripción.
-4. El actor puede filtrar por categoría padre o estado (activo/inactivo).
+4. El actor puede filtrar por estado (activo/inactivo).
 5. El sistema presenta los resultados paginados (20 por página).
 
 ### Edición de categoría
 
 1. El actor selecciona una categoría de la lista y elige "Editar".
 2. El sistema presenta el formulario pre-poblado con los datos actuales.
-3. El actor modifica los campos deseados (nombre, descripción, categoría padre).
-4. El sistema valida los datos modificados (nombre único, no crear referencia circular).
+3. El actor modifica los campos deseados (nombre, descripción).
+4. El sistema valida los datos modificados (nombre único).
 5. El sistema actualiza el registro con la nueva información.
 6. El sistema muestra un mensaje de confirmación.
 
@@ -56,37 +55,22 @@ El actor selecciona la opción "Gestión de categorías" desde el menú de inven
 4. Si no hay productos asociados, el sistema solicita confirmación.
 5. El actor confirma la desactivación.
 6. El sistema cambia el estado de la categoría a inactivo.
-7. Las subcategorías también se desactivan si el actor confirma.
 
 ### Reactivación de categoría
 
 1. El actor selecciona una categoría inactiva de la lista y elige "Activar".
-2. El sistema verifica que la categoría padre esté activa (si existe).
-3. Si la categoría padre está inactiva, el sistema muestra un error indicando que debe activar la categoría padre primero.
-4. Si la categoría padre está activa, el sistema cambia el estado a activo.
-5. El sistema muestra un mensaje de confirmación.
+2. El sistema cambia el estado a activo.
+3. El sistema muestra un mensaje de confirmación.
 
 ## Flujos alternos
 
 ### FA1 - Nombre duplicado
 
-- A: Si el nombre de la categoría ya existe en el mismo nivel de jerarquía, el sistema muestra un mensaje de error indicando el duplicado.
+- A: Si el nombre de la categoría ya existe, el sistema muestra un mensaje de error indicando el duplicado.
 
 ### FA2 - Productos asociados
 
 - A: Si se intenta desactivar una categoría con productos asociados, el sistema rechaza la operación e indica la cantidad de productos afectados.
-
-### FA3 - Referencia circular
-
-- A: Si al editar se intenta establecer como categoría padre una categoría hija o la misma categoría, el sistema muestra un error indicando que no se permite la referencia circular.
-
-### FA4 - Categoría padre inactiva
-
-- A: Si se intenta crear una subcategoría de una categoría inactiva, el sistema muestra un error indicando que debe activar la categoría padre primero.
-
-### FA5 - Jerarquía demasiado profunda
-
-- A: Si se intenta crear una subcategoría con más de 3 niveles de profundidad, el sistema muestra un error indicando el límite de niveles.
 
 ## Postcondiciones
 
@@ -98,10 +82,8 @@ El actor selecciona la opción "Gestión de categorías" desde el menú de inven
 
 ## Reglas de negocio
 
-- A: Las categorías pueden tener hasta 3 niveles de profundidad (categoría > subcategoría > sub-subcategoría).
-- A: No puede haber dos categorías con el mismo nombre en el mismo nivel de jerarquía.
+- A: No puede haber dos categorías con el mismo nombre.
 - A: Una categoría desactivada no puede tener productos asociados.
-- A: Al desactivar una categoría padre, las subcategorías también se desactivan.
 - A: Las categorías inactivas no son visibles para usuarios normales en el catálogo.
 
 ## Reglas de seguridad
