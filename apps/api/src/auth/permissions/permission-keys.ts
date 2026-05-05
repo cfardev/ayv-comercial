@@ -11,6 +11,12 @@ export const PERMISSION_KEYS = {
 	CATEGORIES_UPDATE: "categories:update",
 	CATEGORIES_DEACTIVATE: "categories:deactivate",
 	CATEGORIES_REACTIVATE: "categories:reactivate",
+	PRODUCTS_READ: "products:read",
+	PRODUCTS_CREATE: "products:create",
+	PRODUCTS_UPDATE: "products:update",
+	PRODUCTS_DEACTIVATE: "products:deactivate",
+	PRODUCTS_REACTIVATE: "products:reactivate",
+	PRODUCTS_UPLOAD: "products:upload",
 } as const;
 
 export type PermissionKey =

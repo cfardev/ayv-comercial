@@ -16,6 +16,8 @@ import {
 	MONOREPO_ROOT_ENV_FILE,
 } from "./common/utils/monorepo-paths.js";
 import { CategoriesModule } from "./modules/categories/categories.module.js";
+import { ProductsModule } from "./modules/products/products.module.js";
+import { UploadthingModule } from "./modules/uploadthing/uploadthing.module.js";
 import { UsersModule } from "./modules/users/users.module.js";
 
 @Module({
@@ -42,6 +44,8 @@ import { UsersModule } from "./modules/users/users.module.js";
 		AuthModule,
 		UsersModule,
 		CategoriesModule,
+		ProductsModule,
+		UploadthingModule,
 		ServeStaticModule.forRoot({
 			rootPath: CLIENT_DIST_PATH,
 			exclude: ["/api", "/api/*path"],

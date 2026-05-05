@@ -115,6 +115,7 @@ model Product {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   category           Category           @relation(fields: [categoryId], references: [id])
+  images             ProductImage[]
   inventory          Inventory[]
   inventoryMovements InventoryMovement[]
   saleItems          SaleItem[]
@@ -122,6 +123,20 @@ model Product {
   @@index([categoryId])
   @@index([name])
   @@map("products")
+}
+
+model ProductImage {
+  id         String   @id @default(cuid()) @map("id")
+  productId  String   @map("product_id")
+  url        String   @map("url")
+  fileKey    String?  @map("file_key")
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
 }
 
 model Inventory {
