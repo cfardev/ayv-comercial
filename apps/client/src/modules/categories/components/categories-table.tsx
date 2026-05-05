@@ -20,11 +20,7 @@ interface CategoriesTableProps {
 	isLoading?: boolean;
 }
 
-const DEPTH_LABELS = ["Categoría", "Subcategoría", "Sub-subcategoría"];
-
-function depthIndent(depth: number): string {
-	return "—".repeat(depth);
-}
+const COL_COUNT = 5;
 
 function TableHeadRow() {
 	return (
@@ -32,8 +28,6 @@ function TableHeadRow() {
 			<TableHead>Nombre</TableHead>
 			<TableHead>Descripción</TableHead>
 			<TableHead className="w-[100px]">Productos</TableHead>
-			<TableHead>Categoría padre</TableHead>
-			<TableHead className="w-[140px]">Nivel</TableHead>
 			<TableHead className="w-[100px]">Estado</TableHead>
 			<TableHead className="w-[140px]">Acciones</TableHead>
 		</TableRow>
@@ -58,7 +52,7 @@ export function CategoriesTable({
 						{Array.from({ length: 5 }).map((_, i) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton rows
 							<TableRow key={i}>
-								{Array.from({ length: 7 }).map((__, j) => (
+								{Array.from({ length: COL_COUNT }).map((__, j) => (
 									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton cells
 									<TableCell key={j}>
 										<Skeleton className="h-4 w-full" />
@@ -82,7 +76,7 @@ export function CategoriesTable({
 					<TableBody>
 						<TableRow>
 							<TableCell
-								colSpan={7}
+								colSpan={COL_COUNT}
 								className="text-center text-muted-foreground py-8"
 							>
 								No se encontraron categorías.
@@ -103,26 +97,11 @@ export function CategoriesTable({
 				<TableBody>
 					{categories.map((category) => (
 						<TableRow key={category.id}>
-							<TableCell className="font-medium">
-								{category.depth > 0 && (
-									<span className="text-muted-foreground mr-1">
-										{depthIndent(category.depth)}{" "}
-									</span>
-								)}
-								{category.name}
-							</TableCell>
+							<TableCell className="font-medium">{category.name}</TableCell>
 							<TableCell className="text-muted-foreground max-w-[200px] truncate">
 								{category.description ?? "—"}
 							</TableCell>
 							<TableCell>{category.productCount}</TableCell>
-							<TableCell className="text-muted-foreground">
-								{category.parent?.name ?? "—"}
-							</TableCell>
-							<TableCell>
-								<Badge variant="outline">
-									{DEPTH_LABELS[category.depth] ?? `Nivel ${category.depth}`}
-								</Badge>
-							</TableCell>
 							<TableCell>
 								<Badge variant={category.status ? "default" : "destructive"}>
 									{category.status ? "Activo" : "Inactivo"}

@@ -10,8 +10,4 @@ export class CreateCategoryDto {
 	@IsString()
 	@MaxLength(500)
 	description?: string;
-
-	@IsOptional()
-	@IsString()
-	parentId?: string;
 }

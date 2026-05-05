@@ -12,13 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { Category } from "../types/api.js";
 import {
@@ -26,19 +19,15 @@ import {
 	categoryFormSchema,
 } from "../types/schema.js";
 
-const NO_PARENT = "__none__";
-
 interface CategoryFormSubmitData {
 	name: string;
 	description?: string;
-	parentId: string | null;
 }
 
 interface CategoryFormDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	category?: Category | null;
-	parentCategories: Category[];
 	onSubmit: (data: CategoryFormSubmitData) => void;
 	errorMessage?: string | null;
 	isLoading?: boolean;
@@ -48,7 +37,6 @@ export function CategoryFormDialog({
 	open,
 	onOpenChange,
 	category,
-	parentCategories,
 	onSubmit,
 	errorMessage,
 	isLoading,
@@ -60,7 +48,6 @@ export function CategoryFormDialog({
 		defaultValues: {
 			name: "",
 			description: "",
-			parentId: undefined,
 		},
 	});
 
@@ -69,7 +56,6 @@ export function CategoryFormDialog({
 			form.reset({
 				name: category?.name ?? "",
 				description: category?.description ?? "",
-				parentId: category?.parentId ?? undefined,
 			});
 		}
 	}, [open, category, form]);
@@ -82,23 +68,8 @@ export function CategoryFormDialog({
 
 	function handleSubmit(values: CategoryFormValues) {
 		form.clearErrors("root");
-		const parentId: string | null =
-			values.parentId === NO_PARENT || !values.parentId
-				? null
-				: values.parentId;
-		onSubmit({ name: values.name, description: values.description, parentId });
+		onSubmit({ name: values.name, description: values.description });
 	}
-
-	// Only show categories that can be valid parents:
-	// - must be active
-	// - must not be the category itself (on edit)
-	// - must have depth < 2
-	const validParents = parentCategories.filter(
-		(c) =>
-			c.status &&
-			c.depth < 2 &&
-			(!isEditing || (c.id !== category?.id && c.parentId !== category?.id)),
-	);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,35 +115,6 @@ export function CategoryFormDialog({
 								{form.formState.errors.description.message}
 							</p>
 						)}
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="parentId">Categoría padre</Label>
-						<Select
-							value={form.watch("parentId") ?? NO_PARENT}
-							onValueChange={(val) =>
-								form.setValue("parentId", val === NO_PARENT ? undefined : val)
-							}
-						>
-							<SelectTrigger id="parentId" className="cursor-pointer">
-								<SelectValue placeholder="Sin categoría padre (raíz)" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value={NO_PARENT} className="cursor-pointer">
-									Sin categoría padre (raíz)
-								</SelectItem>
-								{validParents.map((c) => (
-									<SelectItem
-										key={c.id}
-										value={c.id}
-										className="cursor-pointer"
-									>
-										{"  ".repeat(c.depth)}
-										{c.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
 					</div>
 
 					{form.formState.errors.root && (

@@ -54,19 +54,12 @@ export function CategoriasPage() {
 		limit: 20,
 	});
 
-	// All active categories for parent selector (no pagination limit for the selector)
-	const { data: allCategoriesData } = useCategories({
-		status: "true",
-		limit: 100,
-	});
-
 	const createCategory = useCreateCategory();
 	const updateCategory = useUpdateCategory();
 	const deactivateCategory = useDeactivateCategory();
 	const reactivateCategory = useReactivateCategory();
 
 	const categories = categoriesData?.data ?? [];
-	const allActiveCategories = allCategoriesData?.data ?? [];
 	const total = categoriesData?.total ?? 0;
 	const totalPages = categoriesData?.totalPages ?? 1;
 
@@ -90,11 +83,7 @@ export function CategoriasPage() {
 		setConfirmDialog({ open: true, category, action: "reactivate" });
 	}
 
-	function handleFormSubmit(data: {
-		name: string;
-		description?: string;
-		parentId: string | null;
-	}) {
+	function handleFormSubmit(data: { name: string; description?: string }) {
 		setFormError(null);
 
 		if (editingCategory) {
@@ -104,7 +93,6 @@ export function CategoriasPage() {
 					data: {
 						name: data.name,
 						description: data.description,
-						parentId: data.parentId,
 					},
 				},
 				{
@@ -117,7 +105,6 @@ export function CategoriasPage() {
 				{
 					name: data.name,
 					description: data.description,
-					parentId: data.parentId ?? undefined,
 				},
 				{
 					onSuccess: () => setFormOpen(false),
@@ -153,12 +140,9 @@ export function CategoriasPage() {
 			return { title: "", description: "", confirmLabel: "" };
 
 		if (action === "deactivate") {
-			const hasChildren = category.childrenCount > 0;
 			return {
 				title: "Eliminar categoría",
-				description: hasChildren
-					? `¿Eliminar "${category.name}"? También dejarán de estar disponibles sus ${category.childrenCount} subcategoría(s).`
-					: `¿Eliminar "${category.name}"? La categoría dejará de estar disponible para nuevos productos.`,
+				description: `¿Eliminar "${category.name}"? La categoría dejará de estar disponible para nuevos productos.`,
 				confirmLabel: "Eliminar",
 				variant: "destructive" as const,
 			};
@@ -279,7 +263,6 @@ export function CategoriasPage() {
 					}
 				}}
 				category={editingCategory}
-				parentCategories={allActiveCategories}
 				onSubmit={handleFormSubmit}
 				errorMessage={formError}
 				isLoading={createCategory.isPending || updateCategory.isPending}

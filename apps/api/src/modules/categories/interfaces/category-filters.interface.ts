@@ -1,6 +1,5 @@
 export interface CategoryFilters {
 	search?: string;
-	parentId?: string | null;
 	status?: "true" | "false" | "ALL";
 	page?: number;
 	limit?: number;

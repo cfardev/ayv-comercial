@@ -43,7 +43,6 @@ export class CategoriesController {
 		void req;
 		return this.categoriesService.findAll({
 			search: query.search,
-			parentId: query.parentId,
 			status: query.status as "true" | "false" | "ALL" | undefined,
 			page: query.page ? Number(query.page) : undefined,
 			limit: query.limit ? Number(query.limit) : undefined,

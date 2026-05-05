@@ -1,10 +1,4 @@
-import {
-	IsNotEmpty,
-	IsOptional,
-	IsString,
-	MaxLength,
-	ValidateIf,
-} from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class UpdateCategoryDto {
 	@IsOptional()
@@ -17,10 +11,4 @@ export class UpdateCategoryDto {
 	@IsString()
 	@MaxLength(500)
 	description?: string;
-
-	/** null = remove parent (make root). undefined = not provided (keep existing). */
-	@IsOptional()
-	@ValidateIf((o: UpdateCategoryDto) => o.parentId !== null)
-	@IsString()
-	parentId?: string | null;
 }

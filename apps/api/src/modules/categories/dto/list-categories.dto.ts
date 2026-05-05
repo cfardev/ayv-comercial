@@ -7,10 +7,6 @@ export class ListCategoriesDto {
 
 	@IsOptional()
 	@IsString()
-	parentId?: string;
-
-	@IsOptional()
-	@IsString()
 	status?: string;
 
 	@IsOptional()

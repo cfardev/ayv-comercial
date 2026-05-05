@@ -15,7 +15,6 @@ async function fetchCategories(
 ): Promise<PaginatedResponse<Category>> {
 	const params = new URLSearchParams();
 	if (filters.search) params.set("search", filters.search);
-	if (filters.parentId !== undefined) params.set("parentId", filters.parentId);
 	if (filters.status && filters.status !== "ALL")
 		params.set("status", filters.status);
 	if (filters.page) params.set("page", String(filters.page));
