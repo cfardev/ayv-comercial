@@ -14,11 +14,6 @@ export class UpdateBrandDto {
 	name?: string;
 
 	@IsOptional()
-	@IsString()
-	@MaxLength(500)
-	description?: string;
-
-	@IsOptional()
 	@ValidateIf((_, v: string | null | undefined) => v !== null)
 	@IsString()
 	@MaxLength(2048)

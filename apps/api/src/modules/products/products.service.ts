@@ -89,7 +89,6 @@ export class ProductsService {
 			const created = await tx.brand.create({
 				data: {
 					name,
-					description: null,
 					status: true,
 					logoUrl: null,
 				},

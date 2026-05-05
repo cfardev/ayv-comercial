@@ -24,7 +24,6 @@ export class BrandsService {
 	private toBrandEntity(row: {
 		id: string;
 		name: string;
-		description: string | null;
 		status: boolean;
 		logoUrl: string | null;
 		createdAt: Date;
@@ -34,7 +33,6 @@ export class BrandsService {
 		return {
 			id: row.id,
 			name: row.name,
-			description: row.description,
 			status: row.status,
 			logoUrl: row.logoUrl,
 			productCount: row._count?.products ?? 0,
@@ -74,10 +72,7 @@ export class BrandsService {
 
 		if (query.search?.trim()) {
 			const term = query.search.trim();
-			where.OR = [
-				{ name: { contains: term, mode: "insensitive" } },
-				{ description: { contains: term, mode: "insensitive" } },
-			];
+			where.name = { contains: term, mode: "insensitive" };
 		}
 
 		const rows = await this.prisma.brand.findMany({
@@ -102,10 +97,7 @@ export class BrandsService {
 
 		if (filters.search?.trim()) {
 			const term = filters.search.trim();
-			where.OR = [
-				{ name: { contains: term, mode: "insensitive" } },
-				{ description: { contains: term, mode: "insensitive" } },
-			];
+			where.name = { contains: term, mode: "insensitive" };
 		}
 
 		if (rawStatus !== "ALL") {
@@ -152,7 +144,6 @@ export class BrandsService {
 		const brand = await this.prisma.brand.create({
 			data: {
 				name: dto.name.trim(),
-				description: dto.description?.trim() || null,
 				status: true,
 				logoUrl: dto.logoUrl?.trim() || null,
 			},
@@ -196,9 +187,6 @@ export class BrandsService {
 			where: { id },
 			data: {
 				...(dto.name !== undefined ? { name: newName } : {}),
-				...(dto.description !== undefined
-					? { description: dto.description.trim() || null }
-					: {}),
 				...logoPatch,
 			},
 			include: {
@@ -214,7 +202,6 @@ export class BrandsService {
 				details: {
 					brandId: id,
 					name: dto.name,
-					description: dto.description,
 					logoUrl: dto.logoUrl,
 				},
 			},

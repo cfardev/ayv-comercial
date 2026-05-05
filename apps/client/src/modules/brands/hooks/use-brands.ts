@@ -22,7 +22,6 @@ export interface BrandListFilters {
 export interface Brand {
 	id: string;
 	name: string;
-	description: string | null;
 	status: boolean;
 	logoUrl: string | null;
 	productCount: number;
@@ -47,13 +46,11 @@ export interface PaginatedResponse<T> {
 
 export interface CreateBrandPayload {
 	name: string;
-	description?: string;
 	logoUrl?: string | null;
 }
 
 export interface UpdateBrandPayload {
 	name?: string;
-	description?: string;
 	logoUrl?: string | null;
 }
 
@@ -79,7 +76,7 @@ async function fetchBrandsAdmin(
 ): Promise<PaginatedResponse<Brand>> {
 	const params = new URLSearchParams();
 	if (filters.search) params.set("search", filters.search);
-	if (filters.status !== undefined && filters.status !== "")
+	if (filters.status !== undefined)
 		params.set("status", filters.status);
 	if (filters.page) params.set("page", String(filters.page));
 	if (filters.limit) params.set("limit", String(filters.limit));

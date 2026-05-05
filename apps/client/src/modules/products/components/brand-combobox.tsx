@@ -45,7 +45,7 @@ export function BrandCombobox({
 
 	const selectedLabel = useMemo(() => {
 		const hit = brands.find((b) => b.id === value);
-		return hit?.name ?? (value ? (fallbackLabel ?? "") : "") ?? "";
+		return hit?.name ?? (value ? (fallbackLabel ?? "") : "");
 	}, [brands, value, fallbackLabel]);
 
 	return (

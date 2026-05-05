@@ -106,7 +106,6 @@ model Category {
 model Brand {
   id          String   @id @default(cuid()) @map("id")
   name        String   @unique @map("name")
-  description String?  @map("description")
   status      Boolean  @default(true) @map("status")
   logoUrl     String?  @map("logo_url")
   createdAt   DateTime @default(now()) @map("created_at")

@@ -12,14 +12,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import type { Brand } from "../hooks/use-brands.js";
 import { type BrandFormValues, brandFormSchema } from "../types/schema.js";
 import { BrandLogoDropzone } from "./brand-logo-dropzone.js";
 
 interface BrandFormSubmitData {
 	name: string;
-	description?: string;
 	logoUrl?: string | null;
 }
 
@@ -48,7 +46,6 @@ export function BrandFormDialog({
 		resolver: zodResolver(brandFormSchema),
 		defaultValues: {
 			name: "",
-			description: "",
 			logoUrl: null,
 		},
 	});
@@ -57,7 +54,6 @@ export function BrandFormDialog({
 		if (open) {
 			form.reset({
 				name: brand?.name ?? "",
-				description: brand?.description ?? "",
 				logoUrl: brand?.logoUrl ?? null,
 			});
 		}
@@ -73,7 +69,6 @@ export function BrandFormDialog({
 		form.clearErrors("root");
 		onSubmit({
 			name: values.name,
-			description: values.description,
 			logoUrl:
 				values.logoUrl === null || values.logoUrl === undefined
 					? null
@@ -128,21 +123,6 @@ export function BrandFormDialog({
 						{form.formState.errors.name && (
 							<p className="text-sm text-destructive">
 								{form.formState.errors.name.message}
-							</p>
-						)}
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="brand-description">Descripción</Label>
-						<Textarea
-							id="brand-description"
-							placeholder="Descripción opcional"
-							rows={3}
-							{...form.register("description")}
-						/>
-						{form.formState.errors.description && (
-							<p className="text-sm text-destructive">
-								{form.formState.errors.description.message}
 							</p>
 						)}
 					</div>

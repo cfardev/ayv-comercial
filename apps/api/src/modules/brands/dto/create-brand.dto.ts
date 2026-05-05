@@ -8,11 +8,6 @@ export class CreateBrandDto {
 
 	@IsOptional()
 	@IsString()
-	@MaxLength(500)
-	description?: string;
-
-	@IsOptional()
-	@IsString()
 	@MaxLength(2048)
 	logoUrl?: string;
 }

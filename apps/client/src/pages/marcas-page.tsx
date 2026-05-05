@@ -98,13 +98,9 @@ export function MarcasPage() {
 
 	function handleFormSubmit(data: {
 		name: string;
-		description?: string;
 		logoUrl?: string | null;
 	}) {
 		setFormError(null);
-
-		const description =
-			data.description?.trim() === "" ? undefined : data.description?.trim();
 
 		if (editingBrand) {
 			updateBrand.mutate(
@@ -112,7 +108,6 @@ export function MarcasPage() {
 					id: editingBrand.id,
 					data: {
 						name: data.name,
-						description,
 						logoUrl: data.logoUrl === undefined ? undefined : data.logoUrl,
 					},
 				},
@@ -125,7 +120,6 @@ export function MarcasPage() {
 			createBrand.mutate(
 				{
 					name: data.name,
-					description,
 					...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
 				},
 				{

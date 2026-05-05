@@ -20,14 +20,13 @@ interface BrandsTableProps {
 	isLoading?: boolean;
 }
 
-const COL_COUNT = 6;
+const COL_COUNT = 5;
 
 function TableHeadRow() {
 	return (
 		<TableRow>
 			<TableHead className="w-[72px]">Logo</TableHead>
 			<TableHead>Nombre</TableHead>
-			<TableHead>Descripción</TableHead>
 			<TableHead className="w-[100px]">Productos</TableHead>
 			<TableHead className="w-[100px]">Estado</TableHead>
 			<TableHead className="w-[160px]">Acciones</TableHead>
@@ -110,9 +109,6 @@ export function BrandsTable({
 								)}
 							</TableCell>
 							<TableCell className="font-medium">{brand.name}</TableCell>
-							<TableCell className="text-muted-foreground max-w-[200px] truncate">
-								{brand.description ?? "—"}
-							</TableCell>
 							<TableCell>{brand.productCount}</TableCell>
 							<TableCell>
 								<Badge variant={brand.status ? "default" : "destructive"}>
