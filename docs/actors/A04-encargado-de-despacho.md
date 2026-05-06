@@ -37,7 +37,7 @@ No tiene acceso a registros financieros, ajustes de inventario ni gestión de us
 | Caso de uso | Descripción |
 |-------------|-------------|
 | CU01 | Inicio de sesión |
-| CU08 | Consulta de existencias |
-| CU18 | Generación de orden de despacho |
-| CU19 | Consulta de pedidos pendientes |
-| CU20 | Actualización del estado del pedido |
+| CU09 | Consulta de existencias |
+| CU19 | Generación de orden de despacho |
+| CU20 | Consulta de pedidos pendientes |
+| CU21 | Actualización del estado del pedido |

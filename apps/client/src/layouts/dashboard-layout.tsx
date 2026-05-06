@@ -8,10 +8,11 @@ import {
 	IconLogout,
 	IconPackages,
 	IconSettings,
+	IconTag,
 	IconTruck,
 	IconUsers,
 } from "@tabler/icons-react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -52,6 +53,13 @@ import {
 	PERMISSION_KEYS,
 } from "@/lib/permission-keys";
 
+type DashboardNavItem = {
+	title: string;
+	url: string;
+	icon: ComponentType<{ className?: string }>;
+	isActive?: (pathname: string) => boolean;
+};
+
 function getInitials(fullName: string): string {
 	return fullName
 		.split(" ")
@@ -61,17 +69,22 @@ function getInitials(fullName: string): string {
 		.toUpperCase();
 }
 
-const navOperaciones = [
+const navOperaciones: DashboardNavItem[] = [
 	{ title: "Panel", url: "/", icon: IconLayoutDashboard },
 	{ title: "Pedidos", url: "/pedidos", icon: IconFileInvoice },
 	{ title: "Inventario", url: "/inventario", icon: IconPackages },
 	{ title: "Despachos", url: "/despachos", icon: IconTruck },
 ];
 
-const navCatalogo = [
-	{ title: "Productos", url: "/productos", icon: IconBox },
+const navCatalogoBase: DashboardNavItem[] = [
+	{
+		title: "Productos",
+		url: "/productos",
+		icon: IconBox,
+		isActive: (pathname) =>
+			pathname === "/productos" || pathname.startsWith("/productos/"),
+	},
 	{ title: "Categorías", url: "/categorias", icon: IconCategory },
-	{ title: "Clientes", url: "/clientes", icon: IconUsers },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -80,7 +93,9 @@ const pageTitles: Record<string, string> = {
 	"/inventario": "Inventario",
 	"/despachos": "Despachos",
 	"/productos": "Productos",
+	"/productos/nuevo": "Nuevo producto",
 	"/categorias": "Categorías",
+	"/marcas": "Marcas",
 	"/clientes": "Clientes",
 	"/usuarios": "Usuarios",
 	"/reportes": "Reportes",
@@ -94,7 +109,7 @@ function NavGroup({
 	currentPath,
 }: {
 	label: string;
-	items: typeof navOperaciones;
+	items: DashboardNavItem[];
 	currentPath: string;
 }) {
 	const { setOpenMobile } = useSidebar();
@@ -106,7 +121,14 @@ function NavGroup({
 				<SidebarMenu>
 					{items.map((item) => (
 						<SidebarMenuItem key={item.title}>
-							<SidebarMenuButton asChild isActive={currentPath === item.url}>
+							<SidebarMenuButton
+								asChild
+								isActive={
+									item.isActive
+										? item.isActive(currentPath)
+										: currentPath === item.url
+								}
+							>
 								<Link to={item.url} onClick={() => setOpenMobile(false)}>
 									<item.icon />
 									<span>{item.title}</span>
@@ -124,7 +146,7 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 	const { user, logout } = useAuth();
 	const { setOpenMobile } = useSidebar();
 
-	const navReportes: (typeof navOperaciones)[number][] = [
+	const navReportes: DashboardNavItem[] = [
 		{ title: "Reportes", url: "/reportes", icon: IconChartBar },
 		...(hasPermissionOrSystemAdmin(
 			user?.permissions,
@@ -134,6 +156,18 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 			? [{ title: "Usuarios", url: "/usuarios", icon: IconUsers }]
 			: []),
 		{ title: "Configuracion", url: "/configuracion", icon: IconSettings },
+	];
+
+	const navCatalogo: DashboardNavItem[] = [
+		...navCatalogoBase,
+		...(hasPermissionOrSystemAdmin(
+			user?.permissions,
+			PERMISSION_KEYS.BRANDS_READ,
+			user?.role?.slug,
+		)
+			? [{ title: "Marcas", url: "/marcas", icon: IconTag }]
+			: []),
+		{ title: "Clientes", url: "/clientes", icon: IconUsers },
 	];
 
 	return (

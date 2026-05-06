@@ -1,0 +1,26 @@
+{
+	"name": "@ayv-comercial/uploadthing-router",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./index.d.ts",
+	"exports": {
+		".": {
+			"types": "./index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"typecheck": "tsc -p tsconfig.json --noEmit"
+	},
+	"dependencies": {
+		"uploadthing": "^7.7.4"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.0",
+		"typescript": "~6.0.2"
+	}
+}

@@ -8,7 +8,7 @@ Es la persona encargada de la administración general del sistema. Tiene acceso 
 
 - Garantizar la correcta configuración del sistema
 - Administrar usuarios del sistema (asignación de roles predefinidos)
-- Mantener el catálogo de productos y categorías actualizado
+- Mantener el catálogo de productos, categorías y marcas actualizado
 - Controlar la integridad del inventario
 
 ## Permisos
@@ -18,6 +18,7 @@ Es la persona encargada de la administración general del sistema. Tiene acceso 
 | Gestionar usuarios | Sí |
 | Asignar rol predefinido a usuarios | Sí |
 | Gestionar categorías | Sí |
+| Gestionar marcas | Sí |
 | Gestionar productos | Sí |
 | Actualizar costos y precios | Sí |
 | Ajustar inventario | Sí |
@@ -46,19 +47,20 @@ Es la persona encargada de la administración general del sistema. Tiene acceso 
 | CU02 | Gestión de usuarios |
 | CU03 | Roles y permisos (modelo estático; sin pantalla de administración) |
 | CU04 | Gestión de categorías |
-| CU05 | Gestión de productos |
-| CU06 | Actualización de costo y precio de producto |
-| CU07 | Registro de entrada de inventario |
-| CU09 | Ajuste de inventario |
-| CU12 | Registro de venta |
-| CU14 | Generación de factura |
-| CU15 | Consulta de ventas y facturas |
-| CU16 | Reimpresión de factura |
-| CU17 | Anulación de factura |
-| CU18 | Generación de orden de despacho |
-| CU19 | Consulta de pedidos pendientes |
-| CU20 | Actualización del estado del pedido |
-| CU24 | Reporte de ventas |
-| CU25 | Reporte de productos más vendidos |
-| CU26 | Reporte de productos de baja rotación |
-| CU27 | Reporte de rentabilidad por producto |
+| CU05 | Gestión de marcas |
+| CU06 | Gestión de productos |
+| CU07 | Actualización de costo y precio de producto |
+| CU08 | Registro de entrada de inventario |
+| CU10 | Ajuste de inventario |
+| CU13 | Registro de venta |
+| CU15 | Generación de factura |
+| CU16 | Consulta de ventas y facturas |
+| CU17 | Reimpresión de factura |
+| CU18 | Anulación de factura |
+| CU19 | Generación de orden de despacho |
+| CU20 | Consulta de pedidos pendientes |
+| CU21 | Actualización del estado del pedido |
+| CU25 | Reporte de ventas |
+| CU26 | Reporte de productos más vendidos |
+| CU27 | Reporte de productos de baja rotación |
+| CU28 | Reporte de rentabilidad por producto |

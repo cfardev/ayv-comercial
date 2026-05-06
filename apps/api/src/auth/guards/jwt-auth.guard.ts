@@ -8,12 +8,20 @@ import { Reflector } from "@nestjs/core";
 import { AuthGuard } from "@nestjs/passport";
 import type { Observable } from "rxjs";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator.js";
+import { isUploadThingHookRequest } from "../utils/is-uploadthing-hook-request.js";
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard("jwt") implements CanActivate {
 	canActivate(
 		context: ExecutionContext,
 	): boolean | Promise<boolean> | Observable<boolean> {
+		const req = context.switchToHttp().getRequest<{
+			headers: Record<string, string | string[] | undefined>;
+		}>();
+		if (isUploadThingHookRequest(req.headers)) {
+			return true;
+		}
+
 		const reflector = new Reflector();
 		const isPublic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
 			context.getHandler(),

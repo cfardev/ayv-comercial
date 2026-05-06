@@ -16,6 +16,7 @@ Es la persona responsable del control de las existencias de productos dentro del
 
 | Acción | Permitido |
 |--------|-----------|
+| Gestionar marcas | Sí |
 | Consultar productos | Sí |
 | Consultar existencias | Sí |
 | Consultar movimientos de inventario | Sí |
@@ -36,9 +37,10 @@ Es la persona responsable del control de las existencias de productos dentro del
 | Caso de uso | Descripción |
 |-------------|-------------|
 | CU01 | Inicio de sesión |
-| CU05 | Gestión de productos |
-| CU07 | Registro de entrada de inventario |
-| CU08 | Consulta de existencias |
-| CU09 | Ajuste de inventario |
-| CU10 | Consulta de movimientos de inventario |
-| CU21 | Alerta de stock bajo |
+| CU05 | Gestión de marcas |
+| CU06 | Gestión de productos |
+| CU08 | Registro de entrada de inventario |
+| CU09 | Consulta de existencias |
+| CU10 | Ajuste de inventario |
+| CU11 | Consulta de movimientos de inventario |
+| CU22 | Alerta de stock bajo |

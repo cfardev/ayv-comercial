@@ -36,6 +36,7 @@ Las siguientes acciones requieren aprobación adicional o son únicamente de con
 | Gestionar usuarios | No |
 | Gestionar productos | No |
 | Gestionar categorías | No |
+| Gestionar marcas | No |
 
 ## Relaciones con otros actores
 
@@ -51,12 +52,12 @@ Este actor tiene acceso predominantemente a consultas y reportes. No realiza ope
 | Caso de uso | Descripción |
 |-------------|-------------|
 | CU01 | Inicio de sesión |
-| CU08 | Consulta de existencias |
-| CU15 | Consulta de ventas y facturas |
-| CU21 | Alerta de stock bajo |
-| CU22 | Consulta de productos de baja rotación |
-| CU23 | Reporte de inventario |
-| CU24 | Reporte de ventas |
-| CU25 | Reporte de productos más vendidos |
-| CU26 | Reporte de productos de baja rotación |
-| CU27 | Reporte de rentabilidad por producto |
+| CU09 | Consulta de existencias |
+| CU16 | Consulta de ventas y facturas |
+| CU22 | Alerta de stock bajo |
+| CU23 | Consulta de productos de baja rotación |
+| CU24 | Reporte de inventario |
+| CU25 | Reporte de ventas |
+| CU26 | Reporte de productos más vendidos |
+| CU27 | Reporte de productos de baja rotación |
+| CU28 | Reporte de rentabilidad por producto |

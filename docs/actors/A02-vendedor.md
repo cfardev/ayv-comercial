@@ -40,11 +40,11 @@ No tiene acceso a ajustes de inventario, gestión de usuarios ni reportes financ
 | Caso de uso | Descripción |
 |-------------|-------------|
 | CU01 | Inicio de sesión |
-| CU05 | Gestión de productos |
-| CU08 | Consulta de existencias |
-| CU11 | Gestión de clientes |
-| CU12 | Registro de venta |
-| CU13 | Cálculo del total de venta |
-| CU14 | Generación de factura |
-| CU15 | Consulta de ventas y facturas |
-| CU16 | Reimpresión de factura |
+| CU06 | Gestión de productos |
+| CU09 | Consulta de existencias |
+| CU12 | Gestión de clientes |
+| CU13 | Registro de venta |
+| CU14 | Cálculo del total de venta |
+| CU15 | Generación de factura |
+| CU16 | Consulta de ventas y facturas |
+| CU17 | Reimpresión de factura |

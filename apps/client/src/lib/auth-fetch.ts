@@ -1,6 +1,6 @@
 const AUTH_STORAGE_KEY = "auth";
 
-function getAccessToken(): string | null {
+export function getAccessToken(): string | null {
 	try {
 		const raw = localStorage.getItem(AUTH_STORAGE_KEY);
 		if (!raw) return null;
