@@ -96,10 +96,7 @@ export function MarcasPage() {
 		setConfirmDialog({ open: true, brand, action: "reactivate" });
 	}
 
-	function handleFormSubmit(data: {
-		name: string;
-		logoUrl?: string | null;
-	}) {
+	function handleFormSubmit(data: { name: string; logoUrl?: string | null }) {
 		setFormError(null);
 
 		if (editingBrand) {

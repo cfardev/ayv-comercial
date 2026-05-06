@@ -76,8 +76,7 @@ async function fetchBrandsAdmin(
 ): Promise<PaginatedResponse<Brand>> {
 	const params = new URLSearchParams();
 	if (filters.search) params.set("search", filters.search);
-	if (filters.status !== undefined)
-		params.set("status", filters.status);
+	if (filters.status !== undefined) params.set("status", filters.status);
 	if (filters.page) params.set("page", String(filters.page));
 	if (filters.limit) params.set("limit", String(filters.limit));
 
