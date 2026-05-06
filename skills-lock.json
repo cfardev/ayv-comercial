@@ -30,6 +30,12 @@
       "source": "vercel/turborepo",
       "sourceType": "github",
       "computedHash": "1373525c4d3831156f3b3dcaec5709cc642381179749bfd737037074019a41cf"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vitest/SKILL.md",
+      "computedHash": "669c7275f7e1379b06b2bcfa593603aead4c983b951c7e8edbc09640aa38d0a1"
     }
   }
 }
