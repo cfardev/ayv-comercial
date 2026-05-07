@@ -29,7 +29,7 @@ function TableHeadRow() {
 			<TableHead>Nombre</TableHead>
 			<TableHead className="w-[100px]">Productos</TableHead>
 			<TableHead className="w-[100px]">Estado</TableHead>
-			<TableHead className="w-[160px]">Acciones</TableHead>
+			<TableHead className="w-[200px]">Acciones</TableHead>
 		</TableRow>
 	);
 }
@@ -116,36 +116,35 @@ export function BrandsTable({
 								</Badge>
 							</TableCell>
 							<TableCell>
-								<div className="flex flex-wrap gap-1">
+								<div className="flex gap-2">
 									<Button
-										variant="ghost"
-										size="icon"
-										className="cursor-pointer"
+										variant="default"
+										size="sm"
+										className="cursor-pointer bg-blue-700 text-white hover:bg-blue-800"
 										onClick={() => onEdit(brand)}
-										title="Editar"
 									>
 										<IconEdit className="h-4 w-4" />
+										Editar
 									</Button>
 									{brand.status ? (
 										<Button
-											variant="ghost"
+											variant="default"
 											size="sm"
-											className="cursor-pointer text-destructive hover:text-destructive"
+											className="cursor-pointer bg-red-700 text-white hover:bg-red-800"
 											onClick={() => onDeactivate(brand)}
-											title="Desactivar"
 										>
 											<IconTrash className="h-4 w-4" />
-											Desactivar
+											Eliminar
 										</Button>
 									) : (
 										<Button
-											variant="ghost"
-											size="icon"
-											className="cursor-pointer text-green-600 hover:text-green-600"
+											variant="default"
+											size="sm"
+											className="cursor-pointer bg-green-700 text-white hover:bg-green-800"
 											onClick={() => onReactivate(brand)}
-											title="Reactivar"
 										>
 											<IconRefresh className="h-4 w-4" />
+											Reactivar
 										</Button>
 									)}
 								</div>

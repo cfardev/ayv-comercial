@@ -108,36 +108,35 @@ export function CategoriesTable({
 								</Badge>
 							</TableCell>
 							<TableCell>
-								<div className="flex gap-1">
+								<div className="flex gap-2">
 									<Button
-										variant="ghost"
-										size="icon"
-										className="cursor-pointer"
+										variant="default"
+										size="sm"
+										className="cursor-pointer bg-blue-700 text-white hover:bg-blue-800"
 										onClick={() => onEdit(category)}
-										title="Editar"
 									>
 										<IconEdit className="h-4 w-4" />
+										Editar
 									</Button>
 									{category.status ? (
 										<Button
-											variant="ghost"
+											variant="default"
 											size="sm"
-											className="cursor-pointer text-destructive hover:text-destructive"
+											className="cursor-pointer bg-red-700 text-white hover:bg-red-800"
 											onClick={() => onDeactivate(category)}
-											title="Eliminar"
 										>
 											<IconTrash className="h-4 w-4" />
 											Eliminar
 										</Button>
 									) : (
 										<Button
-											variant="ghost"
-											size="icon"
-											className="cursor-pointer text-green-600 hover:text-green-600"
+											variant="default"
+											size="sm"
+											className="cursor-pointer bg-green-700 text-white hover:bg-green-800"
 											onClick={() => onReactivate(category)}
-											title="Reactivar"
 										>
 											<IconRefresh className="h-4 w-4" />
+											Reactivar
 										</Button>
 									)}
 								</div>
