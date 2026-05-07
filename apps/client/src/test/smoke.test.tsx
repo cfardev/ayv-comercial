@@ -1,6 +1,5 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { describe, expect, it } from "vitest";
 
 function Smoke() {
