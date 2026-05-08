@@ -1,4 +1,4 @@
-import { IconPhoto, IconTrash, IconUpload } from "@tabler/icons-react";
+import { IconTrash, IconUpload } from "@tabler/icons-react";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ const MAX_BYTES = 4 * 1024 * 1024;
 
 export interface BrandLogoDropzoneProps {
 	value: string | null | undefined;
-	onChange: (next: string | null) => void;
+	onChange: (next: string) => void;
 	disabled?: boolean;
 }
 
@@ -72,7 +72,7 @@ export function BrandLogoDropzone({
 							size="icon"
 							className="absolute right-1 top-1 size-7 cursor-pointer opacity-90"
 							disabled={disabled || isUploading}
-							onClick={() => onChange(null)}
+							onClick={() => onChange("")}
 						>
 							<IconTrash className="size-3.5" />
 						</Button>
@@ -97,13 +97,6 @@ export function BrandLogoDropzone({
 			</div>
 
 			{error ? <p className="text-sm text-destructive">{error}</p> : null}
-
-			{!hasLogo ? (
-				<p className="flex items-center gap-2 text-sm text-muted-foreground">
-					<IconPhoto className="size-4 shrink-0" />
-					El logo es opcional.
-				</p>
-			) : null}
 		</div>
 	);
 }

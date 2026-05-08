@@ -18,7 +18,7 @@ import { BrandLogoDropzone } from "./brand-logo-dropzone.js";
 
 interface BrandFormSubmitData {
 	name: string;
-	logoUrl?: string | null;
+	logoUrl: string;
 }
 
 interface BrandFormDialogProps {
@@ -46,7 +46,7 @@ export function BrandFormDialog({
 		resolver: zodResolver(brandFormSchema),
 		defaultValues: {
 			name: "",
-			logoUrl: null,
+			logoUrl: "",
 		},
 	});
 
@@ -54,7 +54,7 @@ export function BrandFormDialog({
 		if (open) {
 			form.reset({
 				name: brand?.name ?? "",
-				logoUrl: brand?.logoUrl ?? null,
+				logoUrl: brand?.logoUrl ?? "",
 			});
 		}
 	}, [open, brand, form]);
@@ -69,10 +69,7 @@ export function BrandFormDialog({
 		form.clearErrors("root");
 		onSubmit({
 			name: values.name,
-			logoUrl:
-				values.logoUrl === null || values.logoUrl === undefined
-					? null
-					: values.logoUrl.trim() || null,
+			logoUrl: values.logoUrl.trim(),
 		});
 	}
 
@@ -93,10 +90,7 @@ export function BrandFormDialog({
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
 					<div className="space-y-2">
 						<Label>
-							Logo
-							<span className="ml-1 text-muted-foreground font-normal">
-								(opcional)
-							</span>
+							Logo <span className="text-destructive">*</span>
 						</Label>
 						<Controller
 							control={form.control}
@@ -109,6 +103,11 @@ export function BrandFormDialog({
 								/>
 							)}
 						/>
+						{form.formState.errors.logoUrl && (
+							<p className="text-sm text-destructive">
+								{form.formState.errors.logoUrl.message}
+							</p>
+						)}
 					</div>
 
 					<div className="space-y-2">

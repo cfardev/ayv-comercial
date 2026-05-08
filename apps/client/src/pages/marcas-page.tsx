@@ -96,7 +96,7 @@ export function MarcasPage() {
 		setConfirmDialog({ open: true, brand, action: "reactivate" });
 	}
 
-	function handleFormSubmit(data: { name: string; logoUrl?: string | null }) {
+	function handleFormSubmit(data: { name: string; logoUrl: string }) {
 		setFormError(null);
 
 		if (editingBrand) {
@@ -105,7 +105,7 @@ export function MarcasPage() {
 					id: editingBrand.id,
 					data: {
 						name: data.name,
-						logoUrl: data.logoUrl === undefined ? undefined : data.logoUrl,
+						logoUrl: data.logoUrl || undefined,
 					},
 				},
 				{
@@ -117,7 +117,7 @@ export function MarcasPage() {
 			createBrand.mutate(
 				{
 					name: data.name,
-					...(data.logoUrl ? { logoUrl: data.logoUrl } : {}),
+					logoUrl: data.logoUrl,
 				},
 				{
 					onSuccess: () => setFormOpen(false),

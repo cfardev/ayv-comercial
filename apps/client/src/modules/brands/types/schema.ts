@@ -5,7 +5,7 @@ export const brandFormSchema = z.object({
 		.string()
 		.min(1, "El nombre es obligatorio")
 		.max(100, "Máximo 100 caracteres"),
-	logoUrl: z.string().max(2048).nullish(),
+	logoUrl: z.string().min(1, "El logo es obligatorio").max(2048),
 });
 
 export type BrandFormValues = z.infer<typeof brandFormSchema>;
