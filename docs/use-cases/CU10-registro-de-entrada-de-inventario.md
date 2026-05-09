@@ -1,4 +1,4 @@
-# CU08 - Registro de entrada de inventario
+# CU10 - Registro de entrada de inventario
 
 ## Objetivo
 
@@ -14,7 +14,9 @@ Registrar el ingreso de nuevas existencias al inventario, ya sea stock inicial, 
 
 - A: El actor está autenticado en el sistema.
 - A: El actor tiene permisos para registrar entradas de inventario.
-- A: Los productos a ingresar existen en el catálogo (referencia CU06).
+- A: Los productos a ingresar existen en el catálogo (referencia CU07).
+- A: Si la entrada corresponde a una compra, el proveedor seleccionado existe y está activo en el sistema (referencia CU06).
+- A: Si la entrada proviene de una orden de compra, dicha orden existe y se encuentra en estado enviada o parcial (referencia CU09).
 
 ## Disparador
 
@@ -23,7 +25,7 @@ El actor selecciona la opción "Registrar entrada" desde el módulo de inventari
 ## Flujo principal
 
 1. El actor accede al formulario de nueva entrada de inventario.
-2. El sistema presenta los campos: tipo de entrada (compra, devolución, ajuste inicial), número de documento de referencia, proveedor (opcional), fecha de entrada, observaciones.
+2. El sistema presenta los campos: tipo de entrada (compra, devolución, ajuste inicial), número de documento de referencia, proveedor (condicional), fecha de entrada, observaciones.
 3. El actor completa los campos y agrega los productos a ingresar.
 4. Para cada producto, el sistema presenta: selector de producto, cantidad recibida, número de serie/lote (opcional), fecha de vencimiento (opcional).
 5. El actor ingresa las cantidades y productos.
@@ -64,9 +66,11 @@ El actor selecciona la opción "Registrar entrada" desde el módulo de inventari
 
 - A: Toda entrada debe tener al menos un producto con cantidad mayor a cero.
 - A: El tipo de entrada "compra" requiere informar el proveedor.
+- A: El proveedor informado en una entrada por compra corresponde a la operación de abastecimiento y no implica una asociación exclusiva entre el producto y dicho proveedor.
+- A: Un mismo producto puede aparecer en entradas asociadas a distintos proveedores.
 - A: El stock se incrementa inmediatamente tras la confirmación.
 - A: Cada entrada genera un movimiento de inventario con tipo "ENTRADA".
-- A: Las entradas pueden estar asociadas a una orden de compra o ser independientes.
+- A: Las entradas pueden estar asociadas a una orden de compra (referencia CU09) o ser independientes.
 
 ## Reglas de seguridad
 

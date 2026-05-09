@@ -1,4 +1,4 @@
-# CU18 - Anulación de factura
+# CU20 - Anulación de factura
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Anular una factura emitida por error o por solicitud del cliente, registrando la
 
 ## Precondiciones
 
-- A: Existe una factura generada y no anulada (referencia CU15).
+- A: Existe una factura generada y no anulada (referencia CU17).
 - A: El usuario tiene permisos para anular facturas.
 
 ## Disparador

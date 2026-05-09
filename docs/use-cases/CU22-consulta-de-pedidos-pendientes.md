@@ -1,4 +1,4 @@
-# CU20 - Consulta de pedidos pendientes
+# CU22 - Consulta de pedidos pendientes
 
 ## Objetivo
 
@@ -46,7 +46,7 @@ El actor selecciona la opción "Pedidos pendientes" desde el menú de despacho o
 ## Postcondiciones
 
 - A: La consulta muestra información actualizada al momento.
-- A: Los datos son de solo lectura para consulta; para modificar se debe usar la actualización de estado (CU21).
+- A: Los datos son de solo lectura para consulta; para modificar se debe usar la actualización de estado (CU23).
 
 ## Reglas de negocio
 

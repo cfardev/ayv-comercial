@@ -1,4 +1,4 @@
-# CU11 - Consulta de movimientos de inventario
+# CU13 - Consulta de movimientos de inventario
 
 ## Objetivo
 

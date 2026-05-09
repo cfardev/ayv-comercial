@@ -1,4 +1,4 @@
-# CU10 - Ajuste de inventario
+# CU12 - Ajuste de inventario
 
 ## Objetivo
 

@@ -1,4 +1,4 @@
-# CU27 - Reporte de productos de baja rotación
+# CU29 - Reporte de productos de baja rotación
 
 ## Objetivo
 

@@ -1,4 +1,4 @@
-# CU26 - Reporte de productos más vendidos
+# CU28 - Reporte de productos más vendidos
 
 ## Objetivo
 

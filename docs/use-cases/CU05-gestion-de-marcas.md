@@ -74,7 +74,7 @@ El actor selecciona la opción "Gestión de marcas" desde el menú de inventario
 
 ## Postcondiciones
 
-- A: Creación exitosa: la nueva marca queda disponible para asignar a productos (referencia CU06).
+- A: Creación exitosa: la nueva marca queda disponible para asignar a productos (referencia CU07).
 - A: Edición exitosa: los cambios quedan aplicados a la marca.
 - A: Desactivación exitosa: la marca no puede asignarse a nuevos productos; los productos existentes deben haber sido reasignados o quedar validados según reglas de negocio.
 - A: Reactivación exitosa: la marca vuelve a estar disponible para productos.
@@ -84,7 +84,7 @@ El actor selecciona la opción "Gestión de marcas" desde el menú de inventario
 
 - A: No puede haber dos marcas con el mismo nombre.
 - A: Una marca desactivada no debe usarse en altas nuevas de producto.
-- A: Los productos activos no pueden referenciar una marca inactiva (alineado con categorías en CU06).
+- A: Los productos activos no pueden referenciar una marca inactiva (alineado con categorías en CU07).
 
 ## Reglas de seguridad
 
@@ -99,4 +99,4 @@ El actor selecciona la opción "Gestión de marcas" desde el menú de inventario
 - A: Un usuario con permisos puede desactivar una marca sin productos activos asociados.
 - A: El sistema rechaza la desactivación de una marca que aún tiene productos activos asociados.
 - A: El sistema muestra errores claros cuando los campos no cumplen validación.
-- A: Las marcas inactivas no aparecen como opción al crear o editar productos en el catálogo de ventas (reflejo coherente con CU06).
+- A: Las marcas inactivas no aparecen como opción al crear o editar productos en el catálogo de ventas (reflejo coherente con CU07).

@@ -1,4 +1,4 @@
-# CU16 - Consulta de ventas y facturas
+# CU18 - Consulta de ventas y facturas
 
 ## Objetivo
 

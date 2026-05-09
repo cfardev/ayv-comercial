@@ -1,4 +1,4 @@
-# CU13 - Registro de venta
+# CU15 - Registro de venta
 
 ## Objetivo
 
@@ -14,7 +14,7 @@ Registrar una venta asociando el cliente, los productos seleccionados, cantidade
 
 - A: El actor está autenticado en el sistema.
 - A: El actor tiene permisos para registrar ventas.
-- A: Existen productos activos con stock disponible (referencia CU09).
+- A: Existen productos activos con stock disponible (referencia CU11).
 - A: Si se requiere factura, el cliente debe estar activo.
 
 ## Disparador
@@ -62,7 +62,7 @@ El actor selecciona la opción "Nueva venta" desde el módulo de ventas.
 
 - A: Venta exitosa: el registro de venta queda creado con productos y cantidades.
 - A: El stock de los productos queda decrementado según las cantidades vendidas.
-- A: La venta queda pendiente de facturación (referencia CU15) o asociada a factura existente.
+- A: La venta queda pendiente de facturación (referencia CU17) o asociada a factura existente.
 - A: En caso de fallo, no se modifica el stock.
 
 ## Reglas de negocio

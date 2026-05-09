@@ -1,4 +1,4 @@
-# CU23 - Consulta de productos de baja rotación
+# CU25 - Consulta de productos de baja rotación
 
 ## Objetivo
 

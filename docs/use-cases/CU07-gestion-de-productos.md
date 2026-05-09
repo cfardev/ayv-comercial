@@ -1,4 +1,4 @@
-# CU06 - Gestión de productos
+# CU07 - Gestión de productos
 
 ## Objetivo
 
@@ -27,7 +27,7 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 ### Registro de producto
 
 1. El actor accede al formulario de nuevo producto.
-2. El sistema presenta los campos: código, nombre, descripción, categoría, marca, unidad de medida, costo, precio de venta, stock mínimo, proveedor.
+2. El sistema presenta los campos: código, nombre, descripción, categoría, marca, unidad de medida, costo, precio de venta, stock mínimo, estado.
 3. El actor completa los campos obligatorios (código, nombre, categoría, marca, costo, precio de venta).
 4. El sistema valida que el código no esté duplicado.
 5. El sistema crea el producto con estado activo y fecha de creación.
@@ -108,6 +108,8 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - A: Los productos desactivados no aparecen en el catálogo ni en nuevas ventas.
 - A: Los productos activos no pueden tener categoría inactiva.
 - A: Los productos activos no pueden tener marca inactiva.
+- A: Un producto no queda asociado a un proveedor único dentro de su ficha maestra.
+- A: La relación entre productos y proveedores se registra en las órdenes de compra (CU09) y/o entradas de inventario (CU10).
 
 ## Reglas de seguridad
 

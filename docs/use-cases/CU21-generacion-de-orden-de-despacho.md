@@ -1,4 +1,4 @@
-# CU19 - Generación de orden de despacho
+# CU21 - Generación de orden de despacho
 
 ## Objetivo
 
@@ -13,7 +13,7 @@ Crear una orden interna para preparar y entregar el pedido vendido, asignando re
 
 ## Precondiciones
 
-- A: Existe una venta facturada lista para despacho (referencia CU15).
+- A: Existe una venta facturada lista para despacho (referencia CU17).
 - A: El usuario tiene permisos para generar órdenes de despacho.
 
 ## Disparador

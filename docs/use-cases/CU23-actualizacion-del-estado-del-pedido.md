@@ -1,4 +1,4 @@
-# CU21 - Actualización del estado del pedido
+# CU23 - Actualización del estado del pedido
 
 ## Objetivo
 
@@ -12,12 +12,12 @@ Cambiar el estado del pedido a en preparación, preparado o entregado, mantenien
 
 ## Precondiciones
 
-- A: Existe una orden de despacho activa (referencia CU19).
+- A: Existe una orden de despacho activa (referencia CU21).
 - A: El usuario tiene permisos para actualizar el estado del pedido.
 
 ## Disparador
 
-El actor selecciona un pedido desde "Pedidos pendientes" (CU20) o "Consulta de pedidos" y elige "Actualizar estado".
+El actor selecciona un pedido desde "Pedidos pendientes" (CU22) o "Consulta de pedidos" y elige "Actualizar estado".
 
 ## Flujo principal
 

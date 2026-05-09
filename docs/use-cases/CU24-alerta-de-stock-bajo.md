@@ -1,4 +1,4 @@
-# CU22 - Alerta de stock bajo
+# CU24 - Alerta de stock bajo
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Identificar y notificar automáticamente los productos cuya existencia ha caído
 
 ## Precondiciones
 
-- A: Los productos tienen configurado un stock mínimo (referencia CU06).
+- A: Los productos tienen configurado un stock mínimo (referencia CU07).
 - A: El actor tiene permisos para ver alertas.
 
 ## Disparador
@@ -43,7 +43,7 @@ El sistema verifica el stock de todos los productos:
 
 ### FA3 - Reabastecimiento registrado
 
-- A: Cuando se registra una entrada de inventario (CU08) que supera el stock mínimo, la alerta se cierra automáticamente.
+- A: Cuando se registra una entrada de inventario (CU10) que supera el stock mínimo, la alerta se cierra automáticamente.
 
 ### FA4 - Sin alertas
 

@@ -1,4 +1,4 @@
-# CU17 - Reimpresión de factura
+# CU19 - Reimpresión de factura
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Volver a emitir una factura previamente generada, generando una copia con la inf
 
 ## Precondiciones
 
-- A: Existe una factura generada previamente (referencia CU15).
+- A: Existe una factura generada previamente (referencia CU17).
 - A: El usuario tiene permisos para reimprimir facturas.
 
 ## Disparador

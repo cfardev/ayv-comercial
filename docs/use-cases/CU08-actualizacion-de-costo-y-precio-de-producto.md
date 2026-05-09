@@ -1,4 +1,4 @@
-# CU07 - Actualización de costo y precio de producto
+# CU08 - Actualización de costo y precio de producto
 
 ## Objetivo
 
@@ -18,7 +18,7 @@ Permitir modificar el costo y el precio de venta de un producto ya registrado en
 
 ## Disparador
 
-El actor selecciona un producto desde "Gestión de productos" (CU06) y elige la opción "Actualizar precio" o "Actualizar costo y precio".
+El actor selecciona un producto desde "Gestión de productos" (CU07) y elige la opción "Actualizar precio" o "Actualizar costo y precio".
 
 ## Flujo principal
 

@@ -1,4 +1,4 @@
-# CU09 - Consulta de existencias
+# CU11 - Consulta de existencias
 
 ## Objetivo
 
@@ -50,12 +50,12 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 ## Postcondiciones
 
 - A: La consulta muestra información actualizada al momento de la consulta.
-- A: Los datos son de solo lectura; para modificar stock se debe usar el registro de entrada (CU08) o ajuste de inventario (CU10).
+- A: Los datos son de solo lectura; para modificar stock se debe usar el registro de entrada (CU10) o ajuste de inventario (CU12).
 
 ## Reglas de negocio
 
 - A: El stock actual se actualiza en tiempo real tras cada movimiento de inventario.
-- A: El stock mínimo es configurable por producto (referencia CU06).
+- A: El stock mínimo es configurable por producto (referencia CU07).
 - A: Se consideran tres estados: normal (stock >= mínimo), bajo (0 < stock < mínimo), agotado (stock = 0).
 - A: Los productos inactivos se muestran solo si el filtro incluye estados inactivos.
 

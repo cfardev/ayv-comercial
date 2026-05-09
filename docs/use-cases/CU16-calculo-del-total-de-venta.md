@@ -1,4 +1,4 @@
-# CU14 - Cálculo del total de venta
+# CU16 - Cálculo del total de venta
 
 ## Objetivo
 
@@ -11,7 +11,7 @@ Calcular el subtotal y total de la venta en tiempo real a partir de los producto
 
 ## Precondiciones
 
-- A: Existe una venta en proceso de registro (referencia CU13).
+- A: Existe una venta en proceso de registro (referencia CU15).
 - A: Los productos agregados a la venta tienen precios válidos.
 
 ## Disparador

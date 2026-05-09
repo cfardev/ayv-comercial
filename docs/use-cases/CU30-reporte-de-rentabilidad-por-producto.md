@@ -1,4 +1,4 @@
-# CU28 - Reporte de rentabilidad por producto
+# CU30 - Reporte de rentabilidad por producto
 
 ## Objetivo
 
@@ -57,6 +57,8 @@ El actor selecciona la opción "Rentabilidad por producto" desde el menú de rep
 - A: El margen porcentual se calcula como: ((precio - costo) / precio) × 100.
 - A: La utilidad total estimada se calcula como: margen unitario × unidades vendidas.
 - A: Los productos sin ventas no se incluyen en el cálculo de utilidad total.
+- A: El filtro por proveedor considera las compras o entradas de inventario asociadas a ese proveedor dentro del período analizado.
+- A: Un producto puede aparecer vinculado a más de un proveedor según su historial de abastecimiento.
 
 ## Reglas de seguridad
 

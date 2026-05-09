@@ -1,4 +1,4 @@
-# CU15 - Generación de factura
+# CU17 - Generación de factura
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Emitir la factura correspondiente a una venta realizada, generando el documento 
 
 ## Precondiciones
 
-- A: Existe una venta registrada con estado "pendiente de facturación" (referencia CU13).
+- A: Existe una venta registrada con estado "pendiente de facturación" (referencia CU15).
 - A: El cliente asociado a la venta está activo.
 - A: Los productos de la venta tienen precios configurados.
 
@@ -52,7 +52,7 @@ El actor selecciona una venta pendiente y elige la opción "Generar factura" o "
 ## Postcondiciones
 
 - A: Factura exitosa: la factura queda creada y la venta cambia a estado "facturada".
-- A: La factura queda disponible para consulta (referencia CU16), reimpresión (CU17) o anulación (CU18).
+- A: La factura queda disponible para consulta (referencia CU18), reimpresión (CU19) o anulación (CU20).
 - A: En caso de fallo, la venta permanece en estado "pendiente de facturación".
 
 ## Reglas de negocio

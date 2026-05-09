@@ -1,4 +1,4 @@
-# CU24 - Reporte de inventario
+# CU26 - Reporte de inventario
 
 ## Objetivo
 
@@ -57,6 +57,7 @@ El actor selecciona la opción "Reporte de inventario" desde el menú de reporte
 - A: El valor total del inventario se calcula como: suma(stock actual × costo unitario) por producto.
 - A: Los productos inactivos se incluyen solo si el filtro los especifica.
 - A: El reporte incluye productos con stock bajo como sección de alerta.
+- A: El filtro por proveedor se aplica sobre movimientos de abastecimiento o entradas de inventario asociadas a ese proveedor, no sobre un proveedor fijo del producto.
 
 ## Reglas de seguridad
 
