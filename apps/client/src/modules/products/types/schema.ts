@@ -34,8 +34,7 @@ export const productFormSchema = z
 	})
 	.superRefine((data, ctx) => {
 		if (data.brandMode === "existing") {
-			const parsed = z.string().uuid().safeParse(data.brandId);
-			if (!parsed.success) {
+			if (!data.brandId.trim()) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					path: ["brandId"],

@@ -7,7 +7,6 @@ import {
 	IsNumber,
 	IsOptional,
 	IsString,
-	IsUUID,
 	MaxLength,
 	Min,
 	ValidateIf,
@@ -41,14 +40,16 @@ export class CreateProductDto {
 	@Min(0.01)
 	price!: number;
 
-	@IsUUID()
+	@IsString()
+	@IsNotEmpty()
 	categoryId!: string;
 
 	@IsIn(["existing", "new"])
 	brandMode!: "existing" | "new";
 
 	@ValidateIf((dto: CreateProductDto) => dto.brandMode === "existing")
-	@IsUUID()
+	@IsString()
+	@IsNotEmpty()
 	brandId!: string;
 
 	@ValidateIf((dto: CreateProductDto) => dto.brandMode === "new")
