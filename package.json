@@ -13,7 +13,7 @@
 		"test": "turbo run test",
 		"test:watch": "turbo run test:watch",
 		"test:coverage": "turbo run test:coverage",
-		"verify": "pnpm run typecheck && pnpm run lint && pnpm run build",
+		"verify": "pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test",
 		"check": "biome check .",
 		"format": "biome format --write .",
 		"prisma:generate": "pnpm --filter @ayv-comercial/api run prisma:generate",
