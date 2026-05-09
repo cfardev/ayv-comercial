@@ -67,27 +67,7 @@ export function ProductForm({
 		[categoriesData?.data],
 	);
 
-	const form = useForm<ProductFormValues>({
-		resolver: zodResolver(productFormSchema) as Resolver<ProductFormValues>,
-		defaultValues: {
-			code: "",
-			name: "",
-			description: "",
-			cost: 0.01,
-			price: 0.02,
-			categoryId: "",
-			brandMode: "existing",
-			brandId: "",
-			newBrandName: "",
-			images: [],
-			unitOfMeasure: "",
-			minimumStock: 0,
-			supplier: "",
-		},
-	});
-
-	useEffect(() => {
-		if (!active) return;
+	const defaultValues = useMemo<ProductFormValues>(() => {
 		if (product) {
 			const imgs: ProductImageValue[] = [...product.images]
 				.sort((a, b) => a.sortOrder - b.sortOrder)
@@ -96,7 +76,8 @@ export function ProductForm({
 					fileKey: img.fileKey ?? undefined,
 					sortOrder: i,
 				}));
-			form.reset({
+
+			return {
 				code: product.code,
 				name: product.name,
 				description: product.description ?? "",
@@ -110,24 +91,35 @@ export function ProductForm({
 				unitOfMeasure: product.unitOfMeasure ?? "",
 				minimumStock: product.minimumStock,
 				supplier: product.supplier ?? "",
-			});
-		} else {
-			form.reset({
-				code: "",
-				name: "",
-				description: "",
-				cost: 0.01,
-				price: 0.02,
-				categoryId: categories[0]?.id ?? "",
-				brandMode: "existing",
-				brandId: "",
-				newBrandName: "",
-				images: [],
-				unitOfMeasure: "",
-				minimumStock: 0,
-				supplier: "",
-			});
+			};
 		}
+
+		return {
+			code: "",
+			name: "",
+			description: "",
+			cost: 0.01,
+			price: 0.02,
+			categoryId: "",
+			brandMode: "existing",
+			brandId: "",
+			newBrandName: "",
+			images: [],
+			unitOfMeasure: "",
+			minimumStock: 0,
+			supplier: "",
+		};
+	}, [product]);
+
+	const form = useForm<ProductFormValues>({
+		resolver: zodResolver(productFormSchema) as Resolver<ProductFormValues>,
+		defaultValues,
+	});
+
+	useEffect(() => {
+		if (!active || product || categories.length === 0) return;
+
+		form.setValue("categoryId", categories[0]?.id ?? "");
 	}, [active, product, categories, form]);
 
 	useEffect(() => {
