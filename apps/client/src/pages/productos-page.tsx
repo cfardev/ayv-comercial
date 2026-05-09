@@ -65,6 +65,11 @@ export function ProductosPage() {
 		PERMISSION_KEYS.PRODUCTS_REACTIVATE,
 		user?.role?.slug,
 	);
+	const canViewCost = hasPermissionOrSystemAdmin(
+		user?.permissions,
+		PERMISSION_KEYS.PRODUCTS_UPDATE,
+		user?.role?.slug,
+	);
 
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
@@ -353,6 +358,7 @@ export function ProductosPage() {
 				canEdit={canEdit}
 				canDeactivate={canDeactivate}
 				canReactivate={canReactivate}
+				canViewCost={canViewCost}
 				isLoading={productsLoading}
 			/>
 

@@ -20,12 +20,11 @@ interface ProductsTableProps {
 	canEdit: boolean;
 	canDeactivate: boolean;
 	canReactivate: boolean;
+	canViewCost?: boolean;
 	isLoading?: boolean;
 }
 
-const COL_COUNT = 10;
-
-function TableHeadRow() {
+function TableHeadRow({ showCost }: { showCost: boolean }) {
 	return (
 		<TableRow>
 			<TableHead className="w-[72px]">Imagen</TableHead>
@@ -33,7 +32,7 @@ function TableHeadRow() {
 			<TableHead>Nombre</TableHead>
 			<TableHead>Categoría</TableHead>
 			<TableHead>Marca</TableHead>
-			<TableHead className="text-right">Costo</TableHead>
+			{showCost && <TableHead className="text-right">Costo</TableHead>}
 			<TableHead className="text-right">Precio</TableHead>
 			<TableHead className="text-right">Stock</TableHead>
 			<TableHead className="w-[90px]">Estado</TableHead>
@@ -60,20 +59,23 @@ export function ProductsTable({
 	canEdit,
 	canDeactivate,
 	canReactivate,
+	canViewCost = true,
 	isLoading,
 }: ProductsTableProps) {
+	const colCount = canViewCost ? 10 : 9;
+
 	if (isLoading) {
 		return (
 			<div className="overflow-x-auto rounded-md border">
 				<Table>
 					<TableHeader>
-						<TableHeadRow />
+						<TableHeadRow showCost={canViewCost} />
 					</TableHeader>
 					<TableBody>
 						{Array.from({ length: 5 }).map((_, i) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton rows
 							<TableRow key={i}>
-								{Array.from({ length: COL_COUNT }).map((__, j) => (
+								{Array.from({ length: colCount }).map((__, j) => (
 									// biome-ignore lint/suspicious/noArrayIndexKey: skeleton cells
 									<TableCell key={j}>
 										<Skeleton className="h-4 w-full" />
@@ -92,12 +94,12 @@ export function ProductsTable({
 			<div className="overflow-x-auto rounded-md border">
 				<Table>
 					<TableHeader>
-						<TableHeadRow />
+						<TableHeadRow showCost={canViewCost} />
 					</TableHeader>
 					<TableBody>
 						<TableRow>
 							<TableCell
-								colSpan={COL_COUNT}
+								colSpan={colCount}
 								className="text-center text-muted-foreground py-8"
 							>
 								No se encontraron productos.
@@ -113,7 +115,7 @@ export function ProductsTable({
 		<div className="overflow-x-auto rounded-md border">
 			<Table>
 				<TableHeader>
-					<TableHeadRow />
+					<TableHeadRow showCost={canViewCost} />
 				</TableHeader>
 				<TableBody>
 					{products.map((product) => {
@@ -143,9 +145,11 @@ export function ProductsTable({
 								<TableCell className="max-w-[160px] truncate text-muted-foreground">
 									{product.brandName ?? "—"}
 								</TableCell>
-								<TableCell className="text-right tabular-nums">
-									{formatMoney(product.cost)}
-								</TableCell>
+								{canViewCost && (
+									<TableCell className="text-right tabular-nums">
+										{formatMoney(product.cost)}
+									</TableCell>
+								)}
 								<TableCell className="text-right tabular-nums">
 									{formatMoney(product.price)}
 								</TableCell>

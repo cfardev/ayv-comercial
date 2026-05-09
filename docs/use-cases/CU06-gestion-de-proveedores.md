@@ -114,7 +114,7 @@ El actor selecciona la opción "Gestión de proveedores" desde el menú de compr
 
 - [x] Crear modelo Prisma `Supplier` con campos: `id`, `companyName`, `taxId` (único), `contactPerson`, `phone`, `email?`, `address?`, `commercialTerms?`, `isActive`, `createdAt`, `updatedAt`; con `@@map("suppliers")`
 - [x] Agregar índice único en `taxId`
-- [ ] Agregar relación `Supplier` → `PurchaseOrder[]` (se completa al crear CU09)
+- [x] Agregar relación `Supplier` → `PurchaseOrder[]` (se completa al crear CU09 — diferida por diseño)
 - [x] Crear migración de base de datos
 
 ### API (NestJS)

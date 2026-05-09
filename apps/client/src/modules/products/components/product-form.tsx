@@ -67,27 +67,7 @@ export function ProductForm({
 		[categoriesData?.data],
 	);
 
-	const form = useForm<ProductFormValues>({
-		resolver: zodResolver(productFormSchema) as Resolver<ProductFormValues>,
-		defaultValues: {
-			code: "",
-			name: "",
-			description: "",
-			cost: 0.01,
-			price: 0.02,
-			categoryId: "",
-			brandMode: "existing",
-			brandId: "",
-			newBrandName: "",
-			images: [],
-			unitOfMeasure: "",
-			minimumStock: 0,
-			supplier: "",
-		},
-	});
-
-	useEffect(() => {
-		if (!active) return;
+	const defaultValues = useMemo<ProductFormValues>(() => {
 		if (product) {
 			const imgs: ProductImageValue[] = [...product.images]
 				.sort((a, b) => a.sortOrder - b.sortOrder)
@@ -96,7 +76,8 @@ export function ProductForm({
 					fileKey: img.fileKey ?? undefined,
 					sortOrder: i,
 				}));
-			form.reset({
+
+			return {
 				code: product.code,
 				name: product.name,
 				description: product.description ?? "",
@@ -110,24 +91,35 @@ export function ProductForm({
 				unitOfMeasure: product.unitOfMeasure ?? "",
 				minimumStock: product.minimumStock,
 				supplier: product.supplier ?? "",
-			});
-		} else {
-			form.reset({
-				code: "",
-				name: "",
-				description: "",
-				cost: 0.01,
-				price: 0.02,
-				categoryId: categories[0]?.id ?? "",
-				brandMode: "existing",
-				brandId: "",
-				newBrandName: "",
-				images: [],
-				unitOfMeasure: "",
-				minimumStock: 0,
-				supplier: "",
-			});
+			};
 		}
+
+		return {
+			code: "",
+			name: "",
+			description: "",
+			cost: 0.01,
+			price: 0.02,
+			categoryId: "",
+			brandMode: "existing",
+			brandId: "",
+			newBrandName: "",
+			images: [],
+			unitOfMeasure: "",
+			minimumStock: 0,
+			supplier: "",
+		};
+	}, [product]);
+
+	const form = useForm<ProductFormValues>({
+		resolver: zodResolver(productFormSchema) as Resolver<ProductFormValues>,
+		defaultValues,
+	});
+
+	useEffect(() => {
+		if (!active || product || categories.length === 0) return;
+
+		form.setValue("categoryId", categories[0]?.id ?? "");
 	}, [active, product, categories, form]);
 
 	useEffect(() => {
@@ -153,6 +145,25 @@ export function ProductForm({
 		name: "brandId",
 		defaultValue: "",
 	});
+
+	const watchedCost = useWatch({
+		control: form.control,
+		name: "cost",
+		defaultValue: 0,
+	});
+	const watchedPrice = useWatch({
+		control: form.control,
+		name: "price",
+		defaultValue: 0,
+	});
+
+	const costNum = Number(watchedCost) || 0;
+	const priceNum = Number(watchedPrice) || 0;
+	const hasNegativeMargin = costNum > 0 && priceNum > 0 && priceNum <= costNum;
+	const marginPct =
+		costNum > 0 && priceNum > 0
+			? (((priceNum - costNum) / costNum) * 100).toFixed(1)
+			: null;
 
 	const brandFallbackLabel =
 		product?.brandId && product.brandId === watchedBrandId
@@ -394,6 +405,13 @@ export function ProductForm({
 					)}
 				</div>
 			</div>
+
+			{hasNegativeMargin && (
+				<div className="rounded-md border border-amber-500/50 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
+					El precio de venta es menor o igual al costo. Margen:{" "}
+					<span className="font-medium">{marginPct}%</span>
+				</div>
+			)}
 
 			<div className="grid grid-cols-3 gap-3">
 				<div className="space-y-2">
