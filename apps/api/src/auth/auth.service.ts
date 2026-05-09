@@ -168,4 +168,24 @@ export class AuthService {
 			where: { id: userId },
 		});
 	}
+
+	async getMe(userId: string): Promise<LoginResponseDto["user"] | null> {
+		const user = await this.prisma.user.findUnique({
+			where: { id: userId },
+		});
+		if (!user) return null;
+
+		const rolePayload = userRoleToResponse(user.role);
+		const permissions = await this.userPermissions.getPermissionNamesForUser(
+			user.id,
+		);
+
+		return {
+			id: user.id,
+			fullName: user.fullName,
+			email: user.email,
+			role: { name: rolePayload.name, slug: rolePayload.slug },
+			permissions,
+		};
+	}
 }

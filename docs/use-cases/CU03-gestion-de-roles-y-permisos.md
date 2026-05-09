@@ -26,14 +26,14 @@ La documentación histórica que describía CRUD de roles, desactivación de rol
 ### API (NestJS)
 
 - [x] Crear archivo `src/auth/permissions/role-permissions.map.ts` que exporte un mapa `Record<UserRole, string[]>` con los permisos o recursos que puede acceder cada rol
-- [ ] Crear decorador `@Roles(...roles: UserRole[])` en `src/auth/decorators/roles.decorator.ts`
-- [ ] Implementar `RolesGuard` en `src/auth/guards/roles.guard.ts` que lea el decorador y compare con el rol del token JWT
-- [ ] Registrar `RolesGuard` como guard global o aplicarlo por módulo según convenga al proyecto
-- [ ] Crear endpoint `GET /auth/roles` (opcional) que retorne el listado de roles disponibles y sus etiquetas para uso en formularios del frontend
+- [x] Crear decorador `@Roles(...roles: UserRole[])` en `src/auth/decorators/roles.decorator.ts` (implementado como `@RequirePermissions` en `require-permissions.decorator.ts`)
+- [x] Implementar `RolesGuard` en `src/auth/guards/roles.guard.ts` (implementado como `PermissionsGuard` en `permissions.guard.ts`)
+- [x] Registrar `RolesGuard` como guard global o aplicarlo por módulo según convenga al proyecto (`JwtAuthGuard` global + `PermissionsGuard` por ruta)
+- [x] Crear endpoint `GET /auth/roles` que retorne el listado de roles disponibles y sus etiquetas para uso en formularios del frontend
 
 ### Frontend (React)
 
-- [ ] Crear hook `useCurrentUser()` que exponga el rol del usuario autenticado desde el contexto de autenticación
-- [ ] Crear utilidad `hasRole(role: UserRole)` para condicionar visibilidad de elementos de UI
-- [ ] Crear componente `<RoleGate roles={[...]}>` que renderice hijos solo si el usuario tiene el rol requerido
+- [x] Crear hook `useCurrentUser()` que exponga el rol del usuario autenticado desde el contexto de autenticación (implementado como `useAuth().user` en `auth-context.tsx`)
+- [x] Crear utilidad `hasRole(role: UserRole)` para condicionar visibilidad de elementos de UI (implementado como `hasPermission` + `hasPermissionOrSystemAdmin` en `permission-keys.ts`)
+- [x] Crear componente `<RoleGate roles={[...]}>` que renderice hijos solo si el usuario tiene el rol requerido (implementado como checks inline con `hasPermissionOrSystemAdmin` en cada página)
 - [x] Asegurar que las rutas protegidas redirijan con mensaje claro si el rol no tiene acceso

@@ -154,6 +154,25 @@ export function ProductForm({
 		defaultValue: "",
 	});
 
+	const watchedCost = useWatch({
+		control: form.control,
+		name: "cost",
+		defaultValue: 0,
+	});
+	const watchedPrice = useWatch({
+		control: form.control,
+		name: "price",
+		defaultValue: 0,
+	});
+
+	const costNum = Number(watchedCost) || 0;
+	const priceNum = Number(watchedPrice) || 0;
+	const hasNegativeMargin = costNum > 0 && priceNum > 0 && priceNum <= costNum;
+	const marginPct =
+		costNum > 0 && priceNum > 0
+			? (((priceNum - costNum) / costNum) * 100).toFixed(1)
+			: null;
+
 	const brandFallbackLabel =
 		product?.brandId && product.brandId === watchedBrandId
 			? (product.brandName ?? "")
@@ -394,6 +413,13 @@ export function ProductForm({
 					)}
 				</div>
 			</div>
+
+			{hasNegativeMargin && (
+				<div className="rounded-md border border-amber-500/50 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
+					El precio de venta es menor o igual al costo. Margen:{" "}
+					<span className="font-medium">{marginPct}%</span>
+				</div>
+			)}
 
 			<div className="grid grid-cols-3 gap-3">
 				<div className="space-y-2">

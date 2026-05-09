@@ -154,17 +154,17 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - [x] Validar que `salePrice > cost` (advertencia, no error bloqueante)
 - [x] `DTO CreateProductDto` y `UpdateProductDto` con `class-validator`: `@IsPositive` en `cost` y `salePrice`, `@Min(0)` en `minStock`
 - [x] Registrar operaciones con usuario responsable y timestamp
-- [ ] No exponer `cost` a usuarios con rol `SELLER` (filtrar campo en la respuesta)
+- [x] No exponer `cost` a usuarios con rol `SELLER` (filtrar campo en la respuesta)
 
 ### Frontend (React)
 
 - [x] Crear página `/products` protegida para todos los roles autenticados (solo consulta para `SELLER`)
 - [x] Tabla paginada con columnas: código, nombre, categoría, marca, precio de venta, stock actual, stock mínimo, estado
-- [ ] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
+- [x] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
 - [x] Buscador por código, nombre o descripción (debounce)
 - [x] Filtros por categoría, marca, estado; activo por defecto
 - [x] Botón "Nuevo producto" → formulario con todos los campos; selectores de categoría y marca que solo muestran activos
-- [ ] Advertencia visual si `salePrice <= cost` al completar el formulario
+- [x] Advertencia visual si `salePrice <= cost` al completar el formulario
 - [x] Botón "Editar" → formulario pre-poblado
 - [x] Botón "Desactivar" / "Activar" con diálogo de confirmación
 - [x] Integrar con TanStack Query; invalidar caché tras mutaciones

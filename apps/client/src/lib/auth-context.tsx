@@ -7,6 +7,7 @@ import {
 	useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLoginMutation } from "@/modules/auth/hooks/use-login";
 
 export interface AuthUser {
 	id: string;
@@ -26,6 +27,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
 	login: (email: string, password: string) => Promise<User>;
 	logout: () => void;
+	isLoggingIn: boolean;
 }
 
 const AUTH_STORAGE_KEY = "auth";
@@ -72,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		() => getStoredAuth() ?? { user: null, accessToken: null },
 	);
 	const navigate = useNavigate();
+	const loginMutation = useLoginMutation();
 
 	const logout = useCallback(() => {
 		localStorage.removeItem(AUTH_STORAGE_KEY);
@@ -81,27 +84,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const login = useCallback(
 		async (email: string, password: string): Promise<User> => {
-			const res = await fetch("/api/auth/login", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, password }),
-			});
-
-			if (!res.ok) {
-				const data = await res.json().catch(() => ({}));
-				throw new Error(data.message ?? "Credenciales inválidas");
-			}
-
-			const data = (await res.json()) as {
-				accessToken: string;
-				user: AuthUser;
-			};
+			const data = await loginMutation.mutateAsync({ email, password });
 			const newState = { user: data.user, accessToken: data.accessToken };
 			storeAuth(newState);
 			setState(newState);
 			return data.user;
 		},
-		[],
+		[loginMutation],
 	);
 
 	useEffect(() => {
@@ -111,7 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	}, [state.accessToken, navigate]);
 
 	return (
-		<AuthContext.Provider value={{ ...state, login, logout }}>
+		<AuthContext.Provider
+			value={{ ...state, login, logout, isLoggingIn: loginMutation.isPending }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

@@ -12,9 +12,11 @@ import {
 	UseGuards,
 } from "@nestjs/common";
 import type { Request } from "express";
+import type { UserRole } from "../../../generated/prisma/client.js";
 import { RequirePermissions } from "../../auth/decorators/require-permissions.decorator.js";
 import { PermissionsGuard } from "../../auth/guards/permissions.guard.js";
 import { PERMISSION_KEYS } from "../../auth/permissions/permission-keys.js";
+import { getPermissionsForRole } from "../../auth/permissions/role-permissions.map.js";
 import {
 	CreateProductDto,
 	ListProductsDto,
@@ -31,6 +33,7 @@ interface AuthenticatedRequest extends Request {
 	user: {
 		userId: string;
 		email: string;
+		roleSlug: string;
 	};
 }
 
@@ -39,14 +42,26 @@ interface AuthenticatedRequest extends Request {
 export class ProductsController {
 	constructor(private readonly productsService: ProductsService) {}
 
+	/** Check if request user can view cost fields based on role permissions. */
+	private canViewCost(req: AuthenticatedRequest): boolean {
+		const role = req.user?.roleSlug as UserRole | undefined;
+		if (!role) return false;
+		const perms = getPermissionsForRole(role);
+		return perms.includes(PERMISSION_KEYS.PRODUCTS_UPDATE);
+	}
+
+	/** Remove cost from product entity if user lacks cost visibility. */
+	private stripCost<T extends Partial<ProductEntity>>(entity: T): T {
+		const { cost: _, ...rest } = entity;
+		return { ...rest, cost: undefined } as T;
+	}
+
 	@Get()
 	@RequirePermissions(PERMISSION_KEYS.PRODUCTS_READ)
 	async findAll(
 		@Query() query: ListProductsDto,
 		@Req() req: AuthenticatedRequest,
 	): Promise<PaginatedResult<ProductEntity>> {
-		void req;
-
 		const filters: ProductFilters = {
 			search: query.search,
 			status: query.status as ProductFilters["status"],
@@ -65,13 +80,29 @@ export class ProductsController {
 			if (!Number.isNaN(n)) filters.maxPrice = n;
 		}
 
-		return this.productsService.findAll(filters);
+		const result = await this.productsService.findAll(filters);
+
+		if (!this.canViewCost(req)) {
+			return {
+				...result,
+				data: result.data.map((p) => this.stripCost(p)),
+			};
+		}
+
+		return result;
 	}
 
 	@Get(":id")
 	@RequirePermissions(PERMISSION_KEYS.PRODUCTS_READ)
-	async findOne(@Param("id") id: string): Promise<ProductEntity> {
-		return this.productsService.findOne(id);
+	async findOne(
+		@Param("id") id: string,
+		@Req() req: AuthenticatedRequest,
+	): Promise<ProductEntity> {
+		const product = await this.productsService.findOne(id);
+		if (!this.canViewCost(req)) {
+			return this.stripCost(product);
+		}
+		return product;
 	}
 
 	@Post()

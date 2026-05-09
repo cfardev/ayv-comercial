@@ -17,13 +17,13 @@ Completar los CU en orden numérico de la columna **#** evita implementar un CU 
 
 | # | CU | Descripción | Dependencias | Estado |
 |---|----|-------------|--------------|--------|
-| 1 | [CU01](./use-cases/CU01-inicio-de-sesion.md) | Inicio de sesión | — | 🔄 En progreso |
-| 2 | [CU02](./use-cases/CU02-gestion-de-usuarios.md) | Gestión de usuarios | CU01 | 🔄 En progreso |
-| 3 | [CU03](./use-cases/CU03-gestion-de-roles-y-permisos.md) | Roles y permisos (estático) | CU01 | 🔄 En progreso |
+| 1 | [CU01](./use-cases/CU01-inicio-de-sesion.md) | Inicio de sesión | — | ✅ Completo |
+| 2 | [CU02](./use-cases/CU02-gestion-de-usuarios.md) | Gestión de usuarios | CU01 | ✅ Completo |
+| 3 | [CU03](./use-cases/CU03-gestion-de-roles-y-permisos.md) | Roles y permisos (estático) | CU01 | ✅ Completo |
 | 4 | [CU04](./use-cases/CU04-gestion-de-categorias.md) | Gestión de categorías | CU01 | ✅ Completo |
-| 5 | [CU05](./use-cases/CU05-gestion-de-marcas.md) | Gestión de marcas | CU01 | 🔄 En progreso |
-| 6 | [CU06](./use-cases/CU06-gestion-de-proveedores.md) | Gestión de proveedores | CU01 | 🔄 En progreso |
-| 7 | [CU07](./use-cases/CU07-gestion-de-productos.md) | Gestión de productos | CU04, CU05 | 🔄 En progreso |
+| 5 | [CU05](./use-cases/CU05-gestion-de-marcas.md) | Gestión de marcas | CU01 | ✅ Completo |
+| 6 | [CU06](./use-cases/CU06-gestion-de-proveedores.md) | Gestión de proveedores | CU01 | ✅ Completo |
+| 7 | [CU07](./use-cases/CU07-gestion-de-productos.md) | Gestión de productos | CU04, CU05 | ✅ Completo |
 | 8 | [CU08](./use-cases/CU08-actualizacion-de-costo-y-precio-de-producto.md) | Actualización de costo y precio | CU07 | ⬜ Pendiente |
 | 9 | [CU14](./use-cases/CU14-gestion-de-clientes.md) | Gestión de clientes | CU01 | ⬜ Pendiente |
 | 10 | [CU09](./use-cases/CU09-gestion-de-ordenes-de-compra.md) | Gestión de órdenes de compra | CU06, CU07 | ⬜ Pendiente |

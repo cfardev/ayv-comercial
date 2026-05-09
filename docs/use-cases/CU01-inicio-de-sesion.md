@@ -94,20 +94,20 @@ El usuario abre la pantalla de acceso e intenta iniciar sesión con sus credenci
 - [x] Implementar `POST /auth/login`: validar credenciales, verificar cuenta activa, retornar JWT con payload `{ sub, role, username }`
 - [x] Configurar expiración del JWT vía variable de entorno `JWT_EXPIRES_IN`
 - [x] Implementar `JwtAuthGuard` global o por módulo para proteger rutas autenticadas
-- [ ] Implementar `RolesGuard` + decorador `@Roles(...)` para control de acceso por rol
+- [x] Implementar `RolesGuard` + decorador `@Roles(...)` para control de acceso por rol (implementado como `PermissionsGuard` + `@RequirePermissions`)
 - [x] Crear archivo `role-permissions.map.ts` con la relación estática rol → permisos
 - [x] Implementar rate limiting en `/auth/login` (máx. 10 req/min por IP) con `@nestjs/throttler`
 - [x] Registrar intentos fallidos con timestamp e IP (tabla `login_attempts` o log estructurado)
 - [x] Bloquear cuenta tras 5 intentos fallidos consecutivos durante 15 min (campo `lockedUntil` en `User` o en caché)
 - [x] Asegurar que el mensaje de error sea genérico (no revelar si el usuario existe)
-- [ ] Crear `GET /auth/me` que retorne datos del usuario autenticado (sin `passwordHash`)
+- [x] Crear `GET /auth/me` que retorne datos del usuario autenticado (sin `passwordHash`)
 - [x] Configurar `ValidationPipe` global con `whitelist: true` y `forbidNonWhitelisted: true`
 
 ### Frontend (React)
 
 - [x] Crear página `/login` con formulario: campo identificador (email/usuario) y contraseña
 - [x] Implementar validación de formulario con Zod: campos requeridos, formato de email
-- [ ] Integrar llamada a `POST /auth/login` con TanStack Query (`useMutation`)
+- [x] Integrar llamada a `POST /auth/login` con TanStack Query (`useMutation`)
 - [x] Almacenar el JWT en `localStorage` o `httpOnly cookie` (definir política de seguridad)
 - [x] Crear contexto o store de autenticación (`AuthContext`) con estado `user`, `token`, `isAuthenticated`
 - [x] Implementar `PrivateRoute` / `ProtectedRoute` que redirija a `/login` si no autenticado
