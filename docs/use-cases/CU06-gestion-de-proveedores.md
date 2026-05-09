@@ -104,3 +104,40 @@ El actor selecciona la opción "Gestión de proveedores" desde el menú de compr
 - A: Un usuario con permisos puede editar un proveedor existente.
 - A: Un usuario con permisos puede desactivar un proveedor sin operaciones abiertas.
 - A: Un proveedor inactivo no aparece como opción para nuevas órdenes de compra.
+
+## Implementación técnica
+
+> **Dependencias:** CU01 (autenticación y guards de roles)  
+> **Orden sugerido de desarrollo:** #6
+
+### Base de datos
+
+- [x] Crear modelo Prisma `Supplier` con campos: `id`, `companyName`, `taxId` (único), `contactPerson`, `phone`, `email?`, `address?`, `commercialTerms?`, `isActive`, `createdAt`, `updatedAt`; con `@@map("suppliers")`
+- [x] Agregar índice único en `taxId`
+- [ ] Agregar relación `Supplier` → `PurchaseOrder[]` (se completa al crear CU09)
+- [x] Crear migración de base de datos
+
+### API (NestJS)
+
+- [x] Crear `SuppliersModule` con `SuppliersService` y `SuppliersController`
+- [x] `POST /suppliers` — crear proveedor; validar unicidad de `taxId`; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `GET /suppliers` — listar paginado; filtros: `search` (razón social, taxId, contacto), `isActive`; activos por defecto
+- [x] `GET /suppliers/:id` — obtener proveedor por id
+- [x] `PATCH /suppliers/:id` — editar; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /suppliers/:id/deactivate` — verificar que no tenga órdenes de compra abiertas o pendientes; rechazar con 409 si tiene; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /suppliers/:id/activate` — reactivar; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `DTO CreateSupplierDto` con validaciones de campos requeridos y formato de email
+- [x] Registrar operaciones con usuario responsable y timestamp
+
+### Frontend (React)
+
+- [x] Crear página `/suppliers` protegida para roles `ADMIN` y `INVENTORY_MANAGER`
+- [x] Tabla paginada con columnas: razón social, documento fiscal, contacto, teléfono, correo, estado
+- [x] Buscador por razón social, documento fiscal o contacto (debounce)
+- [x] Filtro por estado; activo por defecto
+- [x] Botón "Nuevo proveedor" → formulario con todos los campos (razón social, taxId, contacto, teléfono, correo, dirección, condiciones comerciales)
+- [x] Validación Zod en formulario: campos requeridos, formato de email, unicidad de taxId (feedback desde API)
+- [x] Botón "Editar" → formulario pre-poblado
+- [x] Botón "Desactivar" con confirmación; mostrar error si tiene órdenes abiertas
+- [x] Botón "Activar" para proveedores inactivos
+- [x] Integrar con TanStack Query; invalidar caché tras mutaciones

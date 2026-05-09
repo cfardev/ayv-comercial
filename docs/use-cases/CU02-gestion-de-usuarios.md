@@ -115,3 +115,40 @@ El actor selecciona la opción "Gestión de usuarios" desde su menú de administ
 - A: El sistema rechaza registro con correo o usuario duplicado.
 - A: El sistema muestra errores claros cuando los campos no cumplen validación.
 - A: Un usuario no puede desactivarse a sí mismo.
+
+## Implementación técnica
+
+> **Dependencias:** CU01 (autenticación y modelo `User`)  
+> **Orden sugerido de desarrollo:** #2
+
+### Base de datos
+
+- [x] Reutilizar el modelo `User` creado en CU01; verificar que incluya todos los campos requeridos: `fullName`, `email`, `username`, `passwordHash`, `role`, `isActive`, `createdAt`, `updatedAt`
+- [x] Agregar campo `lockedUntil DateTime?` en `User` si no existe (para bloqueo por intentos fallidos)
+
+### API (NestJS)
+
+- [x] Crear `UsersModule` con `UsersService` y `UsersController`
+- [x] `POST /users` — crear usuario: hash de contraseña con bcrypt (cost 12), validar unicidad de `email` y `username`, guard `ADMIN` only
+- [x] `GET /users` — listar usuarios paginados (page, limit), filtros por `role` y `isActive`; guard `ADMIN` only
+- [x] `GET /users/:id` — obtener usuario por id; guard `ADMIN` only
+- [x] `PATCH /users/:id` — editar usuario (nombre, correo, rol); guard `ADMIN` only; validar unicidad de `email` si cambia
+- [x] `PATCH /users/:id/deactivate` — desactivar usuario; guard `ADMIN` only; rechazar si `id === usuarioActual`
+- [x] `PATCH /users/:id/activate` — reactivar usuario; guard `ADMIN` only
+- [x] `DTO CreateUserDto` con decoradores `class-validator`: `@IsEmail`, `@MinLength(8)`, `@Matches` para contraseña fuerte
+- [x] `DTO UpdateUserDto` con campos opcionales
+- [x] Nunca retornar `passwordHash` en ninguna respuesta (usar `@Exclude()` o mapeo manual)
+- [x] Registrar todas las operaciones con `userId`, `action`, `timestamp` (en log estructurado o tabla de auditoría)
+
+### Frontend (React)
+
+- [x] Crear página `/users` protegida por rol `ADMIN`
+- [x] Tabla paginada de usuarios con columnas: nombre, correo, usuario, rol, estado, fecha de creación
+- [x] Buscador por nombre, correo o usuario (debounce)
+- [x] Filtros por `rol` y `estado` (activo/inactivo); estado activo por defecto
+- [x] Botón "Nuevo usuario" que abre formulario (modal o página separada)
+- [x] Formulario de creación con validación Zod: nombre, email, username, contraseña (reglas: 8+ chars, mayúscula, número), rol
+- [x] Formulario de edición pre-poblado (sin campo contraseña)
+- [x] Botón "Desactivar" / "Activar" con diálogo de confirmación
+- [x] Deshabilitar botón "Desactivar" cuando el usuario listado es el usuario actualmente logueado
+- [x] Integrar todas las operaciones con TanStack Query (`useQuery`, `useMutation`) e invalidar caché tras mutaciones

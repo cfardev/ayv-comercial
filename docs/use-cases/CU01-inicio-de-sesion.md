@@ -73,3 +73,45 @@ El usuario abre la pantalla de acceso e intenta iniciar sesión con sus credenci
 - A: Con credenciales inválidas, el sistema no permite acceso y no revela si el usuario existe.
 - A: Con cuenta inactiva, el sistema no permite acceso e informa el estado de la cuenta.
 - A: Con campos inválidos o vacíos, el formulario bloquea el envío y muestra errores.
+
+## Implementación técnica
+
+> **Dependencias:** ninguna — este es el punto de entrada del sistema  
+> **Orden sugerido de desarrollo:** #1
+
+### Base de datos
+
+- [x] Definir enum `UserRole` en `schema.prisma` (`ADMIN`, `SELLER`, `INVENTORY_MANAGER`, `DISPATCH_MANAGER`, `OWNER_MANAGER`)
+- [x] Crear modelo Prisma `User` con campos: `id`, `fullName`, `email`, `username`, `passwordHash`, `role` (UserRole), `isActive`, `createdAt`, `updatedAt`; con `@@map("users")`
+- [x] Agregar índice único en `email` y en `username`
+- [x] Crear migración inicial de base de datos (`prisma migrate dev`)
+- [x] Sembrar al menos un usuario administrador inicial con `prisma db seed`
+
+### API (NestJS)
+
+- [x] Crear `AuthModule` con `AuthService` y `AuthController`
+- [x] Instalar y configurar `@nestjs/jwt` y `@nestjs/passport` con estrategia `passport-local` y `passport-jwt`
+- [x] Implementar `POST /auth/login`: validar credenciales, verificar cuenta activa, retornar JWT con payload `{ sub, role, username }`
+- [x] Configurar expiración del JWT vía variable de entorno `JWT_EXPIRES_IN`
+- [x] Implementar `JwtAuthGuard` global o por módulo para proteger rutas autenticadas
+- [ ] Implementar `RolesGuard` + decorador `@Roles(...)` para control de acceso por rol
+- [x] Crear archivo `role-permissions.map.ts` con la relación estática rol → permisos
+- [x] Implementar rate limiting en `/auth/login` (máx. 10 req/min por IP) con `@nestjs/throttler`
+- [x] Registrar intentos fallidos con timestamp e IP (tabla `login_attempts` o log estructurado)
+- [x] Bloquear cuenta tras 5 intentos fallidos consecutivos durante 15 min (campo `lockedUntil` en `User` o en caché)
+- [x] Asegurar que el mensaje de error sea genérico (no revelar si el usuario existe)
+- [ ] Crear `GET /auth/me` que retorne datos del usuario autenticado (sin `passwordHash`)
+- [x] Configurar `ValidationPipe` global con `whitelist: true` y `forbidNonWhitelisted: true`
+
+### Frontend (React)
+
+- [x] Crear página `/login` con formulario: campo identificador (email/usuario) y contraseña
+- [x] Implementar validación de formulario con Zod: campos requeridos, formato de email
+- [ ] Integrar llamada a `POST /auth/login` con TanStack Query (`useMutation`)
+- [x] Almacenar el JWT en `localStorage` o `httpOnly cookie` (definir política de seguridad)
+- [x] Crear contexto o store de autenticación (`AuthContext`) con estado `user`, `token`, `isAuthenticated`
+- [x] Implementar `PrivateRoute` / `ProtectedRoute` que redirija a `/login` si no autenticado
+- [x] Redirigir al módulo inicial según `role` del JWT tras login exitoso
+- [x] Mostrar mensaje de error genérico en caso de credenciales inválidas o cuenta inactiva
+- [x] Implementar botón/acción de logout que limpie el token y redirija a `/login`
+- [x] Configurar `react-router-dom` con rutas base: `/login`, `/` (dashboard protegido)
