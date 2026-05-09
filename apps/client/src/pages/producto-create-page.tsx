@@ -59,7 +59,8 @@ export function ProductoCreatePage() {
 						Nuevo producto
 					</h1>
 					<p className="text-muted-foreground text-sm">
-						Completa los datos; al menos una imagen es obligatoria.
+						Completa los datos; el código y al menos una imagen son
+						obligatorios.
 					</p>
 				</div>
 			</div>

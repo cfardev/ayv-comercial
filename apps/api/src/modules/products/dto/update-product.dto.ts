@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import {
 	IsIn,
+	IsInt,
 	IsNotEmpty,
 	IsNumber,
 	IsOptional,
@@ -14,6 +15,11 @@ import {
 import { ProductImageInputDto } from "./product-image-input.dto.js";
 
 export class UpdateProductDto {
+	@IsOptional()
+	@IsString()
+	@MaxLength(50)
+	code?: string;
+
 	@IsOptional()
 	@IsString()
 	@MaxLength(200)
@@ -58,4 +64,20 @@ export class UpdateProductDto {
 	@IsNotEmpty()
 	@MaxLength(120)
 	newBrandName?: string;
+
+	@IsOptional()
+	@IsString()
+	@MaxLength(20)
+	unitOfMeasure?: string;
+
+	@IsOptional()
+	@Type(() => Number)
+	@IsInt()
+	@Min(0)
+	minimumStock?: number;
+
+	@IsOptional()
+	@IsString()
+	@MaxLength(200)
+	supplier?: string;
 }

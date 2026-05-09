@@ -8,6 +8,7 @@ export interface ProductImage {
 
 export interface Product {
 	id: string;
+	code: string;
 	name: string;
 	description: string | null;
 	cost: string;
@@ -17,6 +18,10 @@ export interface Product {
 	categoryName: string;
 	brandId?: string | null;
 	brandName?: string | null;
+	unitOfMeasure: string | null;
+	minimumStock: number;
+	supplier: string | null;
+	stockCurrent: number;
 	images: ProductImage[];
 	createdAt: string;
 	updatedAt: string;
@@ -26,6 +31,7 @@ export interface ProductFilters {
 	search?: string;
 	status?: "true" | "false" | "ALL";
 	categoryId?: string;
+	brandId?: string;
 	minPrice?: number;
 	maxPrice?: number;
 	page?: number;
@@ -47,6 +53,7 @@ export interface ProductImagePayload {
 }
 
 export interface CreateProductPayload {
+	code: string;
 	name: string;
 	description?: string;
 	cost: number;
@@ -56,9 +63,13 @@ export interface CreateProductPayload {
 	brandMode: "existing" | "new";
 	brandId?: string;
 	newBrandName?: string;
+	unitOfMeasure?: string;
+	minimumStock?: number;
+	supplier?: string;
 }
 
 export interface UpdateProductPayload {
+	code?: string;
 	name?: string;
 	description?: string;
 	cost?: number;
@@ -68,4 +79,7 @@ export interface UpdateProductPayload {
 	brandMode?: "existing" | "new";
 	brandId?: string;
 	newBrandName?: string;
+	unitOfMeasure?: string;
+	minimumStock?: number;
+	supplier?: string;
 }

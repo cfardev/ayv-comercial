@@ -2,6 +2,7 @@ export interface ProductFilters {
 	search?: string;
 	status?: "true" | "false" | "ALL";
 	categoryId?: string;
+	brandId?: string;
 	minPrice?: number;
 	maxPrice?: number;
 	page?: number;

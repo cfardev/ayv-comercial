@@ -23,17 +23,19 @@ interface ProductsTableProps {
 	isLoading?: boolean;
 }
 
-const COL_COUNT = 8;
+const COL_COUNT = 10;
 
 function TableHeadRow() {
 	return (
 		<TableRow>
 			<TableHead className="w-[72px]">Imagen</TableHead>
+			<TableHead>Código</TableHead>
 			<TableHead>Nombre</TableHead>
 			<TableHead>Categoría</TableHead>
 			<TableHead>Marca</TableHead>
 			<TableHead className="text-right">Costo</TableHead>
 			<TableHead className="text-right">Precio</TableHead>
+			<TableHead className="text-right">Stock</TableHead>
 			<TableHead className="w-[90px]">Estado</TableHead>
 			<TableHead className="w-[140px]">Acciones</TableHead>
 		</TableRow>
@@ -116,6 +118,8 @@ export function ProductsTable({
 				<TableBody>
 					{products.map((product) => {
 						const thumb = product.images[0]?.url;
+						const isLowStock =
+							product.stockCurrent <= product.minimumStock && product.status;
 						return (
 							<TableRow key={product.id}>
 								<TableCell>
@@ -129,6 +133,9 @@ export function ProductsTable({
 										<div className="size-12 rounded-md bg-muted" />
 									)}
 								</TableCell>
+								<TableCell className="font-mono text-sm">
+									{product.code}
+								</TableCell>
 								<TableCell className="font-medium">{product.name}</TableCell>
 								<TableCell className="text-muted-foreground">
 									{product.categoryName}
@@ -141,6 +148,13 @@ export function ProductsTable({
 								</TableCell>
 								<TableCell className="text-right tabular-nums">
 									{formatMoney(product.price)}
+								</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{isLowStock ? (
+										<Badge variant="destructive">{product.stockCurrent}</Badge>
+									) : (
+										<span>{product.stockCurrent}</span>
+									)}
 								</TableCell>
 								<TableCell>
 									{product.status ? (

@@ -8,6 +8,7 @@ export interface ProductImageEntity {
 
 export class ProductEntity {
 	id!: string;
+	code!: string;
 	name!: string;
 	description!: string | null;
 	cost!: string;
@@ -17,6 +18,10 @@ export class ProductEntity {
 	categoryName!: string;
 	brandId!: string | null;
 	brandName!: string | null;
+	unitOfMeasure!: string | null;
+	minimumStock!: number;
+	supplier!: string | null;
+	stockCurrent!: number;
 	images!: ProductImageEntity[];
 	createdAt!: Date;
 	updatedAt!: Date;

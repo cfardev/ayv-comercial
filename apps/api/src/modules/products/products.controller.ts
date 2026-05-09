@@ -51,6 +51,7 @@ export class ProductsController {
 			search: query.search,
 			status: query.status as ProductFilters["status"],
 			categoryId: query.categoryId,
+			brandId: query.brandId,
 			page: query.page ? Number(query.page) : undefined,
 			limit: query.limit ? Number(query.limit) : undefined,
 		};
@@ -93,13 +94,21 @@ export class ProductsController {
 		return this.productsService.update(id, dto, req.user.userId);
 	}
 
+	@Get(":id/deactivation-info")
+	@RequirePermissions(PERMISSION_KEYS.PRODUCTS_READ)
+	async getDeactivationInfo(
+		@Param("id") id: string,
+	): Promise<{ productName: string; salesCount: number }> {
+		return this.productsService.getDeactivationInfo(id);
+	}
+
 	@Post(":id/deactivate")
 	@HttpCode(HttpStatus.OK)
 	@RequirePermissions(PERMISSION_KEYS.PRODUCTS_DEACTIVATE)
 	async deactivate(
 		@Param("id") id: string,
 		@Req() req: AuthenticatedRequest,
-	): Promise<ProductEntity> {
+	): Promise<{ product: ProductEntity; salesCount: number }> {
 		return this.productsService.deactivate(id, req.user.userId);
 	}
 

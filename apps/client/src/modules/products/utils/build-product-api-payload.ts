@@ -29,12 +29,16 @@ export function buildCreateProductPayload(
 	values: ProductFormValues,
 ): CreateProductPayload {
 	return {
+		code: values.code,
 		name: values.name,
 		description: values.description,
 		cost: values.cost,
 		price: values.price,
 		categoryId: values.categoryId,
 		images: mapImages(values),
+		unitOfMeasure: values.unitOfMeasure || undefined,
+		minimumStock: values.minimumStock,
+		supplier: values.supplier || undefined,
 		...mapBrand(values),
 	};
 }
@@ -43,12 +47,16 @@ export function buildUpdateProductPayload(
 	values: ProductFormValues,
 ): UpdateProductPayload {
 	return {
+		code: values.code,
 		name: values.name,
 		description: values.description,
 		cost: values.cost,
 		price: values.price,
 		categoryId: values.categoryId,
 		images: mapImages(values),
+		unitOfMeasure: values.unitOfMeasure || undefined,
+		minimumStock: values.minimumStock,
+		supplier: values.supplier || undefined,
 		...mapBrand(values),
 	};
 }
