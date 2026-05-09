@@ -18,6 +18,7 @@ import {
 import { BrandsModule } from "./modules/brands/brands.module.js";
 import { CategoriesModule } from "./modules/categories/categories.module.js";
 import { ProductsModule } from "./modules/products/products.module.js";
+import { SuppliersModule } from "./modules/suppliers/suppliers.module.js";
 import { UploadthingModule } from "./modules/uploadthing/uploadthing.module.js";
 import { UsersModule } from "./modules/users/users.module.js";
 
@@ -47,6 +48,7 @@ import { UsersModule } from "./modules/users/users.module.js";
 		CategoriesModule,
 		ProductsModule,
 		BrandsModule,
+		SuppliersModule,
 		UploadthingModule,
 		ServeStaticModule.forRoot({
 			rootPath: CLIENT_DIST_PATH,

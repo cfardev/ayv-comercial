@@ -1,5 +1,5 @@
 import { IconPlus, IconSearch } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,11 +16,13 @@ import {
 	hasPermissionOrSystemAdmin,
 	PERMISSION_KEYS,
 } from "@/lib/permission-keys.js";
+import { useBrandsList } from "@/modules/brands/hooks/use-brands.js";
 import { useCategories } from "@/modules/categories/hooks/use-categories.js";
 import { ProductFormDialog } from "@/modules/products/components/product-form-dialog.js";
 import { ProductsTable } from "@/modules/products/components/products-table.js";
 import {
 	useDeactivateProduct,
+	useProductDeactivationInfo,
 	useProducts,
 	useReactivateProduct,
 	useUpdateProduct,
@@ -68,6 +70,7 @@ export function ProductosPage() {
 	const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
 	const [status, setStatus] = useState<StatusFilter>("true");
 	const [categoryId, setCategoryId] = useState<string | "ALL">("ALL");
+	const [brandId, setBrandId] = useState<string | "ALL">("ALL");
 	const [page, setPage] = useState(1);
 
 	const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -77,7 +80,14 @@ export function ProductosPage() {
 		open: boolean;
 		product: Product | null;
 		action: "deactivate" | "reactivate" | null;
-	}>({ open: false, product: null, action: null });
+		salesCount: number;
+	}>({ open: false, product: null, action: null, salesCount: 0 });
+
+	const [pendingDeactivateId, setPendingDeactivateId] = useState<string | null>(
+		null,
+	);
+	const { data: deactivationInfo } =
+		useProductDeactivationInfo(pendingDeactivateId);
 
 	const { data: categoriesData } = useCategories({
 		status: "true",
@@ -89,10 +99,21 @@ export function ProductosPage() {
 		[categoriesData?.data],
 	);
 
+	const { data: brandsData } = useBrandsList({
+		status: "true",
+		limit: 100,
+		page: 1,
+	});
+	const brandOptions = useMemo(
+		() => brandsData?.data ?? [],
+		[brandsData?.data],
+	);
+
 	const { data: productsData, isLoading: productsLoading } = useProducts({
 		search: debouncedSearch || undefined,
 		status: status === "ALL" ? undefined : status,
 		categoryId: categoryId === "ALL" ? undefined : categoryId,
+		brandId: brandId === "ALL" ? undefined : brandId,
 		page,
 		limit: 20,
 	});
@@ -105,6 +126,21 @@ export function ProductosPage() {
 	const total = productsData?.total ?? 0;
 	const totalPages = productsData?.totalPages ?? 1;
 
+	// Open confirm dialog once deactivation info is fetched
+	useEffect(() => {
+		if (!deactivationInfo || !pendingDeactivateId) return;
+		const product = products.find((p) => p.id === pendingDeactivateId);
+		if (!product) return;
+
+		setConfirmDialog({
+			open: true,
+			product,
+			action: "deactivate",
+			salesCount: deactivationInfo.salesCount,
+		});
+		setPendingDeactivateId(null);
+	}, [deactivationInfo, pendingDeactivateId, products]);
+
 	function handleEdit(product: Product) {
 		setFormError(null);
 		setEditingProduct(product);
@@ -112,32 +148,51 @@ export function ProductosPage() {
 	}
 
 	function handleDeactivate(product: Product) {
-		setConfirmDialog({ open: true, product, action: "deactivate" });
+		setPendingDeactivateId(product.id);
 	}
 
 	function handleReactivate(product: Product) {
-		setConfirmDialog({ open: true, product, action: "reactivate" });
+		setConfirmDialog({
+			open: true,
+			product,
+			action: "reactivate",
+			salesCount: 0,
+		});
 	}
 
-	function handleConfirm() {
+	async function handleConfirm() {
 		const { product, action } = confirmDialog;
 		if (!product || !action) return;
 
 		if (action === "deactivate") {
-			deactivateProduct.mutate(product.id, {
-				onSuccess: () =>
-					setConfirmDialog({ open: false, product: null, action: null }),
-			});
+			try {
+				const result = await deactivateProduct.mutateAsync(product.id);
+				setConfirmDialog({
+					open: false,
+					product: null,
+					action: null,
+					salesCount: 0,
+				});
+				// If there were sales, the backend returned the count — we already allowed it
+				void result;
+			} catch {
+				// Error already shown via toast or form error
+			}
 		} else {
 			reactivateProduct.mutate(product.id, {
 				onSuccess: () =>
-					setConfirmDialog({ open: false, product: null, action: null }),
+					setConfirmDialog({
+						open: false,
+						product: null,
+						action: null,
+						salesCount: 0,
+					}),
 			});
 		}
 	}
 
 	function buildConfirmProps() {
-		const { product, action } = confirmDialog;
+		const { product, action, salesCount } = confirmDialog;
 		if (!product || !action)
 			return {
 				title: "",
@@ -147,9 +202,13 @@ export function ProductosPage() {
 			};
 
 		if (action === "deactivate") {
+			const salesWarning =
+				salesCount > 0
+					? ` Este producto tiene ${salesCount} venta${salesCount > 1 ? "s" : ""} registrada${salesCount > 1 ? "s" : ""}. La desactivación no afecta el historial.`
+					: "";
 			return {
 				title: "Desactivar producto",
-				description: `¿Desactivar "${product.name}"? No aparecerá en ventas nuevas.`,
+				description: `¿Desactivar "${product.name}"? No aparecerá en ventas nuevas.${salesWarning}`,
 				confirmLabel: "Desactivar",
 				variant: "destructive" as const,
 			};
@@ -211,7 +270,7 @@ export function ProductosPage() {
 				<div className="relative flex-1 min-w-[200px]">
 					<IconSearch className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
-						placeholder="Buscar por nombre o descripción…"
+						placeholder="Buscar por código, nombre o descripción…"
 						className="pl-9"
 						value={search}
 						onChange={(e) => {
@@ -227,7 +286,7 @@ export function ProductosPage() {
 						setPage(1);
 					}}
 				>
-					<SelectTrigger className="w-full cursor-pointer md:w-[220px]">
+					<SelectTrigger className="w-full cursor-pointer md:w-[200px]">
 						<SelectValue placeholder="Categoría" />
 					</SelectTrigger>
 					<SelectContent>
@@ -242,13 +301,34 @@ export function ProductosPage() {
 					</SelectContent>
 				</Select>
 				<Select
+					value={brandId}
+					onValueChange={(v) => {
+						setBrandId(v as string | "ALL");
+						setPage(1);
+					}}
+				>
+					<SelectTrigger className="w-full cursor-pointer md:w-[180px]">
+						<SelectValue placeholder="Marca" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="ALL" className="cursor-pointer">
+							Todas las marcas
+						</SelectItem>
+						{brandOptions.map((b) => (
+							<SelectItem key={b.id} value={b.id} className="cursor-pointer">
+								{b.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+				<Select
 					value={status}
 					onValueChange={(v) => {
 						setStatus(v as StatusFilter);
 						setPage(1);
 					}}
 				>
-					<SelectTrigger className="w-full cursor-pointer md:w-[180px]">
+					<SelectTrigger className="w-full cursor-pointer md:w-[160px]">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -322,8 +402,15 @@ export function ProductosPage() {
 			<ConfirmDialog
 				open={confirmDialog.open}
 				onOpenChange={(open) => {
-					if (!open)
-						setConfirmDialog({ open: false, product: null, action: null });
+					if (!open) {
+						setConfirmDialog({
+							open: false,
+							product: null,
+							action: null,
+							salesCount: 0,
+						});
+						setPendingDeactivateId(null);
+					}
 				}}
 				title={confirmProps.title}
 				description={confirmProps.description}

@@ -2,11 +2,11 @@ import { Type } from "class-transformer";
 import {
 	ArrayMinSize,
 	IsIn,
+	IsInt,
 	IsNotEmpty,
 	IsNumber,
 	IsOptional,
 	IsString,
-	IsUUID,
 	MaxLength,
 	Min,
 	ValidateIf,
@@ -15,6 +15,11 @@ import {
 import { ProductImageInputDto } from "./product-image-input.dto.js";
 
 export class CreateProductDto {
+	@IsString()
+	@IsNotEmpty()
+	@MaxLength(50)
+	code!: string;
+
 	@IsString()
 	@IsNotEmpty()
 	@MaxLength(200)
@@ -35,14 +40,16 @@ export class CreateProductDto {
 	@Min(0.01)
 	price!: number;
 
-	@IsUUID()
+	@IsString()
+	@IsNotEmpty()
 	categoryId!: string;
 
 	@IsIn(["existing", "new"])
 	brandMode!: "existing" | "new";
 
 	@ValidateIf((dto: CreateProductDto) => dto.brandMode === "existing")
-	@IsUUID()
+	@IsString()
+	@IsNotEmpty()
 	brandId!: string;
 
 	@ValidateIf((dto: CreateProductDto) => dto.brandMode === "new")
@@ -55,4 +62,20 @@ export class CreateProductDto {
 	@Type(() => ProductImageInputDto)
 	@ArrayMinSize(1)
 	images!: ProductImageInputDto[];
+
+	@IsOptional()
+	@IsString()
+	@MaxLength(20)
+	unitOfMeasure?: string;
+
+	@IsOptional()
+	@Type(() => Number)
+	@IsInt()
+	@Min(0)
+	minimumStock?: number;
+
+	@IsOptional()
+	@IsString()
+	@MaxLength(200)
+	supplier?: string;
 }

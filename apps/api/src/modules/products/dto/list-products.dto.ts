@@ -15,6 +15,10 @@ export class ListProductsDto {
 
 	@IsOptional()
 	@IsString()
+	brandId?: string;
+
+	@IsOptional()
+	@IsString()
 	minPrice?: string;
 
 	@IsOptional()

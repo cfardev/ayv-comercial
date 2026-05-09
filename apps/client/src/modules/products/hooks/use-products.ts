@@ -19,6 +19,7 @@ async function fetchProducts(
 	if (filters.status && filters.status !== "ALL")
 		params.set("status", filters.status);
 	if (filters.categoryId) params.set("categoryId", filters.categoryId);
+	if (filters.brandId) params.set("brandId", filters.brandId);
 	if (filters.minPrice !== undefined)
 		params.set("minPrice", String(filters.minPrice));
 	if (filters.maxPrice !== undefined)
@@ -78,7 +79,24 @@ async function updateProduct(
 	return res.json() as Promise<Product>;
 }
 
-async function deactivateProduct(id: string): Promise<Product> {
+async function fetchDeactivationInfo(
+	id: string,
+): Promise<{ productName: string; salesCount: number }> {
+	const res = await authFetch(`${API_BASE}/products/${id}/deactivation-info`);
+	if (!res.ok) {
+		const err = await res.json().catch(() => ({}));
+		throw new Error(
+			(err as { message?: string }).message ??
+				"Error al obtener información de desactivación",
+		);
+	}
+	return res.json() as Promise<{ productName: string; salesCount: number }>;
+}
+
+async function deactivateProduct(id: string): Promise<{
+	product: Product;
+	salesCount: number;
+}> {
 	const res = await authFetch(`${API_BASE}/products/${id}/deactivate`, {
 		method: "POST",
 	});
@@ -88,7 +106,7 @@ async function deactivateProduct(id: string): Promise<Product> {
 			(err as { message?: string }).message ?? "Error al desactivar producto",
 		);
 	}
-	return res.json() as Promise<Product>;
+	return res.json() as Promise<{ product: Product; salesCount: number }>;
 }
 
 async function reactivateProduct(id: string): Promise<Product> {
@@ -161,5 +179,13 @@ export function useReactivateProduct() {
 		onSuccess: () => {
 			void qc.invalidateQueries({ queryKey: productsKey });
 		},
+	});
+}
+
+export function useProductDeactivationInfo(id: string | null) {
+	return useQuery({
+		queryKey: ["product-deactivation-info", id],
+		queryFn: () => fetchDeactivationInfo(id as string),
+		enabled: Boolean(id),
 	});
 }

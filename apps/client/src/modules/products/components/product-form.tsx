@@ -70,6 +70,7 @@ export function ProductForm({
 	const form = useForm<ProductFormValues>({
 		resolver: zodResolver(productFormSchema) as Resolver<ProductFormValues>,
 		defaultValues: {
+			code: "",
 			name: "",
 			description: "",
 			cost: 0.01,
@@ -79,6 +80,9 @@ export function ProductForm({
 			brandId: "",
 			newBrandName: "",
 			images: [],
+			unitOfMeasure: "",
+			minimumStock: 0,
+			supplier: "",
 		},
 	});
 
@@ -93,6 +97,7 @@ export function ProductForm({
 					sortOrder: i,
 				}));
 			form.reset({
+				code: product.code,
 				name: product.name,
 				description: product.description ?? "",
 				cost: Number(product.cost),
@@ -102,9 +107,13 @@ export function ProductForm({
 				brandId: product.brandId ?? "",
 				newBrandName: "",
 				images: imgs,
+				unitOfMeasure: product.unitOfMeasure ?? "",
+				minimumStock: product.minimumStock,
+				supplier: product.supplier ?? "",
 			});
 		} else {
 			form.reset({
+				code: "",
 				name: "",
 				description: "",
 				cost: 0.01,
@@ -114,6 +123,9 @@ export function ProductForm({
 				brandId: "",
 				newBrandName: "",
 				images: [],
+				unitOfMeasure: "",
+				minimumStock: 0,
+				supplier: "",
 			});
 		}
 	}, [active, product, categories, form]);
@@ -147,10 +159,14 @@ export function ProductForm({
 			? (product.brandName ?? "")
 			: undefined;
 
+	const codeId = `${idPrefix}-code`;
 	const nameId = `${idPrefix}-name`;
 	const descId = `${idPrefix}-desc`;
 	const costId = `${idPrefix}-cost`;
 	const priceId = `${idPrefix}-price`;
+	const unitOfMeasureId = `${idPrefix}-unit-of-measure`;
+	const minimumStockId = `${idPrefix}-minimum-stock`;
+	const supplierId = `${idPrefix}-supplier`;
 	const newBrandId = `${idPrefix}-new-brand-name`;
 
 	return (
@@ -177,20 +193,37 @@ export function ProductForm({
 				)}
 			</div>
 
-			<div className="space-y-2">
-				<Label htmlFor={nameId}>
-					Nombre <span className="text-destructive">*</span>
-				</Label>
-				<Input
-					id={nameId}
-					placeholder="Nombre del producto"
-					{...form.register("name")}
-				/>
-				{form.formState.errors.name && (
-					<p className="text-sm text-destructive">
-						{form.formState.errors.name.message}
-					</p>
-				)}
+			<div className="grid grid-cols-2 gap-3">
+				<div className="space-y-2">
+					<Label htmlFor={codeId}>
+						Código <span className="text-destructive">*</span>
+					</Label>
+					<Input
+						id={codeId}
+						placeholder="Ej: HELA-200"
+						{...form.register("code")}
+					/>
+					{form.formState.errors.code && (
+						<p className="text-sm text-destructive">
+							{form.formState.errors.code.message}
+						</p>
+					)}
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor={nameId}>
+						Nombre <span className="text-destructive">*</span>
+					</Label>
+					<Input
+						id={nameId}
+						placeholder="Nombre del producto"
+						{...form.register("name")}
+					/>
+					{form.formState.errors.name && (
+						<p className="text-sm text-destructive">
+							{form.formState.errors.name.message}
+						</p>
+					)}
+				</div>
 			</div>
 
 			<div className="space-y-2">
@@ -357,6 +390,50 @@ export function ProductForm({
 					{form.formState.errors.price && (
 						<p className="text-sm text-destructive">
 							{form.formState.errors.price.message}
+						</p>
+					)}
+				</div>
+			</div>
+
+			<div className="grid grid-cols-3 gap-3">
+				<div className="space-y-2">
+					<Label htmlFor={unitOfMeasureId}>Unidad de medida</Label>
+					<Input
+						id={unitOfMeasureId}
+						placeholder="Ej: unidad, kg, lt"
+						{...form.register("unitOfMeasure")}
+					/>
+					{form.formState.errors.unitOfMeasure && (
+						<p className="text-sm text-destructive">
+							{form.formState.errors.unitOfMeasure.message}
+						</p>
+					)}
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor={minimumStockId}>Stock mínimo</Label>
+					<Input
+						id={minimumStockId}
+						type="number"
+						step="1"
+						min={0}
+						{...form.register("minimumStock")}
+					/>
+					{form.formState.errors.minimumStock && (
+						<p className="text-sm text-destructive">
+							{form.formState.errors.minimumStock.message}
+						</p>
+					)}
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor={supplierId}>Proveedor</Label>
+					<Input
+						id={supplierId}
+						placeholder="Opcional"
+						{...form.register("supplier")}
+					/>
+					{form.formState.errors.supplier && (
+						<p className="text-sm text-destructive">
+							{form.formState.errors.supplier.message}
 						</p>
 					)}
 				</div>

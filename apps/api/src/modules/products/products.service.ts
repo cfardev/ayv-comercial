@@ -1,5 +1,6 @@
 import {
 	BadRequestException,
+	ConflictException,
 	Injectable,
 	NotFoundException,
 } from "@nestjs/common";
@@ -19,6 +20,7 @@ export class ProductsService {
 
 	private toProductEntity(row: {
 		id: string;
+		code: string;
 		name: string;
 		description: string | null;
 		cost: Prisma.Decimal;
@@ -26,6 +28,9 @@ export class ProductsService {
 		status: boolean;
 		categoryId: string;
 		brandId: string | null;
+		unitOfMeasure: string | null;
+		minimumStock: number;
+		supplier: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		category: { name: string };
@@ -37,12 +42,14 @@ export class ProductsService {
 			sortOrder: number;
 			createdAt: Date;
 		}[];
+		_stockCurrent?: number;
 	}): ProductEntity {
 		const sortedImages = [...row.images].sort(
 			(a, b) => a.sortOrder - b.sortOrder,
 		);
 		return {
 			id: row.id,
+			code: row.code,
 			name: row.name,
 			description: row.description,
 			cost: row.cost.toString(),
@@ -52,6 +59,10 @@ export class ProductsService {
 			categoryName: row.category.name,
 			brandId: row.brandId,
 			brandName: row.brand?.name ?? null,
+			unitOfMeasure: row.unitOfMeasure,
+			minimumStock: row.minimumStock,
+			supplier: row.supplier,
+			stockCurrent: row._stockCurrent ?? 0,
 			images: sortedImages.map((img) => ({
 				id: img.id,
 				url: img.url,
@@ -135,6 +146,23 @@ export class ProductsService {
 		}
 	}
 
+	private async assertCodeUnique(
+		code: string,
+		excludeId?: string,
+	): Promise<void> {
+		const existing = await this.prisma.product.findFirst({
+			where: {
+				code: { equals: code },
+				...(excludeId ? { id: { not: excludeId } } : {}),
+			},
+		});
+		if (existing) {
+			throw new ConflictException(
+				`Ya existe un producto con el código "${code}".`,
+			);
+		}
+	}
+
 	private async assertCategoryActive(categoryId: string): Promise<void> {
 		const category = await this.prisma.category.findUnique({
 			where: { id: categoryId },
@@ -151,6 +179,28 @@ export class ProductsService {
 		}
 	}
 
+	/**
+	 * Aggregate stock quantity from Inventory table for given product IDs.
+	 * Returns a Map<productId, totalQuantity>.
+	 */
+	private async aggregateStock(
+		productIds: string[],
+	): Promise<Map<string, number>> {
+		if (productIds.length === 0) return new Map();
+
+		const rows = await this.prisma.inventory.groupBy({
+			by: ["productId"],
+			where: { productId: { in: productIds } },
+			_sum: { quantity: true },
+		});
+
+		const map = new Map<string, number>();
+		for (const row of rows) {
+			map.set(row.productId, row._sum.quantity ?? 0);
+		}
+		return map;
+	}
+
 	async findAll(
 		filters: ProductFilters,
 	): Promise<PaginatedResult<ProductEntity>> {
@@ -162,6 +212,7 @@ export class ProductsService {
 
 		if (filters.search) {
 			where.OR = [
+				{ code: { contains: filters.search, mode: "insensitive" } },
 				{ name: { contains: filters.search, mode: "insensitive" } },
 				{ description: { contains: filters.search, mode: "insensitive" } },
 			];
@@ -173,6 +224,10 @@ export class ProductsService {
 
 		if (filters.categoryId) {
 			where.categoryId = filters.categoryId;
+		}
+
+		if (filters.brandId) {
+			where.brandId = filters.brandId;
 		}
 
 		if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
@@ -201,8 +256,16 @@ export class ProductsService {
 			this.prisma.product.count({ where }),
 		]);
 
+		// Aggregate stock for the current page
+		const stockMap = await this.aggregateStock(rows.map((r) => r.id));
+
 		return {
-			data: rows.map((r) => this.toProductEntity(r)),
+			data: rows.map((r) =>
+				this.toProductEntity({
+					...r,
+					_stockCurrent: stockMap.get(r.id) ?? 0,
+				}),
+			),
 			total,
 			page,
 			limit,
@@ -222,11 +285,19 @@ export class ProductsService {
 		if (!row) {
 			throw new NotFoundException(`Producto con id "${id}" no encontrado.`);
 		}
-		return this.toProductEntity(row);
+
+		// Aggregate stock for this single product
+		const stockMap = await this.aggregateStock([id]);
+
+		return this.toProductEntity({
+			...row,
+			_stockCurrent: stockMap.get(id) ?? 0,
+		});
 	}
 
 	async create(dto: CreateProductDto, actorId: string): Promise<ProductEntity> {
 		await this.assertCategoryActive(dto.categoryId);
+		await this.assertCodeUnique(dto.code);
 		this.assertPriceAboveCost(dto.cost, dto.price);
 
 		const product = await this.prisma.$transaction(async (tx) => {
@@ -237,6 +308,7 @@ export class ProductsService {
 
 			const p = await tx.product.create({
 				data: {
+					code: dto.code,
 					name: dto.name,
 					description: dto.description ?? null,
 					cost: new Prisma.Decimal(dto.cost),
@@ -244,6 +316,9 @@ export class ProductsService {
 					status: true,
 					categoryId: dto.categoryId,
 					brandId: resolvedBrandId,
+					unitOfMeasure: dto.unitOfMeasure ?? null,
+					minimumStock: dto.minimumStock ?? 0,
+					supplier: dto.supplier ?? null,
 					images: {
 						create: dto.images.map((img, index) => ({
 							url: img.url,
@@ -266,11 +341,15 @@ export class ProductsService {
 				userId: actorId,
 				actorId,
 				action: "PRODUCT_CREATED",
-				details: { productId: product.id, name: product.name },
+				details: {
+					productId: product.id,
+					name: product.name,
+					code: product.code,
+				},
 			},
 		});
 
-		return this.toProductEntity(product);
+		return this.toProductEntity({ ...product, _stockCurrent: 0 });
 	}
 
 	async update(
@@ -294,6 +373,10 @@ export class ProductsService {
 		const cost = dto.cost ?? Number(existing.cost);
 		const price = dto.price ?? Number(existing.price);
 		this.assertPriceAboveCost(cost, price);
+
+		if (dto.code !== undefined && dto.code !== existing.code) {
+			await this.assertCodeUnique(dto.code, id);
+		}
 
 		if (dto.images !== undefined) {
 			if (dto.images.length === 0) {
@@ -328,6 +411,7 @@ export class ProductsService {
 			return tx.product.update({
 				where: { id },
 				data: {
+					...(dto.code !== undefined ? { code: dto.code } : {}),
 					...(dto.name !== undefined ? { name: dto.name } : {}),
 					...(dto.description !== undefined
 						? { description: dto.description }
@@ -339,6 +423,13 @@ export class ProductsService {
 						? { price: new Prisma.Decimal(dto.price) }
 						: {}),
 					...(dto.categoryId !== undefined ? { categoryId } : {}),
+					...(dto.unitOfMeasure !== undefined
+						? { unitOfMeasure: dto.unitOfMeasure }
+						: {}),
+					...(dto.minimumStock !== undefined
+						? { minimumStock: dto.minimumStock }
+						: {}),
+					...(dto.supplier !== undefined ? { supplier: dto.supplier } : {}),
 					...brandPatch,
 				},
 				include: {
@@ -358,16 +449,46 @@ export class ProductsService {
 					productId: id,
 					patch: {
 						name: dto.name,
+						code: dto.code,
 						categoryId: dto.categoryId,
 					},
 				},
 			},
 		});
 
-		return this.toProductEntity(updated);
+		// Get stock for updated product
+		const stockMap = await this.aggregateStock([id]);
+		return this.toProductEntity({
+			...updated,
+			_stockCurrent: stockMap.get(id) ?? 0,
+		});
 	}
 
-	async deactivate(id: string, actorId: string): Promise<ProductEntity> {
+	async getDeactivationInfo(
+		id: string,
+	): Promise<{ productName: string; salesCount: number }> {
+		const existing = await this.prisma.product.findUnique({
+			where: { id },
+			select: { name: true, status: true },
+		});
+		if (!existing) {
+			throw new NotFoundException(`Producto con id "${id}" no encontrado.`);
+		}
+		if (!existing.status) {
+			throw new BadRequestException("El producto ya está inactivo.");
+		}
+
+		const salesCount = await this.prisma.saleItem.count({
+			where: { productId: id },
+		});
+
+		return { productName: existing.name, salesCount };
+	}
+
+	async deactivate(
+		id: string,
+		actorId: string,
+	): Promise<{ product: ProductEntity; salesCount: number }> {
 		const existing = await this.prisma.product.findUnique({
 			where: { id },
 			include: {
@@ -382,6 +503,11 @@ export class ProductsService {
 		if (!existing.status) {
 			throw new BadRequestException("El producto ya está inactivo.");
 		}
+
+		// Count sales associated with this product (for frontend warning)
+		const salesCount = await this.prisma.saleItem.count({
+			where: { productId: id },
+		});
 
 		const updated = await this.prisma.product.update({
 			where: { id },
@@ -398,11 +524,18 @@ export class ProductsService {
 				userId: actorId,
 				actorId,
 				action: "PRODUCT_DEACTIVATED",
-				details: { productId: id },
+				details: { productId: id, salesCount },
 			},
 		});
 
-		return this.toProductEntity(updated);
+		const stockMap = await this.aggregateStock([id]);
+		return {
+			product: this.toProductEntity({
+				...updated,
+				_stockCurrent: stockMap.get(id) ?? 0,
+			}),
+			salesCount,
+		};
 	}
 
 	async reactivate(id: string, actorId: string): Promise<ProductEntity> {
@@ -442,6 +575,10 @@ export class ProductsService {
 			},
 		});
 
-		return this.toProductEntity(updated);
+		const stockMap = await this.aggregateStock([id]);
+		return this.toProductEntity({
+			...updated,
+			_stockCurrent: stockMap.get(id) ?? 0,
+		});
 	}
 }

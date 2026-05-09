@@ -10,6 +10,7 @@ import {
 	IconSettings,
 	IconTag,
 	IconTruck,
+	IconTruckDelivery,
 	IconUsers,
 } from "@tabler/icons-react";
 import type { ComponentType, ReactNode } from "react";
@@ -25,7 +26,6 @@ import {
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -96,6 +96,7 @@ const pageTitles: Record<string, string> = {
 	"/productos/nuevo": "Nuevo producto",
 	"/categorias": "Categorías",
 	"/marcas": "Marcas",
+	"/proveedores": "Proveedores",
 	"/clientes": "Clientes",
 	"/usuarios": "Usuarios",
 	"/reportes": "Reportes",
@@ -167,6 +168,13 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 		)
 			? [{ title: "Marcas", url: "/marcas", icon: IconTag }]
 			: []),
+		...(hasPermissionOrSystemAdmin(
+			user?.permissions,
+			PERMISSION_KEYS.SUPPLIERS_READ,
+			user?.role?.slug,
+		)
+			? [{ title: "Proveedores", url: "/proveedores", icon: IconTruckDelivery }]
+			: []),
 		{ title: "Clientes", url: "/clientes", icon: IconUsers },
 	];
 
@@ -235,21 +243,10 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 								side="top"
 								className="w-[--radix-popper-anchor-width]"
 							>
-								<DropdownMenuGroup>
-									<DropdownMenuItem asChild>
-										<Link
-											to="/configuracion"
-											onClick={() => setOpenMobile(false)}
-										>
-											<IconSettings data-icon="inline-start" />
-											Configuracion
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem onClick={logout} className="cursor-pointer">
-										<IconLogout data-icon="inline-start" />
-										Cerrar sesion
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
+								<DropdownMenuItem onClick={logout} className="cursor-pointer">
+									<IconLogout data-icon="inline-start" />
+									Cerrar sesion
+								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</SidebarMenuItem>

@@ -8,6 +8,10 @@ const productImageSchema = z.object({
 
 export const productFormSchema = z
 	.object({
+		code: z
+			.string()
+			.min(1, "El código es obligatorio")
+			.max(50, "Máximo 50 caracteres"),
 		name: z
 			.string()
 			.min(1, "El nombre es obligatorio")
@@ -20,11 +24,17 @@ export const productFormSchema = z
 		brandId: z.string(),
 		newBrandName: z.string(),
 		images: z.array(productImageSchema).min(1, "Agrega al menos una imagen"),
+		unitOfMeasure: z.string().max(20, "Máximo 20 caracteres").optional(),
+		minimumStock: z.coerce
+			.number()
+			.int()
+			.min(0, "No puede ser negativo")
+			.default(0),
+		supplier: z.string().max(200, "Máximo 200 caracteres").optional(),
 	})
 	.superRefine((data, ctx) => {
 		if (data.brandMode === "existing") {
-			const parsed = z.string().uuid().safeParse(data.brandId);
-			if (!parsed.success) {
+			if (!data.brandId.trim()) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					path: ["brandId"],
