@@ -118,6 +118,25 @@ model Brand {
   @@map("brands")
 }
 
+model Supplier {
+  id                   String   @id @default(cuid()) @map("id")
+  name                 String   @unique @map("name")
+  taxId                String   @unique @map("tax_id")
+  contactName          String?  @map("contact_name")
+  phone                String?  @map("phone")
+  email                String?  @map("email")
+  address              String?  @map("address")
+  commercialConditions String?  @map("commercial_conditions")
+  status               Boolean  @default(true) @map("status")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
+  @@index([taxId])
+  @@index([status])
+  @@map("suppliers")
+}
+
 model Product {
   id             String   @id @default(cuid()) @map("id")
   code           String   @unique @map("code")

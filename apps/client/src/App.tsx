@@ -7,6 +7,7 @@ import { LoginPage } from "@/pages/login-page";
 import { MarcasPage } from "@/pages/marcas-page.js";
 import { ProductoCreatePage } from "@/pages/producto-create-page.js";
 import { ProductosPage } from "@/pages/productos-page.js";
+import { ProveedoresPage } from "@/pages/proveedores-page.js";
 import { UsersPage } from "@/pages/usuarios-page.js";
 
 function Placeholder({ title }: { title: string }) {
@@ -30,6 +31,7 @@ function DashboardRoutes() {
 				<Route path="clientes" element={<Placeholder title="Clientes" />} />
 				<Route path="categorias" element={<CategoriasPage />} />
 				<Route path="marcas" element={<MarcasPage />} />
+				<Route path="proveedores" element={<ProveedoresPage />} />
 				<Route path="usuarios" element={<UsersPage />} />
 				<Route path="reportes" element={<Placeholder title="Reportes" />} />
 				<Route
