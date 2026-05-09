@@ -69,3 +69,30 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 - A: La consulta es filtrable por tipo, fecha, producto y usuario.
 - A: Los movimientos de ajuste muestran el motivo y los valores antes/después.
 - A: La consulta es paginada y exportable.
+
+## Implementación técnica
+
+> **Dependencias:** CU10 (modelo `InventoryMovement`), CU12 (ajustes)  
+> **Orden sugerido de desarrollo:** #14
+
+### Base de datos
+
+- [ ] Verificar que el modelo `InventoryMovement` (creado en CU10) contiene: `id`, `productId`, `movementType`, `quantity`, `previousStock`, `newStock`, `referenceId?`, `referenceType?`, `createdBy`, `createdAt`
+- [ ] Agregar relación `InventoryMovement` → `Product` y `InventoryMovement` → `User` para joins en consulta
+
+### API (NestJS)
+
+- [ ] `GET /inventory/movements` — listar movimientos paginado; filtros: `movementType`, rango de fechas (`startDate`, `endDate`), `productId`, `createdBy`; guard: todos los roles autenticados
+- [ ] Incluir en respuesta: fecha/hora, tipo, producto (nombre + código), cantidad, documento de referencia, usuario responsable, stock anterior, stock nuevo
+- [ ] Ocultar campos de costo en respuesta para rol `SELLER`
+- [ ] Soporte de ordenamiento por fecha, producto o cantidad
+- [ ] `GET /inventory/movements/:id` — detalle de un movimiento (incluir motivo si es ajuste)
+
+### Frontend (React)
+
+- [ ] Crear página `/inventory/movements` protegida para todos los roles autenticados
+- [ ] Tabla paginada con columnas: fecha/hora, tipo, producto, cantidad, documento de referencia, usuario
+- [ ] Chips de tipo de movimiento: entrada (verde), ajuste positivo (azul), ajuste negativo (naranja), salida (rojo)
+- [ ] Filtros por tipo de movimiento, rango de fechas, producto y usuario
+- [ ] Click en fila para ver detalle (modal o página): incluir motivo del ajuste y valores antes/después
+- [ ] Integrar con TanStack Query (`useQuery`)

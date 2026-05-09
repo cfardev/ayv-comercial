@@ -73,3 +73,34 @@ El sistema verifica el stock de todos los productos:
 - A: Las alertas son notificables a los responsables.
 - A: El actor puede marcar alertas como atendidas o ignoradas.
 - A: Las alertas se cierran automáticamente cuando el stock supera el mínimo.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (campo `minStock` en `Product`), CU11 (stock actual), CU10 y CU12 (movimientos que disparan verificación)  
+> **Orden sugerido de desarrollo:** #24
+
+### Base de datos
+
+- [ ] Crear enum `AlertStatus` (`ACTIVE`, `ATTENDED`, `IGNORED`, `RESOLVED`); registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `StockAlert` con campos: `id`, `productId`, `stockAtAlert` (Int), `minStock` (Int), `deficit` (Int, calculado), `severity` (`CRITICAL` si stock=0, `LOW` si 0 < stock < minStock), `status` (AlertStatus, default ACTIVE), `notes?`, `resolvedAt?`, `createdAt`, `updatedAt`; con `@@map("stock_alerts")`
+- [ ] Relaciones: `StockAlert` → `Product`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] Implementar método de servicio `checkAndCreateStockAlerts(productIds: string[])` que compare `currentStock` vs `minStock` y cree o resuelva alertas según corresponda
+- [ ] Llamar `checkAndCreateStockAlerts` desde `InventoryService` al finalizar cada entrada (CU10), ajuste (CU12) y salida por venta (CU15)
+- [ ] `GET /stock-alerts` — listar alertas activas con filtros: `severity` (CRITICAL | LOW), `categoryId`, `productId`; guard: todos los roles autenticados
+- [ ] `PATCH /stock-alerts/:id/attend` — marcar alerta como `ATTENDED` con `notes`; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] `PATCH /stock-alerts/:id/ignore` — marcar como `IGNORED` con `notes`; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] Resolver (`RESOLVED`) alertas automáticamente cuando `currentStock >= minStock` en `checkAndCreateStockAlerts`
+
+### Frontend (React)
+
+- [ ] Crear página `/inventory/alerts` accesible para todos los roles autenticados
+- [ ] Tabla con columnas: producto, stock actual, stock mínimo, déficit, severidad, última actualización
+- [ ] Badge rojo "CRÍTICA" para stock = 0; badge naranja "BAJO" para stock < mínimo
+- [ ] Filtros por severidad y categoría
+- [ ] Acciones por alerta: "Marcar como atendida" (con campo de nota) y "Ignorar"
+- [ ] Indicador numérico de alertas activas en el menú de navegación (badge rojo)
+- [ ] Integrar con TanStack Query con `refetchInterval` para actualización periódica

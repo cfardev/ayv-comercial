@@ -107,3 +107,38 @@ El actor selecciona la opción "Órdenes de compra" desde el menú de compras o 
 - A: El sistema impide registrar órdenes sin productos o con cantidades inválidas.
 - A: El sistema permite actualizar el estado de la orden según reglas válidas.
 - A: Una orden puede vincularse con una entrada de inventario al momento de la recepción.
+
+## Implementación técnica
+
+> **Dependencias:** CU06 (proveedores), CU07 (productos)  
+> **Orden sugerido de desarrollo:** #10
+
+### Base de datos
+
+- [ ] Crear enum `PurchaseOrderStatus` (`PENDING`, `SENT`, `PARTIAL`, `RECEIVED`, `CANCELLED`); registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `PurchaseOrder` con campos: `id`, `supplierId`, `referenceNumber` (único, auto-generado), `estimatedReceiptDate?`, `paymentTerms?`, `notes?`, `status` (PurchaseOrderStatus, default PENDING), `totalEstimated` (Decimal), `createdBy` (userId), `createdAt`, `updatedAt`; con `@@map("purchase_orders")`
+- [ ] Crear modelo `PurchaseOrderItem` con campos: `id`, `purchaseOrderId`, `productId`, `quantityOrdered` (Int), `unitCost` (Decimal), `subtotal` (Decimal, calculado); con `@@map("purchase_order_items")`
+- [ ] Relaciones: `PurchaseOrder` → `Supplier`, `PurchaseOrder` → `PurchaseOrderItem[]`, `PurchaseOrder` → `User`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] Crear `PurchaseOrdersModule` con `PurchaseOrdersService` y `PurchaseOrdersController`
+- [ ] `POST /purchase-orders` — crear orden; validar proveedor activo, productos existentes, cantidades > 0; calcular `totalEstimated`; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] `GET /purchase-orders` — listar paginado; filtros: `search` (número, proveedor), rango de fechas, `status`; por defecto mostrar PENDING y SENT
+- [ ] `GET /purchase-orders/:id` — detalle con items
+- [ ] `PATCH /purchase-orders/:id/status` — actualizar estado; validar transiciones permitidas; registrar trazabilidad; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] Validar transiciones de estado: `PENDING → SENT`, `SENT → PARTIAL | RECEIVED`, `PENDING → CANCELLED`, `SENT → CANCELLED`; `RECEIVED` es estado final
+- [ ] `DTO CreatePurchaseOrderDto` con `items: CreatePurchaseOrderItemDto[]`; `@ArrayMinSize(1)` en items
+- [ ] Retornar costos y montos solo para `ADMIN | INVENTORY_MANAGER` (ocultar para otros roles)
+
+### Frontend (React)
+
+- [ ] Crear página `/purchase-orders` protegida para `ADMIN | INVENTORY_MANAGER`
+- [ ] Tabla paginada con columnas: número, proveedor, fecha, total estimado, estado, fecha estimada de recepción
+- [ ] Buscador por número o proveedor; filtro por estado (PENDING y SENT por defecto)
+- [ ] Botón "Nueva orden" → formulario con selector de proveedor (solo activos), fecha estimada, condiciones, observaciones
+- [ ] Sección de items en el formulario: agregar/eliminar productos con cantidad y costo unitario; mostrar subtotal y total en tiempo real
+- [ ] Botón "Actualizar estado" desde el detalle de la orden con los estados disponibles según estado actual
+- [ ] Flujo de recepción: enlazar con entrada de inventario (CU10)
+- [ ] Integrar con TanStack Query; invalidar caché tras mutaciones

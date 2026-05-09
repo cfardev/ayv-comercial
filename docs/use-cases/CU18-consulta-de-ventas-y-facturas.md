@@ -62,10 +62,33 @@ El actor selecciona la opción "Consulta de ventas" o "Consulta de facturas" des
 
 - A: Todos los roles autenticados pueden consultar ventas y facturas.
 - A: Los vendedores solo ven sus propias ventas.
-- A: Los administradores y gerentes pueden ver todas las ventas.
-- A: Los costos y márgenes solo son visibles para administrador y gerente.
 
-## Criterios de aceptación
+## Implementación técnica
+
+> **Dependencias:** CU15 (ventas), CU17 (facturas)  
+> **Orden sugerido de desarrollo:** #18
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; usar `Sale` e `Invoice` con sus relaciones
+
+### API (NestJS)
+
+- [ ] `GET /sales` (ampliar endpoint de CU15) — incluir en respuesta: `invoiceNumber` (de la factura asociada si existe), todos los filtros requeridos
+- [ ] Filtros: `search` (saleNumber, invoiceNumber, cliente, vendedor), `status` (PENDING_INVOICE | INVOICED | CANCELLED), rango de fechas, `sellerId`
+- [ ] Aplicar scoping automático: si el usuario tiene rol `SELLER`, forzar filtro `sellerId = currentUser.id`
+- [ ] `GET /sales/:id` — detalle completo con items de venta, datos de cliente, factura asociada (si existe), descuentos e impuestos
+- [ ] Ocultar campos de costo y margen para rol `SELLER`
+
+### Frontend (React)
+
+- [ ] Crear página `/sales` para listado de ventas y facturas; accesible para todos los roles autenticados
+- [ ] Tabla paginada con columnas: número de venta, fecha, cliente, vendedor, estado, número de factura, total
+- [ ] Chips de estado: pendiente (amarillo), facturada (verde), anulada (rojo)
+- [ ] Buscador por número de venta, factura o cliente; filtros por estado, rango de fechas, vendedor (solo visible para `ADMIN | OWNER_MANAGER`)
+- [ ] Click en fila → panel lateral o modal con detalle completo de venta (productos, cantidades, precios, descuentos, impuesto, total)
+- [ ] Si tiene factura: botón "Ver factura" que navega al detalle de factura o abre vista de impresión
+- [ ] Integrar con TanStack Query (`useQuery`) con soporte de paginación y filtros como query params
 
 - A: El sistema muestra todas las ventas con su información de estado.
 - A: La consulta es filtrable por estado, fecha, vendedor y cliente.

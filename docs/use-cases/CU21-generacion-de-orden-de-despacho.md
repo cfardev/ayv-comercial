@@ -72,3 +72,32 @@ El actor selecciona una venta facturada y elige la opción "Generar orden de des
 - A: La orden incluye productos, cantidades y dirección de entrega.
 - A: La venta asociada cambia de estado a "en despacho".
 - A: El sistema impide generar órdenes para ventas sin factura o ya despachadas.
+
+## Implementación técnica
+
+> **Dependencias:** CU17 (facturas; venta debe estar `INVOICED`)  
+> **Orden sugerido de desarrollo:** #21
+
+### Base de datos
+
+- [ ] Crear enum `DispatchOrderStatus` (`PENDING`, `IN_PREPARATION`, `READY`, `IN_TRANSIT`, `DELIVERED`, `CANCELLED`); registrar en `schema.prisma`
+- [ ] Crear enum `DispatchPriority` (`NORMAL`, `URGENT`); registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `DispatchOrder` con campos: `id`, `orderNumber` (único, auto-generado), `saleId` (único, FK), `deliveryAddress`, `priority` (DispatchPriority, default NORMAL), `status` (DispatchOrderStatus, default PENDING), `assignedTo?` (userId del preparador), `notes?`, `createdBy` (userId), `createdAt`, `updatedAt`; con `@@map("dispatch_orders")`
+- [ ] Relaciones: `DispatchOrder` → `Sale`, `DispatchOrder` → `User` (assignedTo), `DispatchOrder` → `User` (createdBy)
+- [ ] Agregar campo `dispatchStatus?` en `Sale` para reflejar "en despacho" (o usar estado de `DispatchOrder`)
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] Crear `DispatchModule` con `DispatchService` y `DispatchController`
+- [ ] `POST /dispatch-orders` — generar orden; validar que la venta esté `INVOICED` y sin orden de despacho existente; guard `ADMIN | SELLER | DISPATCH_MANAGER`
+- [ ] Crear `DispatchOrder` y generar `orderNumber` secuencial (ej. `DESP-000001`)
+- [ ] `GET /dispatch-orders` — listar paginado; filtros: `status`, `priority`, rango de fechas; sellers ven solo sus pedidos
+- [ ] `GET /dispatch-orders/:id` — detalle con productos de la venta asociada
+
+### Frontend (React)
+
+- [ ] En detalle de venta facturada, agregar botón "Generar orden de despacho" (visible si `INVOICED` y sin despacho)
+- [ ] Formulario (modal): mostrar cliente, productos y cantidades pre-cargados; campo de dirección de entrega (pre-poblada del cliente, editable); selector de prioridad (normal/urgente); selector de preparador (usuarios con rol `DISPATCH_MANAGER`); observaciones
+- [ ] Confirmar; mostrar mensaje de éxito con número de orden generado
+- [ ] Integrar con TanStack Query; invalidar caché de ventas y pedidos

@@ -87,3 +87,40 @@ El actor selecciona la opción "Nueva venta" desde el módulo de ventas.
 - A: El sistema impide registrar ventas sin productos o sin cliente activo.
 - A: El sistema muestra advertencias cuando el stock es bajo o insuficiente.
 - A: El sistema genera un número único de venta para referencia.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (productos con stock), CU11 (consulta de existencias), CU14 (clientes)  
+> **Orden sugerido de desarrollo:** #15
+
+### Base de datos
+
+- [ ] Crear enum `SaleStatus` (`PENDING_INVOICE`, `INVOICED`, `CANCELLED`); registrar en `schema.prisma`
+- [ ] Crear enum `PaymentMethod` (`CASH`, `CARD`, `TRANSFER`, `CREDIT`); registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `Sale` con campos: `id`, `saleNumber` (único, auto-generado), `customerId`, `sellerId` (userId), `saleDate`, `paymentMethod` (PaymentMethod), `status` (SaleStatus, default PENDING_INVOICE), `subtotal` (Decimal), `discountAmount` (Decimal, default 0), `taxAmount` (Decimal, default 0), `total` (Decimal), `notes?`, `createdAt`, `updatedAt`; con `@@map("sales")`
+- [ ] Crear modelo `SaleItem` con campos: `id`, `saleId`, `productId`, `quantity` (Int), `originalPrice` (Decimal), `appliedPrice` (Decimal), `discount` (Decimal, default 0), `subtotal` (Decimal); con `@@map("sale_items")`
+- [ ] Relaciones: `Sale` → `Customer`, `Sale` → `User` (seller), `Sale` → `SaleItem[]`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] Crear `SalesModule` con `SalesService` y `SalesController`
+- [ ] `POST /sales` — registrar venta; validar cliente activo, al menos un item, stock suficiente por producto; guard `ADMIN | SELLER`
+- [ ] En transacción Prisma: crear `Sale`, crear `SaleItem[]`, decrementar `currentStock` de cada producto, crear `InventoryMovement` tipo `EXIT` por cada item
+- [ ] Generar `saleNumber` secuencial (ej. `SALE-00001`)
+- [ ] Registrar `originalPrice` (precio del catálogo) y `appliedPrice` (precio usado) en cada `SaleItem`; si difieren, marcar para auditoría
+- [ ] `GET /sales` — listar paginado; filtros: `search` (saleNumber, cliente, vendedor), `status`, rango de fechas, `sellerId`; sellers ven solo sus ventas
+- [ ] `GET /sales/:id` — detalle de venta con items
+- [ ] `DTO CreateSaleDto` con `items: CreateSaleItemDto[]`; `@ArrayMinSize(1)`
+
+### Frontend (React)
+
+- [ ] Crear página `/sales/new` protegida para `ADMIN | SELLER`
+- [ ] Buscador de cliente con autocompletado (solo clientes activos); opción de registrar cliente nuevo inline (CU14)
+- [ ] Selector de productos con buscador; mostrar stock disponible por producto
+- [ ] Tabla de items con: producto, cantidad (input), precio unitario, subtotal; botón de eliminar item
+- [ ] Advertencia visual si stock insuficiente al ingresar cantidad
+- [ ] Panel de resumen: subtotal, descuento, impuesto, total (actualizado en tiempo real al modificar items)
+- [ ] Selector de forma de pago
+- [ ] Botón "Confirmar venta"; mostrar mensaje de éxito con número de venta generado
+- [ ] Integrar con TanStack Query (`useMutation`); invalidar caché de stock e inventario tras éxito

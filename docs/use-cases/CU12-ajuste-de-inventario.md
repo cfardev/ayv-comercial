@@ -84,3 +84,33 @@ El actor selecciona la opción "Ajuste de inventario" desde el módulo de invent
 - A: El sistema requiere un motivo para cada ajuste.
 - A: El sistema genera un registro en el historial de movimientos de inventario.
 - A: Los ajustes quedan vinculados al usuario que los realiza.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (productos), CU10 (modelo `InventoryMovement` ya creado)  
+> **Orden sugerido de desarrollo:** #13
+
+### Base de datos
+
+- [ ] Crear enum `AdjustmentReason` con motivos predefinidos: `PHYSICAL_COUNT`, `DAMAGE`, `THEFT`, `EXPIRATION`, `ERROR_CORRECTION`, `OTHER`; registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `InventoryAdjustment` con campos: `id`, `reason` (AdjustmentReason), `reasonDetail?`, `adjustmentDate`, `notes?`, `createdBy` (userId), `createdAt`; con `@@map("inventory_adjustments")`
+- [ ] Crear modelo `InventoryAdjustmentItem` con campos: `id`, `inventoryAdjustmentId`, `productId`, `previousStock` (Int), `adjustmentQuantity` (Int, puede ser negativo), `newStock` (Int); con `@@map("inventory_adjustment_items")`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] `POST /inventory/adjustments` — crear ajuste; validar que `adjustmentQuantity !== 0`; validar que `previousStock + adjustmentQuantity >= 0` (sin stock negativo); guard `ADMIN | INVENTORY_MANAGER`
+- [ ] En transacción Prisma: actualizar `currentStock` de cada producto, crear `InventoryAdjustmentItem` y `InventoryMovement` tipo `ADJUSTMENT_POSITIVE` o `ADJUSTMENT_NEGATIVE`
+- [ ] Si `|adjustmentQuantity / previousStock| > 0.20` (variación > 20%), registrar flag de ajuste significativo para auditoría
+- [ ] `GET /inventory/adjustments` — listar paginado; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] `GET /inventory/adjustments/:id` — detalle con items
+- [ ] `DTO CreateInventoryAdjustmentDto` con `reason`, `items: AdjustmentItemDto[]`; `@ArrayMinSize(1)`
+
+### Frontend (React)
+
+- [ ] Crear página `/inventory/adjustments` protegida para `ADMIN | INVENTORY_MANAGER`
+- [ ] Formulario de nuevo ajuste: selector de razón (lista predefinida), detalle de razón (texto, si `OTHER`), fecha, observaciones
+- [ ] Sección de items: buscar y agregar producto; mostrar stock actual; campo para cantidad de ajuste (positivo o negativo); mostrar stock resultante en tiempo real
+- [ ] Resaltar en rojo si stock resultante sería negativo y deshabilitar confirmación
+- [ ] Confirmar ajuste; mostrar mensaje de éxito con número de ajuste generado
+- [ ] Integrar con TanStack Query; invalidar caché de existencias (CU11) tras mutaciones

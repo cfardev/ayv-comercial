@@ -78,3 +78,40 @@ El actor selecciona una factura y elige la opción "Anular factura".
 - A: El sistema impide anular una factura ya anulada.
 - A: El inventario se revierte tras la anulación.
 - A: Toda anulación queda registrada para auditoría.
+
+## Implementación técnica
+
+> **Dependencias:** CU17 (modelo `Invoice`), CU10 (movimientos de inventario para reversión)  
+> **Orden sugerido de desarrollo:** #20
+
+### Base de datos
+
+- [ ] Crear enum `CancellationReason` con motivos predefinidos: `CUSTOMER_REQUEST`, `BILLING_ERROR`, `PRODUCT_RETURN`, `OTHER`; registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `CreditNote` con campos: `id`, `creditNoteNumber` (único, secuencial), `invoiceId` (único, FK), `reason` (CancellationReason), `reasonDetail?`, `cancellationDate`, `total` (Decimal, igual al total de la factura), `createdBy` (userId), `createdAt`; con `@@map("credit_notes")`
+- [ ] Relaciones: `CreditNote` → `Invoice`, `CreditNote` → `User`
+- [ ] Agregar campo `cancelledAt DateTime?` y `cancellationReason?` en modelo `Invoice`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] `POST /invoices/:id/cancel` — anular factura; guard `ADMIN` only
+- [ ] Validar que factura exista y esté en estado `ACTIVE`
+- [ ] Requerir `reason` (CancellationReason) y `reasonDetail?` en el body
+- [ ] En transacción Prisma:
+  - [ ] Cambiar `Invoice.status` a `CANCELLED`, registrar `cancelledAt` y `cancellationReason`
+  - [ ] Cambiar `Sale.status` a `CANCELLED`
+  - [ ] Revertir `currentStock` de cada item de la venta (+cantidad) si los productos no fueron despachados
+  - [ ] Crear `InventoryMovement` tipo `ENTRY` (reversión) por cada item revertido
+  - [ ] Crear `CreditNote` con `creditNoteNumber` secuencial
+- [ ] Si la factura tiene más de 30 días, retornar advertencia (flag `forceOldInvoice: true` requerido en body)
+- [ ] `GET /invoices/:id/credit-note` — obtener nota de crédito asociada
+
+### Frontend (React)
+
+- [ ] En el detalle de factura, agregar botón "Anular factura" visible solo para rol `ADMIN`
+- [ ] Modal de anulación: mostrar datos de factura (número, fecha, total), selector de motivo (lista predefinida), campo de detalle (texto libre)
+- [ ] Mostrar advertencia si factura tiene más de 30 días
+- [ ] Mostrar advertencia si la anulación revertirá stock
+- [ ] Confirmar anulación con botón explícito; llamar `POST /invoices/:id/cancel` con `useMutation`
+- [ ] Tras éxito: mostrar nota de crédito generada con opción de imprimir
+- [ ] Integrar con TanStack Query; invalidar caché de facturas y ventas

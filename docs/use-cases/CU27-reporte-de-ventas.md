@@ -71,3 +71,32 @@ El actor selecciona la opción "Reporte de ventas" desde el menú de reportes o 
 - A: El sistema permite filtrar por múltiples criterios.
 - A: Los reportes son exportables a PDF o Excel.
 - A: Los vendedores solo ven sus propias ventas.
+
+## Implementación técnica
+
+> **Dependencias:** CU15 (ventas), CU17 (facturas)  
+> **Orden sugerido de desarrollo:** #27
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; consulta sobre `Sale`, `SaleItem`, `Customer`, `User`
+
+### API (NestJS)
+
+- [ ] `GET /reports/sales` — generar datos del reporte de ventas; guard: todos los roles autenticados
+- [ ] Query params: `startDate`, `endDate`, `type` (SUMMARY | DETAILED), `groupBy` (DATE | CUSTOMER | SELLER | PRODUCT), `sellerId?`, `customerId?`
+- [ ] Excluir ventas con `status === CANCELLED` de los cálculos
+- [ ] Aplicar scoping: si rol `SELLER`, forzar `sellerId = currentUser.id`
+- [ ] Calcular: número de ventas, total de ventas, promedio por venta
+- [ ] Ocultar costos y márgenes para rol `SELLER`
+- [ ] Endpoint de exportación: `GET /reports/sales/export?format=pdf|excel`
+
+### Frontend (React)
+
+- [ ] Crear página `/reports/sales` accesible para todos los roles autenticados
+- [ ] Panel de filtros: período (fecha inicio - fecha fin), tipo, agrupar por, filtros adicionales (vendedor solo visible para admin/manager)
+- [ ] Botón "Generar reporte" que carga los resultados
+- [ ] Mostrar métricas resumen: total ventas, número de transacciones, promedio por venta
+- [ ] Tabla de resultados agrupada según `groupBy` seleccionado
+- [ ] Botones "Exportar Excel" y "Exportar PDF"
+- [ ] Integrar con TanStack Query

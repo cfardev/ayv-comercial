@@ -70,3 +70,36 @@ El actor selecciona la opción "Productos de baja rotación" desde el menú de r
 - A: Los productos se ordenan por menor venta o mayor tiempo sin movimiento.
 - A: La consulta es paginada y exportable.
 - A: Los costos no son visibles para vendedores.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (productos), CU11 (stock), CU15 (datos de ventas por producto)  
+> **Orden sugerido de desarrollo:** #25
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; consulta derivada de `Product`, `SaleItem` y `InventoryMovement`
+
+### API (NestJS)
+
+- [ ] `GET /reports/slow-moving-products` — consulta de productos de baja rotación; guard: todos los roles autenticados
+- [ ] Query params: `period` (30 | 60 | 90 días), `threshold` (unidades, default 2), `categoryId`
+- [ ] Lógica de la query:
+  - [ ] Obtener todos los productos activos
+  - [ ] Para cada producto: sumar `SaleItem.quantity` de ventas no canceladas en el período
+  - [ ] Filtrar los que tengan `totalSold <= threshold`
+  - [ ] Calcular `daysSinceLastMovement` desde `InventoryMovement.createdAt` más reciente
+  - [ ] Marcar como `noMovement: true` si `daysSinceLastMovement > 60`
+- [ ] Incluir en respuesta: `code`, `name`, `categoryName`, `totalSold`, `totalRevenue`, `currentStock`, `daysSinceLastMovement`, `noMovement`
+- [ ] Ocultar `cost` para rol `SELLER`
+- [ ] Implementar con Prisma usando `groupBy` y `_sum` en `SaleItem`
+
+### Frontend (React)
+
+- [ ] Crear página `/reports/slow-moving` protegida para todos los roles autenticados
+- [ ] Filtros: período (30/60/90 días), categoría, umbral de rotación (input numérico)
+- [ ] Botón "Consultar" que ejecuta la query con los filtros seleccionados
+- [ ] Tabla paginada con columnas: código, nombre, categoría, unidades vendidas, total de ventas (solo admin/manager), stock actual, días sin movimiento
+- [ ] Badge "SIN MOVIMIENTO" para productos con `daysSinceLastMovement > 60`
+- [ ] Click en producto → historial de ventas detallado (modal)
+- [ ] Integrar con TanStack Query

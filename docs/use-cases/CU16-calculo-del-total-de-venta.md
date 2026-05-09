@@ -73,3 +73,32 @@ El sistema calcula automáticamente el total cada vez que se agrega, modifica o 
 - A: El sistema calcula correctamente el impuesto sobre la base imponible.
 - A: El sistema muestra el desglose completo del cálculo.
 - A: El total calculado coincide con la suma de los componentes.
+
+## Implementación técnica
+
+> **Dependencias:** CU15 (modelo `Sale` y `SaleItem`)  
+> **Orden sugerido de desarrollo:** #16 (implementar como parte de CU15)
+
+### Base de datos
+
+- [ ] Los campos `subtotal`, `discountAmount`, `taxAmount` y `total` del modelo `Sale` (creado en CU15) almacenan el resultado del cálculo
+- [ ] El campo `discount` y `subtotal` en `SaleItem` almacenan el desglose por línea
+
+### API (NestJS)
+
+- [ ] Implementar método de servicio `calculateSaleTotals(items: SaleItemInput[]): SaleTotals` en `SalesService` que calcule:
+  - [ ] Subtotal por item: `quantity × appliedPrice`
+  - [ ] Descuento por item (si aplica): porcentual o fijo
+  - [ ] Subtotal general: suma de subtotales por item menos descuentos
+  - [ ] Impuesto (IVA o configurado): `subtotal × taxRate` (variable de entorno `TAX_RATE`)
+  - [ ] Total final: `subtotal - discountAmount + taxAmount`
+  - [ ] Redondeo a 2 decimales en cada valor
+- [ ] Crear endpoint `POST /sales/calculate` (no persiste) para preview del total desde el frontend antes de confirmar
+- [ ] Asegurar que el cálculo final se realiza en el servidor al confirmar la venta (no confiar en el cliente)
+
+### Frontend (React)
+
+- [ ] Hook `useSaleTotals(items)` que llame a `POST /sales/calculate` con debounce cada vez que cambia la lista de items
+- [ ] Panel de desglose visible en el formulario de venta: subtotal, descuento total, impuesto, **total**
+- [ ] Actualizar panel en tiempo real al agregar, eliminar o modificar items o cantidades
+- [ ] Mostrar cada subtotal por línea de item en la tabla de productos

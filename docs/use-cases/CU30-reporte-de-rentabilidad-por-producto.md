@@ -72,3 +72,37 @@ El actor selecciona la opción "Rentabilidad por producto" desde el menú de rep
 - A: Los productos con margen negativo se destacan visualmente.
 - A: El reporte incluye la utilidad total estimada por producto.
 - A: Los reportes son exportables a PDF o Excel.
+
+## Implementación técnica
+
+> **Dependencias:** CU08 (historial de precios), CU27 (infraestructura de reportes), CU15 (ventas)  
+> **Orden sugerido de desarrollo:** #30
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; consulta sobre `Product`, `SaleItem`, `Sale`, `PriceHistory`
+
+### API (NestJS)
+
+- [ ] `GET /reports/profitability` — reporte de rentabilidad; guard `ADMIN | OWNER_MANAGER`
+- [ ] Query params: `period` (30 | 60 | 90 días o `startDate`/`endDate`), `orderBy` (MARGIN_PCT | MARGIN_ABS), `categoryId?`, `minMargin?`, `maxMargin?`
+- [ ] Lógica de cálculo por producto:
+  - [ ] Obtener `cost` y `salePrice` actuales del producto
+  - [ ] `marginUnit = salePrice - cost`
+  - [ ] `marginPct = ((salePrice - cost) / salePrice) × 100`
+  - [ ] `totalUnitsSold`: suma de `SaleItem.quantity` en ventas no canceladas del período
+  - [ ] `estimatedProfit = marginUnit × totalUnitsSold`
+- [ ] Excluir productos sin ventas en el período del cálculo de `estimatedProfit`
+- [ ] Marcar en respuesta (`negativeMargin: true`) productos con `marginUnit < 0`
+- [ ] Aplicar filtro de rango de margen si se proporcionan `minMargin`/`maxMargin`
+- [ ] Endpoint de exportación: `GET /reports/profitability/export?format=pdf|excel`
+
+### Frontend (React)
+
+- [ ] Crear página `/reports/profitability` protegida para `ADMIN | OWNER_MANAGER`
+- [ ] Filtros: período, ordenar por (margen % / margen absoluto), categoría, rango de margen (min% - max%)
+- [ ] Botón "Generar reporte"
+- [ ] Tabla con columnas: código, nombre, categoría, precio unitario, costo unitario, margen unitario, margen %, unidades vendidas, utilidad total estimada
+- [ ] Filas con margen negativo resaltadas en rojo
+- [ ] Botones "Exportar Excel" y "Exportar PDF"
+- [ ] Integrar con TanStack Query
