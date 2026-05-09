@@ -100,3 +100,39 @@ El actor selecciona la opción "Gestión de categorías" desde el menú de inven
 - A: El sistema rechaza la desactivación de una categoría con productos activos.
 - A: El sistema muestra errores claros cuando los campos no cumplen validación.
 - A: Las categorías inactivas no aparecen en el catálogo público pero sí en la gestión.
+
+## Implementación técnica
+
+> **Dependencias:** CU01 (autenticación y guards de roles)  
+> **Orden sugerido de desarrollo:** #4
+
+### Base de datos
+
+- [x] Crear modelo Prisma `Category` con campos: `id`, `name` (único), `description?`, `isActive`, `createdAt`, `updatedAt`; con `@@map("categories")`
+- [x] Agregar índice único en `name`
+- [x] Agregar relación `Category` → `Product[]` (para contar productos asociados; se completa al crear CU07)
+- [x] Crear migración de base de datos
+
+### API (NestJS)
+
+- [x] Crear `CategoriesModule` con `CategoriesService` y `CategoriesController`
+- [x] `POST /categories` — crear categoría; validar nombre único; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `GET /categories` — listar paginado (page, limit); filtros: `search` (nombre/descripción), `isActive`; incluir conteo de productos asociados; accesible para todos los roles autenticados
+- [x] `GET /categories/:id` — obtener categoría por id
+- [x] `PATCH /categories/:id` — editar nombre y descripción; validar nombre único si cambia; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /categories/:id/deactivate` — desactivar; verificar que no tenga productos activos asociados; rechazar con error 409 si los tiene; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /categories/:id/activate` — reactivar; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `DTO CreateCategoryDto` y `UpdateCategoryDto` con `class-validator`
+- [x] Registrar operaciones con usuario responsable y timestamp
+
+### Frontend (React)
+
+- [x] Crear página `/categories` protegida para roles `ADMIN` y `INVENTORY_MANAGER`
+- [x] Tabla paginada con columnas: nombre, descripción, cantidad de productos, estado
+- [x] Buscador por nombre o descripción (debounce)
+- [x] Filtro por estado (activo/inactivo); activo por defecto
+- [x] Botón "Nueva categoría" → formulario (modal) con nombre (requerido) y descripción (opcional)
+- [x] Botón "Editar" → formulario pre-poblado
+- [x] Botón "Desactivar" con diálogo de confirmación; mostrar error si tiene productos activos
+- [x] Botón "Activar" para categorías inactivas
+- [x] Integrar con TanStack Query; invalidar caché tras mutaciones

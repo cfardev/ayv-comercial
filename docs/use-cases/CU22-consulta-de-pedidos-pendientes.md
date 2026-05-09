@@ -58,9 +58,36 @@ El actor selecciona la opción "Pedidos pendientes" desde el menú de despacho o
 
 - A: Todos los roles autenticados pueden consultar pedidos pendientes.
 - A: Los vendedores solo ven los pedidos de sus clientes.
-- A: Los administradores y gerentes ven todos los pedidos.
 
-## Criterios de aceptación
+## Implementación técnica
+
+> **Dependencias:** CU21 (modelo `DispatchOrder`)  
+> **Orden sugerido de desarrollo:** #22
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; usar `DispatchOrder` con relaciones a `Sale`, `Customer` y `User`
+- [ ] Calcular `waitingTime` (campo derivado) como `now() - DispatchOrder.createdAt` en la capa de servicio
+
+### API (NestJS)
+
+- [ ] `GET /dispatch-orders/pending` — listar pedidos en estado `PENDING` o `IN_PREPARATION`; guard: todos los roles autenticados
+- [ ] Filtros: `status` (PENDING | IN_PREPARATION), `priority`, rango de fechas
+- [ ] Incluir en respuesta: `orderNumber`, `createdAt`, `customer.fullName`, resumen de productos, `priority`, `status`, `waitingHours` (calculado)
+- [ ] Marcar en respuesta (`isLate: true`) los pedidos con `waitingHours > 48`
+- [ ] Aplicar scoping: `SELLER` ve solo pedidos vinculados a sus ventas
+- [ ] Soportar ordenamiento: urgentes primero por defecto, luego por fecha
+
+### Frontend (React)
+
+- [ ] Crear página `/dispatch/pending` accesible para todos los roles autenticados
+- [ ] Tabla paginada con columnas: número de orden, fecha de creación, cliente, productos pendientes, prioridad, estado, tiempo en espera
+- [ ] Badge "URGENTE" rojo en filas con prioridad urgente
+- [ ] Badge de alerta en filas con más de 48 horas en espera
+- [ ] Filtros por estado y prioridad
+- [ ] Click en fila → detalle de pedido (modal): productos, cantidades, dirección de entrega
+- [ ] Desde el detalle, botón "Cambiar prioridad" (inline, sin navegar) que llame `PATCH /dispatch-orders/:id` con `priority`
+- [ ] Integrar con TanStack Query con `refetchInterval` para actualización periódica
 
 - A: El sistema muestra todos los pedidos pendientes con su información.
 - A: Los pedidos se pueden filtrar por estado y prioridad.

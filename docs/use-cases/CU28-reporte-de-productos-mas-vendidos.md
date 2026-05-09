@@ -67,3 +67,33 @@ El actor selecciona la opción "Productos más vendidos" desde el menú de repor
 - A: El reporte incluye la participación porcentual de cada producto.
 - A: Los reportes son exportables a PDF o Excel.
 - A: Los vendedores solo ven información de sus propias ventas.
+
+## Implementación técnica
+
+> **Dependencias:** CU15 (ventas y SaleItems), CU27 (infraestructura de reportes)  
+> **Orden sugerido de desarrollo:** #28
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; consulta sobre `SaleItem`, `Product`, `Sale`
+
+### API (NestJS)
+
+- [ ] `GET /reports/top-products` — reporte de productos más vendidos; guard: todos los roles autenticados
+- [ ] Query params: `period` (30 | 60 | 90 días o `startDate`/`endDate`), `limit` (default 10, max 100), `orderBy` (QUANTITY | REVENUE), `categoryId?`, `sellerId?`
+- [ ] Excluir ventas/items de ventas canceladas
+- [ ] Calcular con Prisma `groupBy productId` + `_sum quantity` y `_sum subtotal` en `SaleItem`
+- [ ] Calcular `percentageOfTotal`: (unidades del producto / total unidades vendidas) × 100
+- [ ] Aplicar scoping: rol `SELLER` ve solo sus propias ventas
+- [ ] Ocultar costos y márgenes para `SELLER`
+- [ ] Endpoint de exportación: `GET /reports/top-products/export?format=pdf|excel`
+
+### Frontend (React)
+
+- [ ] Crear página `/reports/top-products` accesible para todos los roles autenticados
+- [ ] Filtros: período, cantidad máxima a mostrar, ordenar por (cantidad/valor), categoría
+- [ ] Botón "Generar reporte"
+- [ ] Tabla con columnas: posición, código, nombre, categoría, unidades vendidas, total de ventas (oculto para SELLER), participación %
+- [ ] Barra de progreso visual para participación porcentual en la tabla
+- [ ] Botones "Exportar Excel" y "Exportar PDF"
+- [ ] Integrar con TanStack Query

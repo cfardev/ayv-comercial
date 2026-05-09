@@ -76,3 +76,32 @@ El actor selecciona una venta pendiente y elige la opción "Generar factura" o "
 - A: El sistema impide facturar una venta ya facturada.
 - A: Los datos de la factura son correctos y coinciden con la venta.
 - A: La factura queda disponible para consulta e impresión.
+
+## Implementación técnica
+
+> **Dependencias:** CU15 (ventas), CU16 (cálculo de totales)  
+> **Orden sugerido de desarrollo:** #17
+
+### Base de datos
+
+- [ ] Crear enum `InvoiceStatus` (`ACTIVE`, `CANCELLED`); registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `Invoice` con campos: `id`, `invoiceNumber` (único, secuencial), `saleId` (único, FK), `invoiceDate`, `billingAddress?`, `status` (InvoiceStatus, default ACTIVE), `subtotal` (Decimal), `discountAmount` (Decimal), `taxAmount` (Decimal), `total` (Decimal), `createdBy` (userId), `createdAt`; con `@@map("invoices")`
+- [ ] Relaciones: `Invoice` → `Sale` (1-1), `Invoice` → `User`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] `POST /invoices` — generar factura para una venta; validar que venta exista, esté en `PENDING_INVOICE` y sin factura; guard `ADMIN | SELLER`
+- [ ] En transacción Prisma: crear `Invoice`, cambiar `Sale.status` a `INVOICED`
+- [ ] Generar `invoiceNumber` secuencial único (ej. `FAC-000001`); usar secuencia atómica para evitar duplicados (advisory lock o campo de secuencia dedicado en DB)
+- [ ] `GET /invoices` — listar paginado; sellers ven solo facturas de sus ventas
+- [ ] `GET /invoices/:id` — detalle completo (incluye items de venta y datos de cliente)
+
+### Frontend (React)
+
+- [ ] En la página de detalle de venta o lista `/sales`, agregar botón "Facturar" (visible solo si estado es `PENDING_INVOICE`)
+- [ ] Pantalla/modal de confirmación de factura: mostrar resumen de venta (cliente, productos, totales), campo opcional de dirección de facturación
+- [ ] Botón "Confirmar factura"; llamar `POST /invoices` con `useMutation`
+- [ ] Tras éxito: mostrar la factura generada en vista de impresión (página HTML con diseño de factura) con opción de imprimir (`window.print()`) o descargar como PDF
+- [ ] La vista de impresión debe incluir: número de factura, fecha, datos del cliente, detalle de productos, subtotal, impuesto, total
+- [ ] Integrar con TanStack Query; invalidar caché de ventas tras éxito

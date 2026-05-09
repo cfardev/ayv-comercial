@@ -100,3 +100,39 @@ El actor selecciona la opción "Gestión de marcas" desde el menú de inventario
 - A: El sistema rechaza la desactivación de una marca que aún tiene productos activos asociados.
 - A: El sistema muestra errores claros cuando los campos no cumplen validación.
 - A: Las marcas inactivas no aparecen como opción al crear o editar productos en el catálogo de ventas (reflejo coherente con CU07).
+
+## Implementación técnica
+
+> **Dependencias:** CU01 (autenticación y guards de roles)  
+> **Orden sugerido de desarrollo:** #5
+
+### Base de datos
+
+- [x] Crear modelo Prisma `Brand` con campos: `id`, `name` (único), `description?`, `isActive`, `createdAt`, `updatedAt`; con `@@map("brands")`
+- [x] Agregar índice único en `name`
+- [x] Agregar relación `Brand` → `Product[]` (se completa al crear CU07)
+- [x] Crear migración de base de datos
+
+### API (NestJS)
+
+- [x] Crear `BrandsModule` con `BrandsService` y `BrandsController`
+- [x] `POST /brands` — crear marca; validar nombre único; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `GET /brands` — listar paginado; filtros: `search`, `isActive`; incluir conteo de productos activos asociados; accesible para todos los roles autenticados
+- [x] `GET /brands/:id` — obtener marca por id
+- [x] `PATCH /brands/:id` — editar; validar nombre único si cambia; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /brands/:id/deactivate` — verificar que no tenga productos activos; rechazar con 409 si los tiene; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /brands/:id/activate` — reactivar; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `DTO CreateBrandDto` y `UpdateBrandDto` con `class-validator`
+- [x] Registrar operaciones con usuario responsable y timestamp
+
+### Frontend (React)
+
+- [x] Crear página `/brands` protegida para roles `ADMIN` y `INVENTORY_MANAGER`
+- [x] Tabla paginada con columnas: nombre, descripción, cantidad de productos, estado
+- [x] Buscador por nombre o descripción (debounce)
+- [x] Filtro por estado; activo por defecto
+- [x] Botón "Nueva marca" → formulario (modal) con nombre (requerido) y descripción (opcional)
+- [x] Botón "Editar" → formulario pre-poblado
+- [x] Botón "Desactivar" con confirmación; mostrar error con conteo si tiene productos activos
+- [x] Botón "Activar" para marcas inactivas
+- [x] Integrar con TanStack Query; invalidar caché tras mutaciones

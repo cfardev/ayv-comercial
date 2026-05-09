@@ -72,3 +72,32 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 - A: Los productos agotados se muestran con estado "agotado".
 - A: La consulta es paginada y filtrable.
 - A: Los vendedores no pueden ver los costos de los productos.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (modelo `Product` con `currentStock`, `minStock`), CU10 (movimientos actualizan stock)  
+> **Orden sugerido de desarrollo:** #12
+
+### Base de datos
+
+- [ ] Verificar que el modelo `Product` tiene `currentStock` y `minStock` (creados en CU07)
+- [ ] Calcular estado del stock como campo derivado en la capa de servicio: `NORMAL` (currentStock >= minStock), `LOW` (0 < currentStock < minStock), `OUT_OF_STOCK` (currentStock = 0)
+
+### API (NestJS)
+
+- [ ] `GET /inventory/stock` — listar existencias paginado; filtros: `search` (código, nombre), `categoryId`, `brandId`, `stockStatus` (NORMAL | LOW | OUT_OF_STOCK), `isActive`; guard: todos los roles autenticados
+- [ ] Incluir en respuesta: `code`, `name`, `categoryName`, `brandName`, `currentStock`, `minStock`, `stockStatus`, `updatedAt`
+- [ ] Ocultar campo `cost` para usuarios con rol `SELLER`
+- [ ] Soporte de ordenamiento por cualquier columna (query param `sortBy`, `sortOrder`)
+- [ ] `GET /inventory/stock/:productId` — detalle de existencia de un producto
+
+### Frontend (React)
+
+- [ ] Crear página `/inventory/stock` accesible para todos los roles autenticados
+- [ ] Tabla paginada con columnas: código, nombre, categoría, marca, stock actual, stock mínimo, estado, última actualización
+- [ ] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
+- [ ] Chips visuales de estado: verde (NORMAL), amarillo (LOW), rojo (OUT_OF_STOCK)
+- [ ] Buscador por código, nombre o categoría (debounce)
+- [ ] Filtros por estado de stock, categoría, marca
+- [ ] Soporte de ordenamiento por clic en columna de la tabla
+- [ ] Integrar con TanStack Query (`useQuery`) con refetch automático configurable

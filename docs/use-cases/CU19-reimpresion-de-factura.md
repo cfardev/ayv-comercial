@@ -67,3 +67,27 @@ El actor selecciona una venta facturada o una factura existente y elige la opci�
 - A: La reimpresión queda registrada en el historial.
 - A: El sistema impide reimprimir facturas anuladas.
 - A: El sistema registra el usuario y fecha de cada reimpresión.
+
+## Implementación técnica
+
+> **Dependencias:** CU17 (modelo `Invoice`)  
+> **Orden sugerido de desarrollo:** #19
+
+### Base de datos
+
+- [ ] Crear modelo Prisma `InvoiceReprint` con campos: `id`, `invoiceId`, `reprintedBy` (userId), `reprintDate`, `reason?`; con `@@map("invoice_reprints")`
+- [ ] Relaciones: `InvoiceReprint` → `Invoice`, `InvoiceReprint` → `User`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] `POST /invoices/:id/reprint` — registrar reimpresión; validar que factura exista y esté en estado `ACTIVE`; crear registro `InvoiceReprint`; guard `ADMIN | SELLER`
+- [ ] Retornar los datos completos de la factura (con items de venta) para renderizar la copia
+- [ ] `GET /invoices/:id/reprints` — historial de reimpresiones de una factura; guard `ADMIN`
+
+### Frontend (React)
+
+- [ ] En la vista de detalle de factura o lista de ventas, agregar botón "Reimprimir factura" (visible solo si factura está `ACTIVE`)
+- [ ] Llamar `POST /invoices/:id/reprint` con `useMutation`; tras éxito, abrir vista de impresión igual a CU17 pero con leyenda **"COPIA"** visible en el encabezado del documento
+- [ ] Opción de imprimir directamente (`window.print()`) o descargar como PDF
+- [ ] Mostrar contador de reimpresiones en el detalle de la factura (informativo)

@@ -71,3 +71,32 @@ El actor selecciona la opción "Reporte de inventario" desde el menú de reporte
 - A: El reporte incluye resumen general y detalle por categoría.
 - A: Los productos en alerta de stock bajo se incluyen en sección especial.
 - A: Los costos son visibles solo para roles autorizados.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (productos), CU11 (stock), CU12 (ajustes)  
+> **Orden sugerido de desarrollo:** #26
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; consulta sobre `Product`, `Category`, `Brand`, `InventoryMovement`
+
+### API (NestJS)
+
+- [ ] `GET /reports/inventory` — generar datos del reporte de inventario; guard `ADMIN | INVENTORY_MANAGER | OWNER_MANAGER`
+- [ ] Query params: `type` (SUMMARY | DETAILED), `categoryId?`, `stockStatus?` (LOW | OUT_OF_STOCK | NORMAL), `includeInactive` (boolean)
+- [ ] Incluir en respuesta: para cada producto: `code`, `name`, `categoryName`, `currentStock`, `minStock`, `stockStatus`; solo para ADMIN/MANAGER: `unitCost`, `totalInventoryValue` (currentStock × unitCost)
+- [ ] Sección de alertas: productos con `stockStatus !== NORMAL`
+- [ ] Resumen general: total de productos, total de unidades, valor total del inventario (solo ADMIN/MANAGER)
+- [ ] Endpoint de exportación: `GET /reports/inventory/export?format=pdf|excel` — generar archivo descargable (usar librería `exceljs` para Excel, `pdfkit` o `puppeteer` para PDF)
+
+### Frontend (React)
+
+- [ ] Crear página `/reports/inventory` protegida para `ADMIN | INVENTORY_MANAGER | OWNER_MANAGER`
+- [ ] Panel de filtros: tipo (resumido/detallado), categoría, estado de stock
+- [ ] Botón "Generar reporte" que carga la tabla con los resultados
+- [ ] Sección de resumen: total productos, total unidades, valor total del inventario (si autorizado)
+- [ ] Tabla de productos con columnas configuradas según tipo de reporte
+- [ ] Sección separada de alertas de stock bajo al final del reporte
+- [ ] Botones "Exportar Excel" y "Exportar PDF" que disparan descarga del archivo
+- [ ] Integrar con TanStack Query

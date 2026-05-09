@@ -70,3 +70,30 @@ El actor selecciona la opción "Reporte de productos de baja rotación" desde el
 - A: Los productos se marcan según su estado (baja rotación, sin movimiento, agotado).
 - A: Los reportes son exportables a PDF o Excel.
 - A: Los costos no son visibles para vendedores.
+
+## Implementación técnica
+
+> **Dependencias:** CU25 (consulta de baja rotación), CU27 (infraestructura de reportes)  
+> **Orden sugerido de desarrollo:** #29
+
+### Base de datos
+
+- [ ] No requiere modelos adicionales; consulta derivada de `Product`, `SaleItem`, `Sale`, `InventoryMovement`
+
+### API (NestJS)
+
+- [ ] `GET /reports/slow-moving` — reporte de baja rotación; guard `ADMIN | INVENTORY_MANAGER | OWNER_MANAGER`
+- [ ] Query params: `period` (30 | 60 | 90 días o `startDate`/`endDate`), `threshold` (unidades, default 2), `categoryId?`, `includeOutOfStock` (boolean)
+- [ ] Lógica igual a CU25 pero orientada a exportación con campos adicionales: `inventoryValue` (currentStock × cost), `status` (LOW_ROTATION | NO_MOVEMENT | OUT_OF_STOCK)
+- [ ] Ocultar `cost` e `inventoryValue` para rol `SELLER` (sin acceso total al reporte según reglas de seguridad)
+- [ ] Endpoint de exportación: `GET /reports/slow-moving/export?format=pdf|excel`
+
+### Frontend (React)
+
+- [ ] Crear página `/reports/slow-moving` protegida para `ADMIN | INVENTORY_MANAGER | OWNER_MANAGER`
+- [ ] Filtros: período, umbral de rotación (input), categoría, incluir agotados (checkbox)
+- [ ] Botón "Generar reporte"
+- [ ] Tabla con columnas: código, nombre, categoría, unidades vendidas, total ventas, stock actual, días sin movimiento, valor inventariado
+- [ ] Badge de estado por fila: "BAJA ROTACIÓN" (naranja), "SIN MOVIMIENTO" (rojo), "AGOTADO" (negro)
+- [ ] Botones "Exportar Excel" y "Exportar PDF"
+- [ ] Integrar con TanStack Query

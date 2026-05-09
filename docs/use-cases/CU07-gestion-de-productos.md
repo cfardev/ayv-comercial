@@ -128,3 +128,43 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - A: Los productos desactivados no aparecen en el catálogo de ventas.
 - A: Los productos cuya categoría está inactiva no son visibles en el catálogo de ventas (reflejo de CU04 CA6).
 - A: Los productos cuya marca está inactiva no son visibles en el catálogo de ventas (reflejo de CU05).
+
+## Implementación técnica
+
+> **Dependencias:** CU04 (categorías), CU05 (marcas)  
+> **Orden sugerido de desarrollo:** #7
+
+### Base de datos
+
+- [x] Crear modelo Prisma `Product` con campos: `id`, `code` (único), `name`, `description?`, `categoryId`, `brandId`, `unitOfMeasure`, `cost` (Decimal), `salePrice` (Decimal), `minStock` (Int, default 0), `currentStock` (Int, default 0), `isActive`, `createdAt`, `updatedAt`; con `@@map("products")`
+- [x] Agregar índice único en `code`
+- [x] Agregar relación `Product` → `Category` (FK `categoryId`) y `Product` → `Brand` (FK `brandId`)
+- [x] Agregar relaciones inversas en `Category` y `Brand` (`products Product[]`)
+- [x] Crear migración de base de datos
+
+### API (NestJS)
+
+- [x] Crear `ProductsModule` con `ProductsService` y `ProductsController`
+- [x] `POST /products` — crear producto; validar `code` único; verificar que `categoryId` y `brandId` existan y estén activos; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `GET /products` — listar paginado (20/página); filtros: `search` (código, nombre, descripción), `categoryId`, `brandId`, `isActive`, rango de precios; activos por defecto; incluir nombre de categoría y marca en respuesta
+- [x] `GET /products/:id` — detalle del producto
+- [x] `PATCH /products/:id` — editar; validar `code` único si cambia; verificar categoría y marca activas; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /products/:id/deactivate` — cambiar `isActive = false`; mostrar advertencia si tiene ventas; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `PATCH /products/:id/activate` — cambiar `isActive = true`; guard `ADMIN | INVENTORY_MANAGER`
+- [x] Validar que `salePrice > cost` (advertencia, no error bloqueante)
+- [x] `DTO CreateProductDto` y `UpdateProductDto` con `class-validator`: `@IsPositive` en `cost` y `salePrice`, `@Min(0)` en `minStock`
+- [x] Registrar operaciones con usuario responsable y timestamp
+- [ ] No exponer `cost` a usuarios con rol `SELLER` (filtrar campo en la respuesta)
+
+### Frontend (React)
+
+- [x] Crear página `/products` protegida para todos los roles autenticados (solo consulta para `SELLER`)
+- [x] Tabla paginada con columnas: código, nombre, categoría, marca, precio de venta, stock actual, stock mínimo, estado
+- [ ] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
+- [x] Buscador por código, nombre o descripción (debounce)
+- [x] Filtros por categoría, marca, estado; activo por defecto
+- [x] Botón "Nuevo producto" → formulario con todos los campos; selectores de categoría y marca que solo muestran activos
+- [ ] Advertencia visual si `salePrice <= cost` al completar el formulario
+- [x] Botón "Editar" → formulario pre-poblado
+- [x] Botón "Desactivar" / "Activar" con diálogo de confirmación
+- [x] Integrar con TanStack Query; invalidar caché tras mutaciones

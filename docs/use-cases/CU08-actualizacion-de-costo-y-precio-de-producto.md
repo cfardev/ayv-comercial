@@ -82,3 +82,36 @@ El actor selecciona un producto desde "Gestión de productos" (CU07) y elige la 
 - A: El sistema impide guardar valores no numéricos o negativos.
 - A: El sistema registra cada cambio en el historial con trazabilidad completa.
 - A: Las facturas existentes no se ven afectadas por cambios de precio posteriores.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (modelo `Product` con `cost` y `salePrice`)  
+> **Orden sugerido de desarrollo:** #8
+
+### Base de datos
+
+- [ ] Crear modelo Prisma `PriceHistory` con campos: `id`, `productId`, `previousCost` (Decimal), `newCost` (Decimal), `previousSalePrice` (Decimal), `newSalePrice` (Decimal), `justification?`, `changedBy` (userId), `createdAt`; con `@@map("price_history")`
+- [ ] Agregar relación `PriceHistory` → `Product` (FK `productId`) y `PriceHistory` → `User` (FK `changedBy`)
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] Crear endpoint `PATCH /products/:id/pricing` — actualizar costo y/o precio; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] Validar que `cost > 0` y `salePrice > 0` (valores positivos)
+- [ ] Si `salePrice <= cost`: retornar advertencia en la respuesta (no bloquear, pero requerir flag `forceNegativeMargin: true` en body)
+- [ ] Si variación > 50% respecto al precio anterior: retornar advertencia (requerir flag `forceLargeVariation: true`)
+- [ ] Crear registro en `PriceHistory` con valores anteriores, nuevos, justificación y usuario responsable
+- [ ] Actualizar `cost` y `salePrice` en `Product` de forma atómica (transacción Prisma)
+- [ ] Rechazar si el producto está inactivo (error 400)
+- [ ] `DTO UpdatePricingDto` con `@IsPositive` en cost y salePrice, `justification?`
+
+### Frontend (React)
+
+- [ ] Agregar opción "Actualizar precios" en la página de detalle o fila de producto en `/products`
+- [ ] Formulario (modal) que muestre: nombre, código, costo actual, precio actual, margen actual (%)
+- [ ] Campos para nuevo costo y nuevo precio con cálculo en tiempo real del nuevo margen
+- [ ] Mostrar advertencia visual si nuevo `salePrice <= cost`
+- [ ] Mostrar advertencia visual si variación > 50% respecto al valor anterior
+- [ ] Campo opcional de justificación
+- [ ] Confirmar envío con botón explícito; si hay advertencias, mostrar diálogo de confirmación adicional
+- [ ] Integrar con TanStack Query (`useMutation`); invalidar caché de producto tras éxito

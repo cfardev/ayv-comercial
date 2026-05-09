@@ -86,3 +86,37 @@ El actor selecciona la opción "Registrar entrada" desde el módulo de inventari
 - A: El sistema impide registrar cantidades no numéricas o negativas.
 - A: El sistema genera un registro en el historial de movimientos de inventario.
 - A: Las entradas quedan vinculadas al usuario que las registra.
+
+## Implementación técnica
+
+> **Dependencias:** CU07 (productos), CU06 (proveedores), CU09 (órdenes de compra)  
+> **Orden sugerido de desarrollo:** #11
+
+### Base de datos
+
+- [ ] Crear enum `InventoryEntryType` (`PURCHASE`, `RETURN`, `INITIAL_STOCK`); registrar en `schema.prisma`
+- [ ] Crear modelo Prisma `InventoryEntry` con campos: `id`, `entryType` (InventoryEntryType), `referenceDocument?`, `supplierId?`, `purchaseOrderId?`, `entryDate`, `notes?`, `createdBy` (userId), `createdAt`; con `@@map("inventory_entries")`
+- [ ] Crear modelo `InventoryEntryItem` con campos: `id`, `inventoryEntryId`, `productId`, `quantityReceived` (Int), `lotNumber?`, `expirationDate?`; con `@@map("inventory_entry_items")`
+- [ ] Crear modelo `InventoryMovement` con campos: `id`, `productId`, `movementType` (enum: `ENTRY`, `EXIT`, `ADJUSTMENT_POSITIVE`, `ADJUSTMENT_NEGATIVE`), `quantity` (Int), `previousStock` (Int), `newStock` (Int), `referenceId?`, `referenceType?`, `createdBy` (userId), `createdAt`; con `@@map("inventory_movements")`
+- [ ] Relaciones: `InventoryEntry` → `Supplier?`, `PurchaseOrder?`, `User`, `InventoryEntryItem[]`
+- [ ] Crear migración de base de datos
+
+### API (NestJS)
+
+- [ ] Crear `InventoryModule` con `InventoryService` y `InventoryController`
+- [ ] `POST /inventory/entries` — crear entrada; validar productos activos, cantidades > 0; si `entryType === PURCHASE` requerir `supplierId`; si `purchaseOrderId` proporcionado, validar que la orden exista y esté en SENT o PARTIAL; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] Actualizar `currentStock` de cada producto en transacción Prisma: `currentStock += quantityReceived`
+- [ ] Crear registros `InventoryMovement` tipo `ENTRY` por cada item, con `previousStock` y `newStock`
+- [ ] Si entrada vinculada a `PurchaseOrder`, evaluar si actualizar estado de la orden a `PARTIAL` o `RECEIVED`
+- [ ] `GET /inventory/entries` — listar paginado con filtros; guard `ADMIN | INVENTORY_MANAGER`
+- [ ] `GET /inventory/entries/:id` — detalle con items
+- [ ] `DTO CreateInventoryEntryDto` con `items: CreateEntryItemDto[]`; `@ArrayMinSize(1)`
+
+### Frontend (React)
+
+- [ ] Crear página `/inventory/entries` protegida para `ADMIN | INVENTORY_MANAGER`
+- [ ] Formulario de nueva entrada: selector de tipo (compra, devolución, stock inicial), número de documento, proveedor (si compra), fecha, observaciones
+- [ ] Sección de items: agregar/eliminar productos con cantidad, número de lote (opcional), fecha de vencimiento (opcional)
+- [ ] Opción de vincular a una orden de compra existente (selector de órdenes en estado SENT o PARTIAL)
+- [ ] Confirmar entrada; mostrar mensaje de éxito con número de entrada generado
+- [ ] Integrar con TanStack Query; invalidar caché de existencias (CU11) tras mutaciones
