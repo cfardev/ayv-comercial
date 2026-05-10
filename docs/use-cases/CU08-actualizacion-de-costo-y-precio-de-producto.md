@@ -90,28 +90,28 @@ El actor selecciona un producto desde "Gestión de productos" (CU07) y elige la 
 
 ### Base de datos
 
-- [ ] Crear modelo Prisma `PriceHistory` con campos: `id`, `productId`, `previousCost` (Decimal), `newCost` (Decimal), `previousSalePrice` (Decimal), `newSalePrice` (Decimal), `justification?`, `changedBy` (userId), `createdAt`; con `@@map("price_history")`
-- [ ] Agregar relación `PriceHistory` → `Product` (FK `productId`) y `PriceHistory` → `User` (FK `changedBy`)
-- [ ] Crear migración de base de datos
+- [x] Crear modelo Prisma `PriceHistory` con campos: `id`, `productId`, `previousCost` (Decimal), `newCost` (Decimal), `previousSalePrice` (Decimal), `newSalePrice` (Decimal), `justification?`, `changedBy` (userId), `createdAt`; con `@@map("price_history")`
+- [x] Agregar relación `PriceHistory` → `Product` (FK `productId`) y `PriceHistory` → `User` (FK `changedBy`)
+- [x] Crear migración de base de datos
 
 ### API (NestJS)
 
-- [ ] Crear endpoint `PATCH /products/:id/pricing` — actualizar costo y/o precio; guard `ADMIN | INVENTORY_MANAGER`
-- [ ] Validar que `cost > 0` y `salePrice > 0` (valores positivos)
-- [ ] Si `salePrice <= cost`: retornar advertencia en la respuesta (no bloquear, pero requerir flag `forceNegativeMargin: true` en body)
-- [ ] Si variación > 50% respecto al precio anterior: retornar advertencia (requerir flag `forceLargeVariation: true`)
-- [ ] Crear registro en `PriceHistory` con valores anteriores, nuevos, justificación y usuario responsable
-- [ ] Actualizar `cost` y `salePrice` en `Product` de forma atómica (transacción Prisma)
-- [ ] Rechazar si el producto está inactivo (error 400)
-- [ ] `DTO UpdatePricingDto` con `@IsPositive` en cost y salePrice, `justification?`
+- [x] Crear endpoint `PATCH /products/:id/pricing` — actualizar costo y/o precio; guard `ADMIN | INVENTORY_MANAGER`
+- [x] Validar que `cost > 0` y `salePrice > 0` (valores positivos)
+- [x] Si `salePrice <= cost`: retornar advertencia en la respuesta (no bloquear, pero requerir flag `forceNegativeMargin: true` en body)
+- [x] Si variación > 50% respecto al precio anterior: retornar advertencia (requerir flag `forceLargeVariation: true`)
+- [x] Crear registro en `PriceHistory` con valores anteriores, nuevos, justificación y usuario responsable
+- [x] Actualizar `cost` y `salePrice` en `Product` de forma atómica (transacción Prisma)
+- [x] Rechazar si el producto está inactivo (error 400)
+- [x] `DTO UpdatePricingDto` con `@IsPositive` en cost y salePrice, `justification?`
 
 ### Frontend (React)
 
-- [ ] Agregar opción "Actualizar precios" en la página de detalle o fila de producto en `/products`
-- [ ] Formulario (modal) que muestre: nombre, código, costo actual, precio actual, margen actual (%)
-- [ ] Campos para nuevo costo y nuevo precio con cálculo en tiempo real del nuevo margen
-- [ ] Mostrar advertencia visual si nuevo `salePrice <= cost`
-- [ ] Mostrar advertencia visual si variación > 50% respecto al valor anterior
-- [ ] Campo opcional de justificación
-- [ ] Confirmar envío con botón explícito; si hay advertencias, mostrar diálogo de confirmación adicional
-- [ ] Integrar con TanStack Query (`useMutation`); invalidar caché de producto tras éxito
+- [x] Agregar opción "Actualizar precios" en la página de detalle o fila de producto en `/products`
+- [x] Formulario (modal) que muestre: nombre, código, costo actual, precio actual, margen actual (%)
+- [x] Campos para nuevo costo y nuevo precio con cálculo en tiempo real del nuevo margen
+- [x] Mostrar advertencia visual si nuevo `salePrice <= cost`
+- [x] Mostrar advertencia visual si variación > 50% respecto al valor anterior
+- [x] Campo opcional de justificación
+- [x] Confirmar envío con botón explícito; si hay advertencias, mostrar diálogo de confirmación adicional
+- [x] Integrar con TanStack Query (`useMutation`); invalidar caché de producto tras éxito
