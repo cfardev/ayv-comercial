@@ -27,8 +27,8 @@ El sistema verifica el stock de todos los productos:
 1. El sistema compara el stock actual con el stock mínimo de cada producto.
 2. Los productos con stock actual menor al stock mínimo se incluyen en la lista de alerta.
 3. El sistema notifica a los usuarios con rol encargado de inventario y administrador.
-4. La alerta incluye: producto, stock actual, stock mínimo, déficit calculado, última fecha de movimiento.
-5. El actor puede filtrar las alertas por categoría o producto.
+4. La alerta incluye: producto, proveedor, stock actual, stock mínimo, déficit calculado, última fecha de movimiento.
+5. El actor puede filtrar las alertas por categoría, proveedor o producto.
 6. El actor puede marcar una alerta como "atendida" o "ignorada" con备注.
 
 ## Flujos alternos
@@ -76,7 +76,7 @@ El sistema verifica el stock de todos los productos:
 
 ## Implementación técnica
 
-> **Dependencias:** CU07 (campo `minStock` en `Product`), CU11 (stock actual), CU10 y CU12 (movimientos que disparan verificación)  
+> **Dependencias:** CU07 (campo `minStock` en `Product`), CU11 (stock actual), CU10 y CU15 (movimientos que disparan verificación)  
 > **Orden sugerido de desarrollo:** #24
 
 ### Base de datos
@@ -89,8 +89,8 @@ El sistema verifica el stock de todos los productos:
 ### API (NestJS)
 
 - [ ] Implementar método de servicio `checkAndCreateStockAlerts(productIds: string[])` que compare `currentStock` vs `minStock` y cree o resuelva alertas según corresponda
-- [ ] Llamar `checkAndCreateStockAlerts` desde `InventoryService` al finalizar cada entrada (CU10), ajuste (CU12) y salida por venta (CU15)
-- [ ] `GET /stock-alerts` — listar alertas activas con filtros: `severity` (CRITICAL | LOW), `categoryId`, `productId`; guard: todos los roles autenticados
+- [ ] Llamar `checkAndCreateStockAlerts` desde `InventoryService` al finalizar cada entrada (CU10) y salida por venta (CU15)
+- [ ] `GET /stock-alerts` — listar alertas activas con filtros: `severity` (CRITICAL | LOW), `categoryId`, `supplierId`, `productId`; guard: todos los roles autenticados
 - [ ] `PATCH /stock-alerts/:id/attend` — marcar alerta como `ATTENDED` con `notes`; guard `ADMIN | INVENTORY_MANAGER`
 - [ ] `PATCH /stock-alerts/:id/ignore` — marcar como `IGNORED` con `notes`; guard `ADMIN | INVENTORY_MANAGER`
 - [ ] Resolver (`RESOLVED`) alertas automáticamente cuando `currentStock >= minStock` en `checkAndCreateStockAlerts`
@@ -98,9 +98,9 @@ El sistema verifica el stock de todos los productos:
 ### Frontend (React)
 
 - [ ] Crear página `/inventory/alerts` accesible para todos los roles autenticados
-- [ ] Tabla con columnas: producto, stock actual, stock mínimo, déficit, severidad, última actualización
+- [ ] Tabla con columnas: producto, proveedor, stock actual, stock mínimo, déficit, severidad, última actualización
 - [ ] Badge rojo "CRÍTICA" para stock = 0; badge naranja "BAJO" para stock < mínimo
-- [ ] Filtros por severidad y categoría
+- [ ] Filtros por severidad, categoría y proveedor
 - [ ] Acciones por alerta: "Marcar como atendida" (con campo de nota) y "Ignorar"
 - [ ] Indicador numérico de alertas activas en el menú de navegación (badge rojo)
 - [ ] Integrar con TanStack Query con `refetchInterval` para actualización periódica

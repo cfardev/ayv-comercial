@@ -17,6 +17,7 @@ Registrar, consultar, editar y desactivar productos del catálogo de la distribu
 - A: El actor tiene permisos para gestionar productos.
 - A: Existen categorías disponibles para clasificar los productos (referencia CU04).
 - A: Existen marcas disponibles para identificar el fabricante o línea comercial del producto (referencia CU05).
+- A: Existen proveedores activos disponibles para asignar al producto (referencia CU06).
 
 ## Disparador
 
@@ -27,8 +28,8 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 ### Registro de producto
 
 1. El actor accede al formulario de nuevo producto.
-2. El sistema presenta los campos: código, nombre, descripción, categoría, marca, unidad de medida, costo, precio de venta, stock mínimo, estado.
-3. El actor completa los campos obligatorios (código, nombre, categoría, marca, costo, precio de venta).
+2. El sistema presenta los campos: código, nombre, descripción, categoría, marca, proveedor, unidad de medida, costo, precio de venta, stock mínimo, estado.
+3. El actor completa los campos obligatorios (código, nombre, categoría, marca, proveedor, costo, precio de venta).
 4. El sistema valida que el código no esté duplicado.
 5. El sistema crea el producto con estado activo y fecha de creación.
 6. El sistema muestra un mensaje de confirmación y actualiza la lista de productos.
@@ -36,17 +37,17 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 ### Consulta de productos
 
 1. El actor accede a la lista de productos.
-2. El sistema muestra la tabla con columnas: código, nombre, categoría, marca, costo, precio de venta, stock actual, stock mínimo, estado.
+2. El sistema muestra la tabla con columnas: código, nombre, categoría, marca, proveedor, costo, precio de venta, stock actual, stock mínimo, estado.
 3. El actor puede buscar por código, nombre o descripción.
-4. El actor puede filtrar por categoría, marca, estado (activo/inactivo) o rango de precios.
+4. El actor puede filtrar por categoría, marca, proveedor, estado (activo/inactivo) o rango de precios.
 5. El sistema presenta los resultados paginados (20 por página).
 
 ### Edición de producto
 
 1. El actor selecciona un producto de la lista y elige "Editar".
 2. El sistema presenta el formulario pre-poblado con los datos actuales.
-3. El actor modifica los campos deseados (nombre, descripción, categoría, marca, costos, precios).
-4. El sistema valida los datos modificados (código único si cambia, precios numéricos positivos).
+3. El actor modifica los campos deseados (nombre, descripción, categoría, marca, proveedor, costos, precios).
+4. El sistema valida los datos modificados (código único si cambia, precios numéricos positivos, proveedor activo).
 5. El sistema actualiza el registro con la nueva información.
 6. El sistema muestra un mensaje de confirmación.
 
@@ -108,8 +109,9 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - A: Los productos desactivados no aparecen en el catálogo ni en nuevas ventas.
 - A: Los productos activos no pueden tener categoría inactiva.
 - A: Los productos activos no pueden tener marca inactiva.
-- A: Un producto no queda asociado a un proveedor único dentro de su ficha maestra.
-- A: La relación entre productos y proveedores se registra en las órdenes de compra (CU09) y/o entradas de inventario (CU10).
+- A: Los productos activos no pueden tener proveedor inactivo.
+- A: Cada producto está asociado a un único proveedor.
+- A: La relación entre producto y proveedor se establece en la ficha maestra del producto y se refleja en las órdenes de compra (CU09).
 
 ## Reglas de seguridad
 
@@ -131,24 +133,24 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 
 ## Implementación técnica
 
-> **Dependencias:** CU04 (categorías), CU05 (marcas)  
+> **Dependencias:** CU04 (categorías), CU05 (marcas), CU06 (proveedores)  
 > **Orden sugerido de desarrollo:** #7
 
 ### Base de datos
 
-- [x] Crear modelo Prisma `Product` con campos: `id`, `code` (único), `name`, `description?`, `categoryId`, `brandId`, `unitOfMeasure`, `cost` (Decimal), `salePrice` (Decimal), `minStock` (Int, default 0), `currentStock` (Int, default 0), `isActive`, `createdAt`, `updatedAt`; con `@@map("products")`
+- [x] Crear modelo Prisma `Product` con campos: `id`, `code` (único), `name`, `description?`, `categoryId`, `brandId`, `supplierId`, `unitOfMeasure`, `cost` (Decimal), `salePrice` (Decimal), `minStock` (Int, default 0), `currentStock` (Int, default 0), `isActive`, `createdAt`, `updatedAt`; con `@@map("products")`
 - [x] Agregar índice único en `code`
-- [x] Agregar relación `Product` → `Category` (FK `categoryId`) y `Product` → `Brand` (FK `brandId`)
-- [x] Agregar relaciones inversas en `Category` y `Brand` (`products Product[]`)
+- [x] Agregar relación `Product` → `Category` (FK `categoryId`), `Product` → `Brand` (FK `brandId`) y `Product` → `Supplier` (FK `supplierId`)
+- [x] Agregar relaciones inversas en `Category`, `Brand` y `Supplier` (`products Product[]`)
 - [x] Crear migración de base de datos
 
 ### API (NestJS)
 
 - [x] Crear `ProductsModule` con `ProductsService` y `ProductsController`
-- [x] `POST /products` — crear producto; validar `code` único; verificar que `categoryId` y `brandId` existan y estén activos; guard `ADMIN | INVENTORY_MANAGER`
-- [x] `GET /products` — listar paginado (20/página); filtros: `search` (código, nombre, descripción), `categoryId`, `brandId`, `isActive`, rango de precios; activos por defecto; incluir nombre de categoría y marca en respuesta
-- [x] `GET /products/:id` — detalle del producto
-- [x] `PATCH /products/:id` — editar; validar `code` único si cambia; verificar categoría y marca activas; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `POST /products` — crear producto; validar `code` único; verificar que `categoryId`, `brandId` y `supplierId` existan y estén activos; guard `ADMIN | INVENTORY_MANAGER`
+- [x] `GET /products` — listar paginado (20/página); filtros: `search` (código, nombre, descripción), `categoryId`, `brandId`, `supplierId`, `isActive`, rango de precios; activos por defecto; incluir nombre de categoría, marca y proveedor en respuesta
+- [x] `GET /products` — detalle del producto
+- [x] `PATCH /products/:id` — editar; validar `code` único si cambia; verificar categoría, marca y proveedor activos; guard `ADMIN | INVENTORY_MANAGER`
 - [x] `PATCH /products/:id/deactivate` — cambiar `isActive = false`; mostrar advertencia si tiene ventas; guard `ADMIN | INVENTORY_MANAGER`
 - [x] `PATCH /products/:id/activate` — cambiar `isActive = true`; guard `ADMIN | INVENTORY_MANAGER`
 - [x] Validar que `salePrice > cost` (advertencia, no error bloqueante)
@@ -159,11 +161,11 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 ### Frontend (React)
 
 - [x] Crear página `/products` protegida para todos los roles autenticados (solo consulta para `SELLER`)
-- [x] Tabla paginada con columnas: código, nombre, categoría, marca, precio de venta, stock actual, stock mínimo, estado
+- [x] Tabla paginada con columnas: código, nombre, categoría, marca, proveedor, precio de venta, stock actual, stock mínimo, estado
 - [x] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
 - [x] Buscador por código, nombre o descripción (debounce)
-- [x] Filtros por categoría, marca, estado; activo por defecto
-- [x] Botón "Nuevo producto" → formulario con todos los campos; selectores de categoría y marca que solo muestran activos
+- [x] Filtros por categoría, marca, proveedor, estado; activo por defecto
+- [x] Botón "Nuevo producto" → formulario con todos los campos; selectores de categoría, marca y proveedor que solo muestran activos
 - [x] Advertencia visual si `salePrice <= cost` al completar el formulario
 - [x] Botón "Editar" → formulario pre-poblado
 - [x] Botón "Desactivar" / "Activar" con diálogo de confirmación

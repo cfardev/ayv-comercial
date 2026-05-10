@@ -88,8 +88,8 @@ El actor selecciona la opción "Gestión de proveedores" desde el menú de compr
 
 - A: No puede haber dos proveedores con el mismo documento fiscal.
 - A: Un proveedor inactivo no puede utilizarse en nuevas órdenes de compra (referencia CU09).
-- A: Un producto no queda ligado a un proveedor único; la relación entre productos y proveedores se materializa en las órdenes de compra (CU09) y/o entradas de inventario (CU10).
-- A: Un proveedor puede abastecer múltiples productos y un mismo producto puede ser adquirido a múltiples proveedores.
+- A: Cada producto del catálogo está asociado a un único proveedor.
+- A: Un proveedor puede abastecer múltiples productos, pero un producto solo se compra al proveedor al que está asociado.
 
 ## Reglas de seguridad
 

@@ -23,8 +23,8 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 ## Flujo principal
 
 1. El actor accede a la vista de movimientos de inventario.
-2. El sistema muestra la tabla con columnas: fecha y hora, tipo de movimiento (entrada, ajuste positivo, ajuste negativo, salida), producto, cantidad, documento de referencia, usuario responsable.
-3. El actor puede filtrar por tipo de movimiento, rango de fechas, producto o usuario.
+2. El sistema muestra la tabla con columnas: fecha y hora, tipo de movimiento (entrada, salida), producto, proveedor, cantidad, documento de referencia, usuario responsable.
+3. El actor puede filtrar por tipo de movimiento, rango de fechas, producto, proveedor o usuario.
 4. El actor puede ordenar por fecha, producto o cantidad.
 5. El sistema presenta los resultados paginados (20 por página).
 
@@ -42,10 +42,6 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 
 - A: El actor puede exportar la consulta a formato Excel o PDF para reportes externos.
 
-### FA4 - Movimiento de ajuste
-
-- A: Si el movimiento es un ajuste, el sistema muestra el motivo del ajuste y las cantidades antes y después.
-
 ## Postcondiciones
 
 - A: La consulta muestra información del período seleccionado.
@@ -55,7 +51,7 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 
 - A: Los movimientos se registran cronológicamente con todos los datos de trazabilidad.
 - A: Solo se muestran movimientos de productos activos, salvo que el filtro incluya inactivos.
-- A: Los movimientos incluyen: entrada, ajuste positivo, ajuste negativo, salida por venta, salida por ajuste.
+- A: Los movimientos incluyen: entrada por recepción de compra, salida por venta.
 
 ## Reglas de seguridad
 
@@ -72,7 +68,7 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 
 ## Implementación técnica
 
-> **Dependencias:** CU10 (modelo `InventoryMovement`), CU12 (ajustes)  
+> **Dependencias:** CU10 (modelo `InventoryMovement`)  
 > **Orden sugerido de desarrollo:** #14
 
 ### Base de datos
@@ -82,8 +78,8 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 
 ### API (NestJS)
 
-- [ ] `GET /inventory/movements` — listar movimientos paginado; filtros: `movementType`, rango de fechas (`startDate`, `endDate`), `productId`, `createdBy`; guard: todos los roles autenticados
-- [ ] Incluir en respuesta: fecha/hora, tipo, producto (nombre + código), cantidad, documento de referencia, usuario responsable, stock anterior, stock nuevo
+- [ ] `GET /inventory/movements` — listar movimientos paginado; filtros: `movementType`, rango de fechas (`startDate`, `endDate`), `productId`, `supplierId`, `createdBy`; guard: todos los roles autenticados
+- [ ] Incluir en respuesta: fecha/hora, tipo, producto (nombre + código), proveedor, cantidad, documento de referencia, usuario responsable, stock anterior, stock nuevo
 - [ ] Ocultar campos de costo en respuesta para rol `SELLER`
 - [ ] Soporte de ordenamiento por fecha, producto o cantidad
 - [ ] `GET /inventory/movements/:id` — detalle de un movimiento (incluir motivo si es ajuste)
@@ -91,8 +87,8 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 ### Frontend (React)
 
 - [ ] Crear página `/inventory/movements` protegida para todos los roles autenticados
-- [ ] Tabla paginada con columnas: fecha/hora, tipo, producto, cantidad, documento de referencia, usuario
-- [ ] Chips de tipo de movimiento: entrada (verde), ajuste positivo (azul), ajuste negativo (naranja), salida (rojo)
-- [ ] Filtros por tipo de movimiento, rango de fechas, producto y usuario
+- [ ] Tabla paginada con columnas: fecha/hora, tipo, producto, proveedor, cantidad, documento de referencia, usuario
+- [ ] Chips de tipo de movimiento: entrada (verde), salida (rojo)
+- [ ] Filtros por tipo de movimiento, rango de fechas, producto, proveedor y usuario
 - [ ] Click en fila para ver detalle (modal o página): incluir motivo del ajuste y valores antes/después
 - [ ] Integrar con TanStack Query (`useQuery`)

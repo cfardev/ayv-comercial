@@ -23,9 +23,9 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 ## Flujo principal
 
 1. El actor accede a la vista de existencias.
-2. El sistema muestra la tabla con columnas: código de producto, nombre, categoría, marca, stock actual, stock mínimo, estado (normal/bajo/agotado), última actualización.
+2. El sistema muestra la tabla con columnas: código de producto, nombre, categoría, marca, proveedor, stock actual, stock mínimo, estado (normal/bajo/agotado), última actualización.
 3. El actor puede buscar por código, nombre o categoría.
-4. El actor puede filtrar por estado de stock (todos, bajo, agotado, normal), por categoría o por marca.
+4. El actor puede filtrar por estado de stock (todos, bajo, agotado, normal), por categoría, marca o proveedor.
 5. El actor puede ordenar por cualquier columna.
 6. El sistema presenta los resultados paginados (20 por página).
 
@@ -50,7 +50,7 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 ## Postcondiciones
 
 - A: La consulta muestra información actualizada al momento de la consulta.
-- A: Los datos son de solo lectura; para modificar stock se debe usar el registro de entrada (CU10) o ajuste de inventario (CU12).
+- A: Los datos son de solo lectura; el stock solo se modifica por recepción de órdenes de compra (CU10) o registro de ventas (CU15).
 
 ## Reglas de negocio
 
@@ -85,8 +85,8 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 
 ### API (NestJS)
 
-- [ ] `GET /inventory/stock` — listar existencias paginado; filtros: `search` (código, nombre), `categoryId`, `brandId`, `stockStatus` (NORMAL | LOW | OUT_OF_STOCK), `isActive`; guard: todos los roles autenticados
-- [ ] Incluir en respuesta: `code`, `name`, `categoryName`, `brandName`, `currentStock`, `minStock`, `stockStatus`, `updatedAt`
+- [ ] `GET /inventory/stock` — listar existencias paginado; filtros: `search` (código, nombre), `categoryId`, `brandId`, `supplierId`, `stockStatus` (NORMAL | LOW | OUT_OF_STOCK), `isActive`; guard: todos los roles autenticados
+- [ ] Incluir en respuesta: `code`, `name`, `categoryName`, `brandName`, `supplierName`, `currentStock`, `minStock`, `stockStatus`, `updatedAt`
 - [ ] Ocultar campo `cost` para usuarios con rol `SELLER`
 - [ ] Soporte de ordenamiento por cualquier columna (query param `sortBy`, `sortOrder`)
 - [ ] `GET /inventory/stock/:productId` — detalle de existencia de un producto
@@ -94,10 +94,10 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 ### Frontend (React)
 
 - [ ] Crear página `/inventory/stock` accesible para todos los roles autenticados
-- [ ] Tabla paginada con columnas: código, nombre, categoría, marca, stock actual, stock mínimo, estado, última actualización
+- [ ] Tabla paginada con columnas: código, nombre, categoría, marca, proveedor, stock actual, stock mínimo, estado, última actualización
 - [ ] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
 - [ ] Chips visuales de estado: verde (NORMAL), amarillo (LOW), rojo (OUT_OF_STOCK)
 - [ ] Buscador por código, nombre o categoría (debounce)
-- [ ] Filtros por estado de stock, categoría, marca
+- [ ] Filtros por estado de stock, categoría, marca, proveedor
 - [ ] Soporte de ordenamiento por clic en columna de la tabla
 - [ ] Integrar con TanStack Query (`useQuery`) con refetch automático configurable

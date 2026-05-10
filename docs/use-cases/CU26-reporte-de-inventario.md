@@ -26,7 +26,7 @@ El actor selecciona la opción "Reporte de inventario" desde el menú de reporte
 2. El sistema presenta las opciones: tipo de reporte (resumido/detallado), formato de salida (PDF/Excel), filtros (categoría, proveedor, estado del stock).
 3. El actor selecciona las opciones y ejecuta el reporte.
 4. El sistema genera el reporte con las secciones: resumen general, detalle por categoría, detalle por producto, productos en alerta.
-5. El reporte incluye: código, nombre, categoría, stock actual, stock mínimo, costo unitario, valor total del inventario.
+5. El reporte incluye: código, nombre, categoría, marca, proveedor, stock actual, stock mínimo, costo unitario, valor total del inventario.
 6. El sistema presenta el reporte para visualización o descarga.
 
 ## Flujos alternos
@@ -57,7 +57,7 @@ El actor selecciona la opción "Reporte de inventario" desde el menú de reporte
 - A: El valor total del inventario se calcula como: suma(stock actual × costo unitario) por producto.
 - A: Los productos inactivos se incluyen solo si el filtro los especifica.
 - A: El reporte incluye productos con stock bajo como sección de alerta.
-- A: El filtro por proveedor se aplica sobre movimientos de abastecimiento o entradas de inventario asociadas a ese proveedor, no sobre un proveedor fijo del producto.
+- A: El filtro por proveedor se aplica sobre el proveedor asociado al producto.
 
 ## Reglas de seguridad
 
@@ -74,7 +74,7 @@ El actor selecciona la opción "Reporte de inventario" desde el menú de reporte
 
 ## Implementación técnica
 
-> **Dependencias:** CU07 (productos), CU11 (stock), CU12 (ajustes)  
+> **Dependencias:** CU07 (productos), CU11 (stock)  
 > **Orden sugerido de desarrollo:** #26
 
 ### Base de datos
@@ -84,8 +84,8 @@ El actor selecciona la opción "Reporte de inventario" desde el menú de reporte
 ### API (NestJS)
 
 - [ ] `GET /reports/inventory` — generar datos del reporte de inventario; guard `ADMIN | INVENTORY_MANAGER | OWNER_MANAGER`
-- [ ] Query params: `type` (SUMMARY | DETAILED), `categoryId?`, `stockStatus?` (LOW | OUT_OF_STOCK | NORMAL), `includeInactive` (boolean)
-- [ ] Incluir en respuesta: para cada producto: `code`, `name`, `categoryName`, `currentStock`, `minStock`, `stockStatus`; solo para ADMIN/MANAGER: `unitCost`, `totalInventoryValue` (currentStock × unitCost)
+- [ ] Query params: `type` (SUMMARY | DETAILED), `categoryId?`, `supplierId?`, `stockStatus?` (LOW | OUT_OF_STOCK | NORMAL), `includeInactive` (boolean)
+- [ ] Incluir en respuesta: para cada producto: `code`, `name`, `categoryName`, `brandName`, `supplierName`, `currentStock`, `minStock`, `stockStatus`; solo para ADMIN/MANAGER: `unitCost`, `totalInventoryValue` (currentStock × unitCost)
 - [ ] Sección de alertas: productos con `stockStatus !== NORMAL`
 - [ ] Resumen general: total de productos, total de unidades, valor total del inventario (solo ADMIN/MANAGER)
 - [ ] Endpoint de exportación: `GET /reports/inventory/export?format=pdf|excel` — generar archivo descargable (usar librería `exceljs` para Excel, `pdfkit` o `puppeteer` para PDF)
@@ -93,7 +93,7 @@ El actor selecciona la opción "Reporte de inventario" desde el menú de reporte
 ### Frontend (React)
 
 - [ ] Crear página `/reports/inventory` protegida para `ADMIN | INVENTORY_MANAGER | OWNER_MANAGER`
-- [ ] Panel de filtros: tipo (resumido/detallado), categoría, estado de stock
+- [ ] Panel de filtros: tipo (resumido/detallado), categoría, proveedor, estado de stock
 - [ ] Botón "Generar reporte" que carga la tabla con los resultados
 - [ ] Sección de resumen: total productos, total unidades, valor total del inventario (si autorizado)
 - [ ] Tabla de productos con columnas configuradas según tipo de reporte

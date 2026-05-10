@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Registrar una venta asociando el cliente, los productos seleccionados, cantidades y precios, generando el movimiento correspondiente en el inventario.
+Registrar una venta asociando el cliente, los productos seleccionados, cantidades y precios, generando el movimiento de salida de inventario correspondiente. La venta es la única vía de salida de stock del sistema.
 
 ## Actores
 
