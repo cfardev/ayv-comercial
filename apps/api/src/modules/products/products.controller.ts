@@ -20,8 +20,10 @@ import { getPermissionsForRole } from "../../auth/permissions/role-permissions.m
 import {
 	CreateProductDto,
 	ListProductsDto,
+	UpdatePricingDto,
 	UpdateProductDto,
 } from "./dto/index.js";
+import type { UpdatePricingResult } from "./entities/price-history.entity.js";
 import type { ProductEntity } from "./entities/product.entity.js";
 import type {
 	PaginatedResult,
@@ -151,5 +153,15 @@ export class ProductsController {
 		@Req() req: AuthenticatedRequest,
 	): Promise<ProductEntity> {
 		return this.productsService.reactivate(id, req.user.userId);
+	}
+
+	@Patch(":id/pricing")
+	@RequirePermissions(PERMISSION_KEYS.PRODUCTS_UPDATE)
+	async updatePricing(
+		@Param("id") id: string,
+		@Body() dto: UpdatePricingDto,
+		@Req() req: AuthenticatedRequest,
+	): Promise<UpdatePricingResult> {
+		return this.productsService.updatePricing(id, dto, req.user.userId);
 	}
 }

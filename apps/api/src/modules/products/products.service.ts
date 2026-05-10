@@ -7,7 +7,12 @@ import {
 import { Prisma } from "../../../generated/prisma/client.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
 import type { CreateProductDto } from "./dto/create-product.dto.js";
+import type { UpdatePricingDto } from "./dto/update-pricing.dto.js";
 import type { UpdateProductDto } from "./dto/update-product.dto.js";
+import type {
+	PriceHistoryEntity,
+	UpdatePricingResult,
+} from "./entities/price-history.entity.js";
 import type { ProductEntity } from "./entities/product.entity.js";
 import type {
 	PaginatedResult,
@@ -580,5 +585,108 @@ export class ProductsService {
 			...updated,
 			_stockCurrent: stockMap.get(id) ?? 0,
 		});
+	}
+
+	async updatePricing(
+		id: string,
+		dto: UpdatePricingDto,
+		actorId: string,
+	): Promise<UpdatePricingResult> {
+		const product = await this.prisma.product.findUnique({ where: { id } });
+		if (!product) {
+			throw new NotFoundException(`Producto con id "${id}" no encontrado.`);
+		}
+		if (!product.status) {
+			throw new BadRequestException(
+				"No se puede modificar el precio de un producto inactivo. Reactívalo primero.",
+			);
+		}
+
+		const prevCost = Number(product.cost);
+		const prevPrice = Number(product.price);
+		const newCost = dto.cost;
+		const newSalePrice = dto.salePrice;
+
+		// Negative margin check
+		const negativeMargin = newSalePrice <= newCost;
+		if (negativeMargin && !dto.forceNegativeMargin) {
+			throw new BadRequestException({
+				message:
+					"El precio de venta es menor o igual al costo (margen negativo). Confirma con forceNegativeMargin: true para continuar.",
+				warning: "NEGATIVE_MARGIN",
+				newMarginPercent:
+					prevCost > 0
+						? (((newSalePrice - newCost) / newCost) * 100).toFixed(2)
+						: null,
+			});
+		}
+
+		// Large variation check (based on previous price)
+		const variationPercent =
+			prevPrice > 0
+				? Math.abs(((newSalePrice - prevPrice) / prevPrice) * 100)
+				: 0;
+		const largeVariation = variationPercent > 50;
+		if (largeVariation && !dto.forceLargeVariation) {
+			throw new BadRequestException({
+				message: `La variación de precio es de ${variationPercent.toFixed(2)}% (supera el 50%). Confirma con forceLargeVariation: true para continuar.`,
+				warning: "LARGE_VARIATION",
+				variationPercent: variationPercent.toFixed(2),
+			});
+		}
+
+		// Atomic transaction: update product + create price history
+		const [updatedProduct, history] = await this.prisma.$transaction(
+			async (tx) => {
+				const updated = await tx.product.update({
+					where: { id },
+					data: {
+						cost: new Prisma.Decimal(newCost),
+						price: new Prisma.Decimal(newSalePrice),
+					},
+					select: { id: true, cost: true, price: true },
+				});
+
+				const ph = await tx.priceHistory.create({
+					data: {
+						productId: id,
+						previousCost: new Prisma.Decimal(prevCost),
+						newCost: new Prisma.Decimal(newCost),
+						previousSalePrice: new Prisma.Decimal(prevPrice),
+						newSalePrice: new Prisma.Decimal(newSalePrice),
+						justification: dto.justification ?? null,
+						changedBy: actorId,
+					},
+				});
+
+				return [updated, ph] as const;
+			},
+		);
+
+		const priceHistory: PriceHistoryEntity = {
+			id: history.id,
+			productId: history.productId,
+			previousCost: history.previousCost.toString(),
+			newCost: history.newCost.toString(),
+			previousSalePrice: history.previousSalePrice.toString(),
+			newSalePrice: history.newSalePrice.toString(),
+			justification: history.justification,
+			changedBy: history.changedBy,
+			createdAt: history.createdAt,
+		};
+
+		return {
+			product: {
+				id: updatedProduct.id,
+				cost: updatedProduct.cost.toString(),
+				price: updatedProduct.price.toString(),
+			},
+			priceHistory,
+			warnings: {
+				negativeMargin,
+				largeVariation,
+				variationPercent,
+			},
+		};
 	}
 }

@@ -83,22 +83,17 @@ For each task:
 
 > **If blocked:** If a task is unclear or requires a design decision, stop and ask the user. Do NOT guess or skip.
 
-### Step 7 — Final commit and summary
+### Step 7 — Final summary
 
-After all checkboxes are done:
+After all checkboxes are done, report summary and prompt for verification:
 
-1. Update `docs/ROADMAP.md`: change `🔄 En progreso` → `✅ Completo` for this CU.
-2. Commit: `docs: mark CUxx complete in ROADMAP`
-3. Push branch: `git push -u origin feat/CUxx-<kebab-title>`
-4. Report summary:
-
-> **CUxx — <Título>** implementado.
+> **CUxx — <Título>** implementado localmente.
 >
 > - Rama: `feat/CUxx-<kebab-title>`
 > - Commits: <N>
 > - Tareas completadas: <N>/<N>
 >
-> ¿Deseas crear un Pull Request?
+> Revisa los cambios y ejecuta `/cu-verify CUxx` para verificar que todo está correctamente implementado antes de hacer push y crear el PR.
 
 ## Implementation guidelines
 
