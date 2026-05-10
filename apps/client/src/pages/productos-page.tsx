@@ -20,14 +20,19 @@ import { useBrandsList } from "@/modules/brands/hooks/use-brands.js";
 import { useCategories } from "@/modules/categories/hooks/use-categories.js";
 import { ProductFormDialog } from "@/modules/products/components/product-form-dialog.js";
 import { ProductsTable } from "@/modules/products/components/products-table.js";
+import { UpdatePricingDialog } from "@/modules/products/components/update-pricing-dialog.js";
 import {
 	useDeactivateProduct,
 	useProductDeactivationInfo,
 	useProducts,
 	useReactivateProduct,
+	useUpdatePricing,
 	useUpdateProduct,
 } from "@/modules/products/hooks/use-products.js";
-import type { Product } from "@/modules/products/types/api.js";
+import type {
+	Product,
+	UpdatePricingPayload,
+} from "@/modules/products/types/api.js";
 import type { ProductFormValues } from "@/modules/products/types/schema.js";
 import { buildUpdateProductPayload } from "@/modules/products/utils/build-product-api-payload.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
@@ -70,6 +75,11 @@ export function ProductosPage() {
 		PERMISSION_KEYS.PRODUCTS_UPDATE,
 		user?.role?.slug,
 	);
+	const canUpdatePricing = hasPermissionOrSystemAdmin(
+		user?.permissions,
+		PERMISSION_KEYS.PRODUCTS_UPDATE,
+		user?.role?.slug,
+	);
 
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
@@ -87,6 +97,10 @@ export function ProductosPage() {
 		action: "deactivate" | "reactivate" | null;
 		salesCount: number;
 	}>({ open: false, product: null, action: null, salesCount: 0 });
+
+	const [pricingDialogOpen, setPricingDialogOpen] = useState(false);
+	const [pricingProduct, setPricingProduct] = useState<Product | null>(null);
+	const [pricingError, setPricingError] = useState<string | null>(null);
 
 	const [pendingDeactivateId, setPendingDeactivateId] = useState<string | null>(
 		null,
@@ -126,6 +140,7 @@ export function ProductosPage() {
 	const updateProduct = useUpdateProduct();
 	const deactivateProduct = useDeactivateProduct();
 	const reactivateProduct = useReactivateProduct();
+	const updatePricing = useUpdatePricing();
 
 	const products = productsData?.data ?? [];
 	const total = productsData?.total ?? 0;
@@ -150,6 +165,26 @@ export function ProductosPage() {
 		setFormError(null);
 		setEditingProduct(product);
 		setEditDialogOpen(true);
+	}
+
+	function handleOpenPricingDialog(product: Product) {
+		setPricingError(null);
+		setPricingProduct(product);
+		setPricingDialogOpen(true);
+	}
+
+	async function handleSubmitPricing(payload: UpdatePricingPayload) {
+		if (!pricingProduct) return;
+		setPricingError(null);
+		try {
+			await updatePricing.mutateAsync({ id: pricingProduct.id, data: payload });
+			setPricingDialogOpen(false);
+			setPricingProduct(null);
+		} catch (e) {
+			setPricingError(
+				e instanceof Error ? e.message : "Error al guardar precios",
+			);
+		}
 	}
 
 	function handleDeactivate(product: Product) {
@@ -355,9 +390,11 @@ export function ProductosPage() {
 				onEdit={handleEdit}
 				onDeactivate={handleDeactivate}
 				onReactivate={handleReactivate}
+				onUpdatePricing={handleOpenPricingDialog}
 				canEdit={canEdit}
 				canDeactivate={canDeactivate}
 				canReactivate={canReactivate}
+				canUpdatePricing={canUpdatePricing}
 				canViewCost={canViewCost}
 				isLoading={productsLoading}
 			/>
@@ -424,6 +461,21 @@ export function ProductosPage() {
 				onConfirm={handleConfirm}
 				isLoading={isConfirmLoading}
 				variant={confirmProps.variant}
+			/>
+
+			<UpdatePricingDialog
+				open={pricingDialogOpen}
+				onOpenChange={(open) => {
+					setPricingDialogOpen(open);
+					if (!open) {
+						setPricingProduct(null);
+						setPricingError(null);
+					}
+				}}
+				product={pricingProduct}
+				onSubmit={handleSubmitPricing}
+				isLoading={updatePricing.isPending}
+				errorMessage={pricingError}
 			/>
 		</div>
 	);

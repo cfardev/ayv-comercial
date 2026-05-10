@@ -6,6 +6,8 @@ import type {
 	PaginatedResponse,
 	Product,
 	ProductFilters,
+	UpdatePricingPayload,
+	UpdatePricingResponse,
 	UpdateProductPayload,
 } from "../types/api.js";
 
@@ -187,5 +189,41 @@ export function useProductDeactivationInfo(id: string | null) {
 		queryKey: ["product-deactivation-info", id],
 		queryFn: () => fetchDeactivationInfo(id as string),
 		enabled: Boolean(id),
+	});
+}
+
+async function updatePricing(
+	id: string,
+	data: UpdatePricingPayload,
+): Promise<UpdatePricingResponse> {
+	const res = await authFetch(`${API_BASE}/products/${id}/pricing`, {
+		method: "PATCH",
+		body: JSON.stringify(data),
+	});
+	if (!res.ok) {
+		const err = await res.json().catch(() => ({}));
+		const errData = err as {
+			message?: string;
+			warning?: string;
+			variationPercent?: string;
+		};
+		const error = new Error(
+			errData.message ?? "Error al actualizar precios",
+		) as Error & { warning?: string; variationPercent?: string };
+		error.warning = errData.warning;
+		error.variationPercent = errData.variationPercent;
+		throw error;
+	}
+	return res.json() as Promise<UpdatePricingResponse>;
+}
+
+export function useUpdatePricing() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: ({ id, data }: { id: string; data: UpdatePricingPayload }) =>
+			updatePricing(id, data),
+		onSuccess: () => {
+			void qc.invalidateQueries({ queryKey: productsKey });
+		},
 	});
 }

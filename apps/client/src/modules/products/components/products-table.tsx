@@ -1,4 +1,9 @@
-import { IconEdit, IconRefresh, IconTrash } from "@tabler/icons-react";
+import {
+	IconCurrencyDollar,
+	IconEdit,
+	IconRefresh,
+	IconTrash,
+} from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,9 +22,11 @@ interface ProductsTableProps {
 	onEdit: (product: Product) => void;
 	onDeactivate: (product: Product) => void;
 	onReactivate: (product: Product) => void;
+	onUpdatePricing?: (product: Product) => void;
 	canEdit: boolean;
 	canDeactivate: boolean;
 	canReactivate: boolean;
+	canUpdatePricing?: boolean;
 	canViewCost?: boolean;
 	isLoading?: boolean;
 }
@@ -56,9 +63,11 @@ export function ProductsTable({
 	onEdit,
 	onDeactivate,
 	onReactivate,
+	onUpdatePricing,
 	canEdit,
 	canDeactivate,
 	canReactivate,
+	canUpdatePricing = false,
 	canViewCost = true,
 	isLoading,
 }: ProductsTableProps) {
@@ -179,6 +188,19 @@ export function ProductsTable({
 												aria-label="Editar"
 											>
 												<IconEdit className="size-4" />
+											</Button>
+										) : null}
+										{canUpdatePricing && product.status ? (
+											<Button
+												type="button"
+												variant="ghost"
+												size="icon"
+												className="cursor-pointer"
+												onClick={() => onUpdatePricing?.(product)}
+												aria-label="Actualizar precios"
+												title="Actualizar precios"
+											>
+												<IconCurrencyDollar className="size-4" />
 											</Button>
 										) : null}
 										{canDeactivate && product.status ? (

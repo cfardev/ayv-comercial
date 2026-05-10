@@ -83,3 +83,37 @@ export interface UpdateProductPayload {
 	minimumStock?: number;
 	supplier?: string;
 }
+
+export interface UpdatePricingPayload {
+	cost: number;
+	salePrice: number;
+	justification?: string;
+	forceNegativeMargin?: boolean;
+	forceLargeVariation?: boolean;
+}
+
+export interface PriceHistoryRecord {
+	id: string;
+	productId: string;
+	previousCost: string;
+	newCost: string;
+	previousSalePrice: string;
+	newSalePrice: string;
+	justification: string | null;
+	changedBy: string;
+	createdAt: string;
+}
+
+export interface UpdatePricingResponse {
+	product: {
+		id: string;
+		cost: string;
+		price: string;
+	};
+	priceHistory: PriceHistoryRecord;
+	warnings: {
+		negativeMargin: boolean;
+		largeVariation: boolean;
+		variationPercent: number;
+	};
+}
