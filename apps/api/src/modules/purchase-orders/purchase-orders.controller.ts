@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Get,
@@ -12,13 +13,17 @@ import {
 	UseGuards,
 } from "@nestjs/common";
 import type { Request } from "express";
-import { UserRole } from "../../../generated/prisma/client.js";
+import {
+	PurchaseOrderStatus,
+	UserRole,
+} from "../../../generated/prisma/client.js";
 import { RequirePermissions } from "../../auth/decorators/require-permissions.decorator.js";
 import { PermissionsGuard } from "../../auth/guards/permissions.guard.js";
 import { PERMISSION_KEYS } from "../../auth/permissions/permission-keys.js";
 import {
 	CreatePurchaseOrderDto,
 	ListPurchaseOrdersDto,
+	ProductsBySupplierDto,
 	UpdatePurchaseOrderStatusDto,
 } from "./dto/index.js";
 import type {
@@ -73,13 +78,22 @@ export class PurchaseOrdersController {
 		@Query() query: ListPurchaseOrdersDto,
 		@Req() req: AuthenticatedRequest,
 	): Promise<PaginatedResult<PurchaseOrderEntity>> {
+		const parsedStatus = query.status
+			? query.status
+					.split(",")
+					.map((value) => value.trim())
+					.filter((value) => value.length > 0)
+					.map((value) => {
+						if (!(value in PurchaseOrderStatus)) {
+							throw new BadRequestException(`Invalid status filter: ${value}`);
+						}
+						return value as PurchaseOrderStatus;
+					})
+			: undefined;
+
 		const filters: PurchaseOrderFilters = {
 			search: query.search,
-			status: query.status
-				? (query.status
-						.split(",")
-						.map((value) => value.trim()) as PurchaseOrderFilters["status"])
-				: undefined,
+			status: parsedStatus,
 			fromDate: query.fromDate,
 			toDate: query.toDate,
 			page: query.page ? Number(query.page) : undefined,
@@ -100,9 +114,9 @@ export class PurchaseOrdersController {
 	@Get("products-by-supplier")
 	@RequirePermissions(PERMISSION_KEYS.PURCHASE_ORDERS_READ)
 	async findProductsBySupplier(
-		@Query("supplierId") supplierId: string,
+		@Query() query: ProductsBySupplierDto,
 	): Promise<Array<{ id: string; name: string; cost: number }>> {
-		return this.purchaseOrdersService.findProductsBySupplier(supplierId);
+		return this.purchaseOrdersService.findProductsBySupplier(query.supplierId);
 	}
 
 	@Get(":id")

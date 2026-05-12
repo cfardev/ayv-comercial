@@ -25,6 +25,8 @@ const DEFAULT_STATUSES: PurchaseOrderStatus[] = [
 	PurchaseOrderStatus.SENT,
 ];
 
+const MAX_REFERENCE_RETRIES = 5;
+
 @Injectable()
 export class PurchaseOrdersService {
 	constructor(private readonly prisma: PrismaService) {}
@@ -61,6 +63,28 @@ export class PurchaseOrdersService {
 			createdAt: row.createdAt,
 			updatedAt: row.updatedAt,
 			items,
+		};
+	}
+
+	private toListEntity(
+		row: Prisma.PurchaseOrderGetPayload<{
+			include: { supplier: true };
+		}>,
+	): PurchaseOrderEntity {
+		return {
+			id: row.id,
+			supplierId: row.supplierId,
+			supplierName: row.supplier.name,
+			referenceNumber: row.referenceNumber,
+			estimatedReceiptDate: row.estimatedReceiptDate,
+			paymentTerms: row.paymentTerms,
+			notes: row.notes,
+			status: row.status,
+			totalEstimated: this.toNumber(row.totalEstimated),
+			createdBy: row.createdBy,
+			createdAt: row.createdAt,
+			updatedAt: row.updatedAt,
+			items: [],
 		};
 	}
 
@@ -122,6 +146,26 @@ export class PurchaseOrdersService {
 		return `${prefix}${String(count + 1).padStart(6, "0")}`;
 	}
 
+	private isUniqueReferenceError(error: unknown): boolean {
+		if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+			return false;
+		}
+
+		if (error.code !== "P2002") {
+			return false;
+		}
+
+		const target = error.meta?.target;
+		if (Array.isArray(target)) {
+			return (
+				target.includes("reference_number") ||
+				target.includes("referenceNumber")
+			);
+		}
+
+		return false;
+	}
+
 	async findAll(
 		filters: PurchaseOrderFilters,
 	): Promise<PaginatedResult<PurchaseOrderEntity>> {
@@ -138,14 +182,13 @@ export class PurchaseOrdersService {
 				orderBy: { createdAt: "desc" },
 				include: {
 					supplier: true,
-					items: { include: { product: true } },
 				},
 			}),
 			this.prisma.purchaseOrder.count({ where }),
 		]);
 
 		return {
-			data: rows.map((row) => this.toEntity(row)),
+			data: rows.map((row) => this.toListEntity(row)),
 			total,
 			page,
 			limit,
@@ -178,9 +221,7 @@ export class PurchaseOrdersService {
 		});
 
 		if (!supplier?.status) {
-			throw new BadRequestException(
-				"Selected supplier is invalid or inactive.",
-			);
+			throw new BadRequestException("Proveedor invalido o inactivo.");
 		}
 
 		const productIds = [...new Set(dto.items.map((item) => item.productId))];
@@ -194,50 +235,70 @@ export class PurchaseOrdersService {
 
 		if (products.length !== productIds.length) {
 			throw new BadRequestException(
-				"Some products are invalid, inactive, or not associated with selected supplier.",
+				"Algunos productos son invalidos, inactivos o no pertenecen al proveedor seleccionado.",
 			);
 		}
 
 		for (const item of dto.items) {
 			if (item.quantityOrdered <= 0) {
 				throw new BadRequestException(
-					"Item quantity must be greater than zero.",
+					"La cantidad de cada item debe ser mayor a cero.",
 				);
 			}
 		}
 
-		const referenceNumber = await this.generateReferenceNumber();
 		const totalEstimated = dto.items.reduce(
 			(acc, item) => acc + item.quantityOrdered * item.unitCost,
 			0,
 		);
 
-		const order = await this.prisma.purchaseOrder.create({
-			data: {
-				supplierId: dto.supplierId,
-				referenceNumber,
-				estimatedReceiptDate: dto.estimatedReceiptDate
-					? new Date(dto.estimatedReceiptDate)
-					: null,
-				paymentTerms: dto.paymentTerms?.trim() || null,
-				notes: dto.notes?.trim() || null,
-				status: PurchaseOrderStatus.PENDING,
-				totalEstimated,
-				createdBy: actorId,
-				items: {
-					create: dto.items.map((item) => ({
-						productId: item.productId,
-						quantityOrdered: item.quantityOrdered,
-						unitCost: item.unitCost,
-						subtotal: item.quantityOrdered * item.unitCost,
-					})),
-				},
-			},
-			include: {
-				supplier: true,
-				items: { include: { product: true } },
-			},
-		});
+		let order: Prisma.PurchaseOrderGetPayload<{
+			include: { supplier: true; items: { include: { product: true } } };
+		}> | null = null;
+		let referenceNumber = "";
+
+		for (let attempt = 0; attempt < MAX_REFERENCE_RETRIES; attempt += 1) {
+			referenceNumber = await this.generateReferenceNumber();
+			try {
+				order = await this.prisma.purchaseOrder.create({
+					data: {
+						supplierId: dto.supplierId,
+						referenceNumber,
+						estimatedReceiptDate: dto.estimatedReceiptDate
+							? new Date(dto.estimatedReceiptDate)
+							: null,
+						paymentTerms: dto.paymentTerms?.trim() || null,
+						notes: dto.notes?.trim() || null,
+						status: PurchaseOrderStatus.PENDING,
+						totalEstimated,
+						createdBy: actorId,
+						items: {
+							create: dto.items.map((item) => ({
+								productId: item.productId,
+								quantityOrdered: item.quantityOrdered,
+								unitCost: item.unitCost,
+								subtotal: item.quantityOrdered * item.unitCost,
+							})),
+						},
+					},
+					include: {
+						supplier: true,
+						items: { include: { product: true } },
+					},
+				});
+				break;
+			} catch (error) {
+				if (!this.isUniqueReferenceError(error)) {
+					throw error;
+				}
+			}
+		}
+
+		if (!order) {
+			throw new BadRequestException(
+				"No fue posible generar un numero de referencia unico. Intenta nuevamente.",
+			);
+		}
 
 		await this.prisma.userAuditLog.create({
 			data: {
@@ -266,7 +327,7 @@ export class PurchaseOrdersService {
 		const allowed = this.getAllowedTransitions(current.status);
 		if (!allowed.includes(dto.status)) {
 			throw new BadRequestException(
-				`Invalid status transition from ${current.status} to ${dto.status}.`,
+				`Transicion de estado invalida: ${current.status} a ${dto.status}.`,
 			);
 		}
 
@@ -299,7 +360,7 @@ export class PurchaseOrdersService {
 			where: { id: supplierId },
 		});
 		if (!supplier?.status) {
-			throw new NotFoundException("Active supplier not found.");
+			throw new NotFoundException("Proveedor activo no encontrado.");
 		}
 
 		const products = await this.prisma.product.findMany({

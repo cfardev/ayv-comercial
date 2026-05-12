@@ -100,6 +100,11 @@ export function PurchaseOrdersPage() {
 		PERMISSION_KEYS.PURCHASE_ORDERS_CREATE,
 		user?.role.slug,
 	);
+	const canUpdate = hasPermissionOrSystemAdmin(
+		user?.permissions,
+		PERMISSION_KEYS.PURCHASE_ORDERS_UPDATE,
+		user?.role.slug,
+	);
 
 	const [search, setSearch] = useState("");
 	const [statusFilter, setStatusFilter] = useState<
@@ -198,11 +203,13 @@ export function PurchaseOrdersPage() {
 										<Label>Proveedor</Label>
 										<Select
 											value={supplierId}
-											onValueChange={(value) =>
+											onValueChange={(value) => {
 												form.setValue("supplierId", value, {
 													shouldValidate: true,
-												})
-											}
+												});
+												form.resetField("items", { defaultValue: [] });
+												void form.trigger("items");
+											}}
 										>
 											<SelectTrigger className="cursor-pointer">
 												<SelectValue placeholder="Selecciona proveedor" />
@@ -495,23 +502,25 @@ export function PurchaseOrdersPage() {
 											>
 												Detalle
 											</Button>
-											{allowedStatusByCurrent[order.status].map(
-												(nextStatus) => (
-													<Button
-														key={nextStatus}
-														className="cursor-pointer"
-														size="sm"
-														onClick={() =>
-															updateStatus.mutate({
-																id: order.id,
-																status: nextStatus,
-															})
-														}
-													>
-														{statusLabels[nextStatus]}
-													</Button>
-												),
-											)}
+											{canUpdate
+												? allowedStatusByCurrent[order.status].map(
+														(nextStatus) => (
+															<Button
+																key={nextStatus}
+																className="cursor-pointer"
+																size="sm"
+																onClick={() =>
+																	updateStatus.mutate({
+																		id: order.id,
+																		status: nextStatus,
+																	})
+																}
+															>
+																{statusLabels[nextStatus]}
+															</Button>
+														),
+													)
+												: null}
 											<Button
 												asChild
 												variant="secondary"
