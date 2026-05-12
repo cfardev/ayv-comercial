@@ -237,7 +237,6 @@ model Customer {
   sales  Sale[]
   orders Order[]
 
-  @@index([taxId])
   @@index([fullName])
   @@index([isActive])
   @@map("customers")
