@@ -7,7 +7,7 @@ import {
 	MaxLength,
 	ValidateIf,
 } from "class-validator";
-import { PersonType } from "@prisma/client";
+import { PersonType } from "../../../../generated/prisma/client.js";
 
 export class UpdateCustomerDto {
 	@IsOptional()

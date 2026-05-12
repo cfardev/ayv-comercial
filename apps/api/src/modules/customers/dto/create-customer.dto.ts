@@ -6,7 +6,7 @@ import {
 	IsString,
 	MaxLength,
 } from "class-validator";
-import { PersonType } from "generated/prisma/client";
+import { PersonType } from "../../../../generated/prisma/client.js";
 
 export class CreateCustomerDto {
 	@IsEnum(PersonType, {
