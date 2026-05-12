@@ -6,12 +6,13 @@ import {
 	IsString,
 	MaxLength,
 } from "class-validator";
+import { PersonType } from "generated/prisma/client";
 
 export class CreateCustomerDto {
-	@IsEnum(["NATURAL", "JURIDICA"], {
+	@IsEnum(PersonType, {
 		message: "El tipo de persona debe ser NATURAL o JURIDICA",
 	})
-	personType!: "NATURAL" | "JURIDICA";
+	personType!: PersonType;
 
 	@IsString()
 	@IsNotEmpty()
