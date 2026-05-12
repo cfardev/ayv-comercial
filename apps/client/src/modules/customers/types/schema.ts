@@ -2,9 +2,7 @@ import { z } from "zod";
 
 export const customerFormSchema = z
 	.object({
-		personType: z.enum(["NATURAL", "JURIDICA"], {
-			required_error: "El tipo de persona es obligatorio",
-		}),
+		personType: z.enum(["NATURAL", "JURIDICA"]),
 		fullName: z
 			.string()
 			.min(1, "El nombre es obligatorio")

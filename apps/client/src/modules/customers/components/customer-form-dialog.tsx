@@ -125,7 +125,10 @@ export function CustomerFormDialog({
 									form.setValue("taxId", "");
 								}}
 							>
-								<SelectTrigger id="customer-person-type" className="cursor-pointer">
+								<SelectTrigger
+									id="customer-person-type"
+									className="cursor-pointer"
+								>
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>

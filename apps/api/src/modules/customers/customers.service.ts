@@ -137,7 +137,10 @@ export class CustomersService {
 		return this.toEntity(customer);
 	}
 
-	async create(dto: CreateCustomerDto, actorId: string): Promise<CustomerEntity> {
+	async create(
+		dto: CreateCustomerDto,
+		actorId: string,
+	): Promise<CustomerEntity> {
 		const fullName = dto.fullName.trim();
 		const taxId = dto.taxId.trim();
 
@@ -179,7 +182,8 @@ export class CustomersService {
 		}
 
 		const nextPersonType = dto.personType ?? existing.personType;
-		const nextTaxId = dto.taxId !== undefined ? dto.taxId.trim() : existing.taxId;
+		const nextTaxId =
+			dto.taxId !== undefined ? dto.taxId.trim() : existing.taxId;
 
 		if (dto.taxId !== undefined) {
 			this.validateTaxIdFormat(nextTaxId, nextPersonType);

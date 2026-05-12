@@ -1,8 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/components/protected-route";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
-import { ClientesPage } from "@/pages/clientes-page.js";
 import { CategoriasPage } from "@/pages/categorias-page";
+import { ClientesPage } from "@/pages/clientes-page.js";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
 import { LoginPage } from "@/pages/login-page";
 import { MarcasPage } from "@/pages/marcas-page.js";

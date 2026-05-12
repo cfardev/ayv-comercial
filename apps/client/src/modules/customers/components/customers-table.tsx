@@ -99,7 +99,9 @@ export function CustomersTable({
 				<TableBody>
 					{customers.map((customer) => (
 						<TableRow key={customer.id}>
-							<TableCell className="font-mono text-sm">{customer.taxId}</TableCell>
+							<TableCell className="font-mono text-sm">
+								{customer.taxId}
+							</TableCell>
 							<TableCell>
 								<div className="flex flex-col gap-1">
 									<span className="font-medium">{customer.fullName}</span>
@@ -112,17 +114,13 @@ export function CustomersTable({
 							</TableCell>
 							<TableCell>
 								<Badge variant="outline">
-									{customer.personType === "NATURAL"
-										? "Natural"
-										: "Jurídica"}
+									{customer.personType === "NATURAL" ? "Natural" : "Jurídica"}
 								</Badge>
 							</TableCell>
 							<TableCell>{customer.phone || "—"}</TableCell>
 							<TableCell>{customer.email || "—"}</TableCell>
 							<TableCell>
-								<Badge
-									variant={customer.isActive ? "default" : "destructive"}
-								>
+								<Badge variant={customer.isActive ? "default" : "destructive"}>
 									{customer.isActive ? "Activo" : "Inactivo"}
 								</Badge>
 							</TableCell>

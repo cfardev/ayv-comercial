@@ -21,7 +21,9 @@ async function fetchCustomers(
 	if (filters.page) params.set("page", String(filters.page));
 	if (filters.limit) params.set("limit", String(filters.limit));
 
-	const response = await authFetch(`${API_BASE}/customers?${params.toString()}`);
+	const response = await authFetch(
+		`${API_BASE}/customers?${params.toString()}`,
+	);
 	if (!response.ok) {
 		const error = await response.json().catch(() => ({}));
 		throw new Error(
@@ -60,8 +62,7 @@ async function updateCustomer(
 	if (!response.ok) {
 		const error = await response.json().catch(() => ({}));
 		throw new Error(
-			(error as { message?: string }).message ??
-				"Error al actualizar cliente",
+			(error as { message?: string }).message ?? "Error al actualizar cliente",
 		);
 	}
 
@@ -76,8 +77,7 @@ async function deactivateCustomer(id: string): Promise<Customer> {
 	if (!response.ok) {
 		const error = await response.json().catch(() => ({}));
 		throw new Error(
-			(error as { message?: string }).message ??
-				"Error al desactivar cliente",
+			(error as { message?: string }).message ?? "Error al desactivar cliente",
 		);
 	}
 
