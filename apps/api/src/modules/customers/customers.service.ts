@@ -185,7 +185,7 @@ export class CustomersService {
 		const nextTaxId =
 			dto.taxId !== undefined ? dto.taxId.trim() : existing.taxId;
 
-		if (dto.taxId !== undefined) {
+		if (dto.taxId !== undefined || dto.personType !== undefined) {
 			this.validateTaxIdFormat(nextTaxId, nextPersonType);
 		}
 

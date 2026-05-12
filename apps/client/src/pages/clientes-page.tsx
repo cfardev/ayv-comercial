@@ -146,7 +146,7 @@ export function ClientesPage() {
 		confirmDialog.action === "deactivate"
 			? {
 					title: "Desactivar cliente",
-					description: `¿Desactivar "${confirmDialog.customer?.fullName}"? ${confirmDialog.customer?.taxId ? `El cliente tiene ventas asociadas y podrá desactivarse, pero no podrá ser seleccionado en nuevas ventas.` : "Dejará de estar disponible para nuevas ventas."}`,
+					description: `¿Desactivar "${confirmDialog.customer?.fullName}"? Dejará de estar disponible para nuevas ventas.`,
 					confirmLabel: "Desactivar",
 					variant: "destructive" as const,
 				}
