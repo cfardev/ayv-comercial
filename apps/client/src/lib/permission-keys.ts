@@ -30,6 +30,11 @@ export const PERMISSION_KEYS = {
 	PRODUCTS_DEACTIVATE: "products:deactivate",
 	PRODUCTS_REACTIVATE: "products:reactivate",
 	PRODUCTS_UPLOAD: "products:upload",
+	CUSTOMERS_READ: "customers:read",
+	CUSTOMERS_CREATE: "customers:create",
+	CUSTOMERS_UPDATE: "customers:update",
+	CUSTOMERS_DEACTIVATE: "customers:deactivate",
+	CUSTOMERS_REACTIVATE: "customers:reactivate",
 } as const;
 
 export type PermissionKey =

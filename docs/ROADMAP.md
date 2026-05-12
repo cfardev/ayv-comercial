@@ -25,7 +25,7 @@ Completar los CU en orden numérico de la columna **#** evita implementar un CU 
 | 6 | [CU06](./use-cases/CU06-gestion-de-proveedores.md) | Gestión de proveedores | CU01 | ✅ Completo |
 | 7 | [CU07](./use-cases/CU07-gestion-de-productos.md) | Gestión de productos | CU04, CU05, CU06 | ✅ Completo |
 | 8 | [CU08](./use-cases/CU08-actualizacion-de-costo-y-precio-de-producto.md) | Actualización de costo y precio | CU07 | ✅ Completo |
-| 9 | [CU14](./use-cases/CU14-gestion-de-clientes.md) | Gestión de clientes | CU01 | ⬜ Pendiente |
+| 9 | [CU14](./use-cases/CU14-gestion-de-clientes.md) | Gestión de clientes | CU01 | ✅ Completo |
 | 10 | [CU09](./use-cases/CU09-gestion-de-ordenes-de-compra.md) | Gestión de órdenes de compra | CU06, CU07 | ⬜ Pendiente |
 | 11 | [CU10](./use-cases/CU10-registro-de-entrada-de-inventario.md) | Registro de entrada de inventario | CU07, CU06, CU09 | ⬜ Pendiente |
 | 12 | [CU11](./use-cases/CU11-consulta-de-existencias.md) | Consulta de existencias | CU07, CU10 | ⬜ Pendiente |

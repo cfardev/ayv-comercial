@@ -112,31 +112,31 @@ El actor selecciona la opción "Gestión de clientes" desde el menú de ventas o
 
 ### Base de datos
 
-- [ ] Crear enum `PersonType` (`NATURAL`, `JURIDICA`); registrar en `schema.prisma`
-- [ ] Crear modelo Prisma `Customer` con campos: `id`, `personType` (PersonType), `fullName`, `taxId` (único; cédula 10 dígitos o RUC 13 dígitos), `address?`, `phone?`, `email?`, `isActive`, `createdAt`, `updatedAt`; con `@@map("customers")`
-- [ ] Agregar índice único en `taxId`
-- [ ] Crear migración de base de datos
+- [x] Crear enum `PersonType` (`NATURAL`, `JURIDICA`); registrar en `schema.prisma`
+- [x] Crear modelo Prisma `Customer` con campos: `id`, `personType` (PersonType), `fullName`, `taxId` (único; cédula 10 dígitos o RUC 13 dígitos), `address?`, `phone?`, `email?`, `isActive`, `createdAt`, `updatedAt`; con `@@map("customers")`
+- [x] Agregar índice único en `taxId`
+- [x] Crear migración de base de datos
 
 ### API (NestJS)
 
-- [ ] Crear `CustomersModule` con `CustomersService` y `CustomersController`
-- [ ] `POST /customers` — crear cliente; validar unicidad de `taxId`; validar formato según `personType` (10 dígitos natural, 13 dígitos jurídica); guard `ADMIN | SELLER`
-- [ ] `GET /customers` — listar paginado; filtros: `search` (taxId, nombre), `personType`, `isActive`; activos por defecto
-- [ ] `GET /customers/:id` — obtener cliente por id
-- [ ] `PATCH /customers/:id` — editar; validar formato de `taxId` y `email` si cambian; guard `ADMIN | SELLER`
-- [ ] `PATCH /customers/:id/deactivate` — desactivar (advertir si tiene ventas, pero permitir); guard `ADMIN | SELLER`
-- [ ] `PATCH /customers/:id/activate` — reactivar; guard `ADMIN | SELLER`
-- [ ] `DTO CreateCustomerDto` con `@IsEmail`, `@Matches` para validación de taxId por personType
-- [ ] Registrar operaciones con usuario responsable y timestamp
+- [x] Crear `CustomersModule` con `CustomersService` y `CustomersController`
+- [x] `POST /customers` — crear cliente; validar unicidad de `taxId`; validar formato según `personType` (10 dígitos natural, 13 dígitos jurídica); guard `ADMIN | SELLER`
+- [x] `GET /customers` — listar paginado; filtros: `search` (taxId, nombre), `personType`, `isActive`; activos por defecto
+- [x] `GET /customers/:id` — obtener cliente por id
+- [x] `PATCH /customers/:id` — editar; validar formato de `taxId` y `email` si cambian; guard `ADMIN | SELLER`
+- [x] `PATCH /customers/:id/deactivate` — desactivar (advertir si tiene ventas, pero permitir); guard `ADMIN | SELLER`
+- [x] `PATCH /customers/:id/activate` — reactivar; guard `ADMIN | SELLER`
+- [x] `DTO CreateCustomerDto` con `@IsEmail`, `@Matches` para validación de taxId por personType
+- [x] Registrar operaciones con usuario responsable y timestamp
 
 ### Frontend (React)
 
-- [ ] Crear página `/customers` protegida para `ADMIN` y `SELLER`
-- [ ] Tabla paginada con columnas: identificación, nombre/razón social, tipo, teléfono, correo, estado, fecha de creación
-- [ ] Buscador por taxId o nombre (debounce)
-- [ ] Filtros por tipo de persona y estado; activo por defecto
-- [ ] Botón "Nuevo cliente" → formulario con campos: tipo (natural/jurídica), nombre, taxId, dirección, teléfono, correo
-- [ ] Validación Zod: taxId de 10 dígitos si NATURAL, 13 si JURIDICA; formato de email
-- [ ] Botón "Editar" → formulario pre-poblado
-- [ ] Botón "Desactivar" / "Activar" con confirmación (advertir si tiene ventas)
-- [ ] Integrar con TanStack Query; invalidar caché tras mutaciones
+- [x] Crear página `/customers` protegida para `ADMIN` y `SELLER`
+- [x] Tabla paginada con columnas: identificación, nombre/razón social, tipo, teléfono, correo, estado, fecha de creación
+- [x] Buscador por taxId o nombre (debounce)
+- [x] Filtros por tipo de persona y estado; activo por defecto
+- [x] Botón "Nuevo cliente" → formulario con campos: tipo (natural/jurídica), nombre, taxId, dirección, teléfono, correo
+- [x] Validación Zod: taxId de 10 dígitos si NATURAL, 13 si JURIDICA; formato de email
+- [x] Botón "Editar" → formulario pre-poblado
+- [x] Botón "Desactivar" / "Activar" con confirmación (advertir si tiene ventas)
+- [x] Integrar con TanStack Query; invalidar caché tras mutaciones
