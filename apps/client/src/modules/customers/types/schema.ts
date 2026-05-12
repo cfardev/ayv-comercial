@@ -8,11 +8,14 @@ export const customerFormSchema = z
 			.min(1, "El nombre es obligatorio")
 			.max(150, "Máximo 150 caracteres"),
 		taxId: z.string().min(1, "La identificación es obligatoria"),
-		email: z
-			.string()
-			.max(255, "Máximo 255 caracteres")
-			.email("Correo inválido")
-			.or(z.literal("")),
+		email: z.preprocess(
+			(value) => (value === "" ? undefined : value),
+			z
+				.string()
+				.max(255, "Máximo 255 caracteres")
+				.email("Correo inválido")
+				.optional(),
+		),
 		phone: z.string().max(30, "Máximo 30 caracteres").optional(),
 		address: z.string().max(255, "Máximo 255 caracteres").optional(),
 	})
