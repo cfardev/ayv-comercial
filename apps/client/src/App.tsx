@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/components/protected-route";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
+import { ClientesPage } from "@/pages/clientes-page.js";
 import { CategoriasPage } from "@/pages/categorias-page";
 import { DashboardHomePage } from "@/pages/dashboard-home-page";
 import { LoginPage } from "@/pages/login-page";
@@ -28,7 +29,7 @@ function DashboardRoutes() {
 				<Route path="despachos" element={<Placeholder title="Despachos" />} />
 				<Route path="productos/nuevo" element={<ProductoCreatePage />} />
 				<Route path="productos" element={<ProductosPage />} />
-				<Route path="clientes" element={<Placeholder title="Clientes" />} />
+				<Route path="clientes" element={<ClientesPage />} />
 				<Route path="categorias" element={<CategoriasPage />} />
 				<Route path="marcas" element={<MarcasPage />} />
 				<Route path="proveedores" element={<ProveedoresPage />} />
