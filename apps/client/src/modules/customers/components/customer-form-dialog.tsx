@@ -84,15 +84,20 @@ export function CustomerFormDialog({
 		}
 	}, [errorMessage, form]);
 
+	function normalizeOptionalText(value?: string) {
+		const trimmedValue = value?.trim();
+		return trimmedValue ? trimmedValue : undefined;
+	}
+
 	function handleSubmit(values: CustomerFormValues) {
 		form.clearErrors("root");
 		onSubmit({
 			personType: values.personType,
 			fullName: values.fullName,
 			taxId: values.taxId,
-			address: values.address?.trim(),
-			phone: values.phone?.trim(),
-			email: values.email?.trim(),
+			address: normalizeOptionalText(values.address),
+			phone: normalizeOptionalText(values.phone),
+			email: normalizeOptionalText(values.email),
 		});
 	}
 
