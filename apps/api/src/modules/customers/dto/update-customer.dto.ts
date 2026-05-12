@@ -7,13 +7,14 @@ import {
 	MaxLength,
 	ValidateIf,
 } from "class-validator";
+import { PersonType } from "@prisma/client";
 
 export class UpdateCustomerDto {
 	@IsOptional()
-	@IsEnum(["NATURAL", "JURIDICA"], {
+	@IsEnum(PersonType, {
 		message: "El tipo de persona debe ser NATURAL o JURIDICA",
 	})
-	personType?: "NATURAL" | "JURIDICA";
+	personType?: PersonType;
 
 	@IsOptional()
 	@IsString()
