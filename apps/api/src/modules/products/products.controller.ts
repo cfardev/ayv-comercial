@@ -69,6 +69,7 @@ export class ProductsController {
 			status: query.status as ProductFilters["status"],
 			categoryId: query.categoryId,
 			brandId: query.brandId,
+			supplierId: query.supplierId,
 			page: query.page ? Number(query.page) : undefined,
 			limit: query.limit ? Number(query.limit) : undefined,
 		};

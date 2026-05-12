@@ -72,6 +72,11 @@ function getInitials(fullName: string): string {
 const navOperaciones: DashboardNavItem[] = [
 	{ title: "Panel", url: "/", icon: IconLayoutDashboard },
 	{ title: "Pedidos", url: "/pedidos", icon: IconFileInvoice },
+	{
+		title: "Ordenes de compra",
+		url: "/purchase-orders",
+		icon: IconFileInvoice,
+	},
 	{ title: "Inventario", url: "/inventario", icon: IconPackages },
 	{ title: "Despachos", url: "/despachos", icon: IconTruck },
 ];
@@ -90,6 +95,7 @@ const navCatalogoBase: DashboardNavItem[] = [
 const pageTitles: Record<string, string> = {
 	"/": "Panel",
 	"/pedidos": "Pedidos",
+	"/purchase-orders": "Ordenes de compra",
 	"/inventario": "Inventario",
 	"/despachos": "Despachos",
 	"/productos": "Productos",

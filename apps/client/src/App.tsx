@@ -9,6 +9,7 @@ import { MarcasPage } from "@/pages/marcas-page.js";
 import { ProductoCreatePage } from "@/pages/producto-create-page.js";
 import { ProductosPage } from "@/pages/productos-page.js";
 import { ProveedoresPage } from "@/pages/proveedores-page.js";
+import { PurchaseOrdersPage } from "@/pages/purchase-orders-page";
 import { UsersPage } from "@/pages/usuarios-page.js";
 
 function Placeholder({ title }: { title: string }) {
@@ -25,6 +26,7 @@ function DashboardRoutes() {
 			<Routes>
 				<Route index element={<DashboardHomePage />} />
 				<Route path="pedidos" element={<Placeholder title="Pedidos" />} />
+				<Route path="purchase-orders" element={<PurchaseOrdersPage />} />
 				<Route path="inventario" element={<Placeholder title="Inventario" />} />
 				<Route path="despachos" element={<Placeholder title="Despachos" />} />
 				<Route path="productos/nuevo" element={<ProductoCreatePage />} />

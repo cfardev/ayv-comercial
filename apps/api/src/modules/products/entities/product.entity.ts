@@ -18,9 +18,10 @@ export class ProductEntity {
 	categoryName!: string;
 	brandId!: string | null;
 	brandName!: string | null;
+	supplierId!: string;
+	supplierName!: string;
 	unitOfMeasure!: string | null;
 	minimumStock!: number;
-	supplier!: string | null;
 	stockCurrent!: number;
 	images!: ProductImageEntity[];
 	createdAt!: Date;

@@ -47,6 +47,11 @@ export class UpdateProductDto {
 	categoryId?: string;
 
 	@IsOptional()
+	@IsString()
+	@IsNotEmpty()
+	supplierId?: string;
+
+	@IsOptional()
 	@ValidateNested({ each: true })
 	@Type(() => ProductImageInputDto)
 	images?: ProductImageInputDto[];
@@ -76,9 +81,4 @@ export class UpdateProductDto {
 	@IsInt()
 	@Min(0)
 	minimumStock?: number;
-
-	@IsOptional()
-	@IsString()
-	@MaxLength(200)
-	supplier?: string;
 }

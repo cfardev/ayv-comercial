@@ -3,6 +3,7 @@ export interface ProductFilters {
 	status?: "true" | "false" | "ALL";
 	categoryId?: string;
 	brandId?: string;
+	supplierId?: string;
 	minPrice?: number;
 	maxPrice?: number;
 	page?: number;

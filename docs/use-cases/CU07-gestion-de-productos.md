@@ -110,7 +110,8 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - A: Los productos activos no pueden tener categoría inactiva.
 - A: Los productos activos no pueden tener marca inactiva.
 - A: Los productos activos no pueden tener proveedor inactivo.
-- A: Cada producto está asociado a un único proveedor.
+- A: Cada producto está asociado a un único proveedor mediante `supplierId` (FK a proveedores).
+- A: El proveedor del producto es obligatorio en creación y edición; no se permite entrada de texto libre para este vínculo.
 - A: La relación entre producto y proveedor se establece en la ficha maestra del producto y se refleja en las órdenes de compra (CU09).
 
 ## Reglas de seguridad
@@ -166,6 +167,7 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - [x] Buscador por código, nombre o descripción (debounce)
 - [x] Filtros por categoría, marca, proveedor, estado; activo por defecto
 - [x] Botón "Nuevo producto" → formulario con todos los campos; selectores de categoría, marca y proveedor que solo muestran activos
+- [x] Selector de proveedor tipo input + dropdown (combobox) obligatorio para crear/editar productos; sin texto libre
 - [x] Advertencia visual si `salePrice <= cost` al completar el formulario
 - [x] Botón "Editar" → formulario pre-poblado
 - [x] Botón "Desactivar" / "Activar" con diálogo de confirmación

@@ -33,13 +33,14 @@ export class ProductsService {
 		status: boolean;
 		categoryId: string;
 		brandId: string | null;
+		supplierId: string;
 		unitOfMeasure: string | null;
 		minimumStock: number;
-		supplier: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		category: { name: string };
 		brand: { name: string } | null;
+		supplier: { name: string };
 		images: {
 			id: string;
 			url: string;
@@ -64,9 +65,10 @@ export class ProductsService {
 			categoryName: row.category.name,
 			brandId: row.brandId,
 			brandName: row.brand?.name ?? null,
+			supplierId: row.supplierId,
+			supplierName: row.supplier.name,
 			unitOfMeasure: row.unitOfMeasure,
 			minimumStock: row.minimumStock,
-			supplier: row.supplier,
 			stockCurrent: row._stockCurrent ?? 0,
 			images: sortedImages.map((img) => ({
 				id: img.id,
@@ -184,6 +186,22 @@ export class ProductsService {
 		}
 	}
 
+	private async assertSupplierActive(supplierId: string): Promise<void> {
+		const supplier = await this.prisma.supplier.findUnique({
+			where: { id: supplierId },
+		});
+		if (!supplier) {
+			throw new NotFoundException(
+				`Proveedor con id "${supplierId}" no encontrado.`,
+			);
+		}
+		if (!supplier.status) {
+			throw new BadRequestException(
+				"No se puede asignar un proveedor inactivo al producto.",
+			);
+		}
+	}
+
 	/**
 	 * Aggregate stock quantity from Inventory table for given product IDs.
 	 * Returns a Map<productId, totalQuantity>.
@@ -235,6 +253,10 @@ export class ProductsService {
 			where.brandId = filters.brandId;
 		}
 
+		if (filters.supplierId) {
+			where.supplierId = filters.supplierId;
+		}
+
 		if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
 			const priceFilter: Prisma.DecimalFilter<"Product"> = {};
 			if (filters.minPrice !== undefined) {
@@ -255,6 +277,7 @@ export class ProductsService {
 				include: {
 					category: { select: { name: true } },
 					brand: { select: { name: true } },
+					supplier: { select: { name: true } },
 					images: true,
 				},
 			}),
@@ -284,6 +307,7 @@ export class ProductsService {
 			include: {
 				category: { select: { name: true } },
 				brand: { select: { name: true } },
+				supplier: { select: { name: true } },
 				images: true,
 			},
 		});
@@ -302,6 +326,7 @@ export class ProductsService {
 
 	async create(dto: CreateProductDto, actorId: string): Promise<ProductEntity> {
 		await this.assertCategoryActive(dto.categoryId);
+		await this.assertSupplierActive(dto.supplierId);
 		await this.assertCodeUnique(dto.code);
 		this.assertPriceAboveCost(dto.cost, dto.price);
 
@@ -321,9 +346,9 @@ export class ProductsService {
 					status: true,
 					categoryId: dto.categoryId,
 					brandId: resolvedBrandId,
+					supplierId: dto.supplierId,
 					unitOfMeasure: dto.unitOfMeasure ?? null,
 					minimumStock: dto.minimumStock ?? 0,
-					supplier: dto.supplier ?? null,
 					images: {
 						create: dto.images.map((img, index) => ({
 							url: img.url,
@@ -335,6 +360,7 @@ export class ProductsService {
 				include: {
 					category: { select: { name: true } },
 					brand: { select: { name: true } },
+					supplier: { select: { name: true } },
 					images: true,
 				},
 			});
@@ -373,6 +399,10 @@ export class ProductsService {
 		const categoryId = dto.categoryId ?? existing.categoryId;
 		if (dto.categoryId !== undefined) {
 			await this.assertCategoryActive(dto.categoryId);
+		}
+
+		if (dto.supplierId !== undefined) {
+			await this.assertSupplierActive(dto.supplierId);
 		}
 
 		const cost = dto.cost ?? Number(existing.cost);
@@ -428,18 +458,21 @@ export class ProductsService {
 						? { price: new Prisma.Decimal(dto.price) }
 						: {}),
 					...(dto.categoryId !== undefined ? { categoryId } : {}),
+					...(dto.supplierId !== undefined
+						? { supplierId: dto.supplierId }
+						: {}),
 					...(dto.unitOfMeasure !== undefined
 						? { unitOfMeasure: dto.unitOfMeasure }
 						: {}),
 					...(dto.minimumStock !== undefined
 						? { minimumStock: dto.minimumStock }
 						: {}),
-					...(dto.supplier !== undefined ? { supplier: dto.supplier } : {}),
 					...brandPatch,
 				},
 				include: {
 					category: { select: { name: true } },
 					brand: { select: { name: true } },
+					supplier: { select: { name: true } },
 					images: true,
 				},
 			});
@@ -456,6 +489,7 @@ export class ProductsService {
 						name: dto.name,
 						code: dto.code,
 						categoryId: dto.categoryId,
+						supplierId: dto.supplierId,
 					},
 				},
 			},
@@ -499,6 +533,7 @@ export class ProductsService {
 			include: {
 				category: { select: { name: true } },
 				brand: { select: { name: true } },
+				supplier: { select: { name: true } },
 				images: true,
 			},
 		});
@@ -520,6 +555,7 @@ export class ProductsService {
 			include: {
 				category: { select: { name: true } },
 				brand: { select: { name: true } },
+				supplier: { select: { name: true } },
 				images: true,
 			},
 		});
@@ -561,12 +597,15 @@ export class ProductsService {
 
 		await this.assertCategoryActive(existing.categoryId);
 
+		await this.assertSupplierActive(existing.supplierId);
+
 		const updated = await this.prisma.product.update({
 			where: { id },
 			data: { status: true },
 			include: {
 				category: { select: { name: true } },
 				brand: { select: { name: true } },
+				supplier: { select: { name: true } },
 				images: true,
 			},
 		});

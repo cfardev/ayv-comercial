@@ -35,6 +35,14 @@ enum InvoiceStatus {
   ANNULLED
 }
 
+enum PurchaseOrderStatus {
+  PENDING
+  SENT
+  PARTIAL
+  RECEIVED
+  CANCELLED
+}
+
 enum UserRole {
   ADMIN
   SELLER
@@ -89,6 +97,7 @@ model User {
   auditLogs          UserAuditLog[]      @relation("AuditLogUser")
   performedActions   UserAuditLog[]      @relation("AuditLogActor")
   priceChanges       PriceHistory[]
+  purchaseOrders     PurchaseOrder[]
 
   @@index([email])
   @@index([role])
@@ -137,6 +146,9 @@ model Supplier {
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
+  purchaseOrders       PurchaseOrder[]
+  products             Product[]
+
   @@index([name])
   @@index([taxId])
   @@index([status])
@@ -153,23 +165,26 @@ model Product {
   status         Boolean  @default(true) @map("status")
   categoryId     String   @map("category_id")
   brandId        String?  @map("brand_id")
+  supplierId     String   @map("supplier_id")
   unitOfMeasure  String?  @map("unit_of_measure")
   minimumStock   Int      @default(0) @map("minimum_stock")
-  supplier       String?  @map("supplier")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   category           Category           @relation(fields: [categoryId], references: [id])
   brand              Brand?             @relation(fields: [brandId], references: [id])
+  supplier           Supplier           @relation(fields: [supplierId], references: [id])
   images             ProductImage[]
   inventory          Inventory[]
   inventoryMovements InventoryMovement[]
   saleItems          SaleItem[]
   priceHistory       PriceHistory[]
+  purchaseOrderItems PurchaseOrderItem[]
 
   @@index([code])
   @@index([categoryId])
   @@index([brandId])
+  @@index([supplierId])
   @@index([name])
   @@map("products")
 }
@@ -345,4 +360,44 @@ model PriceHistory {
   @@index([changedBy])
   @@index([createdAt])
   @@map("price_history")
+}
+
+model PurchaseOrder {
+  id                   String              @id @default(cuid()) @map("id")
+  supplierId           String              @map("supplier_id")
+  referenceNumber      String              @unique @map("reference_number")
+  estimatedReceiptDate DateTime?           @map("estimated_receipt_date")
+  paymentTerms         String?             @map("payment_terms")
+  notes                String?             @map("notes")
+  status               PurchaseOrderStatus @default(PENDING) @map("status")
+  totalEstimated       Decimal             @db.Decimal(12, 2) @map("total_estimated")
+  createdBy            String              @map("created_by")
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  supplier Supplier            @relation(fields: [supplierId], references: [id])
+  items    PurchaseOrderItem[]
+  creator  User                @relation(fields: [createdBy], references: [id])
+
+  @@index([supplierId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([createdBy])
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String   @id @default(cuid()) @map("id")
+  purchaseOrderId String   @map("purchase_order_id")
+  productId       String   @map("product_id")
+  quantityOrdered Int      @map("quantity_ordered")
+  unitCost        Decimal  @db.Decimal(12, 2) @map("unit_cost")
+  subtotal        Decimal  @db.Decimal(12, 2) @map("subtotal")
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id])
+
+  @@index([purchaseOrderId])
+  @@index([productId])
+  @@map("purchase_order_items")
 }
