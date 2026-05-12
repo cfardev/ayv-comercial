@@ -22,6 +22,7 @@ async function fetchProducts(
 		params.set("status", filters.status);
 	if (filters.categoryId) params.set("categoryId", filters.categoryId);
 	if (filters.brandId) params.set("brandId", filters.brandId);
+	if (filters.supplierId) params.set("supplierId", filters.supplierId);
 	if (filters.minPrice !== undefined)
 		params.set("minPrice", String(filters.minPrice));
 	if (filters.maxPrice !== undefined)

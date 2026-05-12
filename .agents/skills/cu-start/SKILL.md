@@ -1,6 +1,6 @@
 ---
 name: cu-start
-description: Begins implementation of a specific use case. Updates ROADMAP.md status to in-progress, creates a git branch, then implements each checkbox in the "## Implementación técnica" section sequentially, marking each done as it's completed.
+description: Begins implementation of a specific use case. Sets ROADMAP.md status to in-progress, creates a git branch, and implements each checkbox in the "## Implementación técnica" section sequentially. Never marks ROADMAP as complete; completion is handled only after cu-verify and explicit user confirmation.
 metadata:
   author: ayv-comercial team
   version: "2026.1.0"
@@ -94,6 +94,13 @@ After all checkboxes are done, report summary and prompt for verification:
 > - Tareas completadas: <N>/<N>
 >
 > Revisa los cambios y ejecuta `/cu-verify CUxx` para verificar que todo está correctamente implementado antes de hacer push y crear el PR.
+
+### Step 8 — Completion boundary (strict)
+
+- `cu-start` **must not** cambiar `docs/ROADMAP.md` a `✅ Completo`.
+- `cu-start` **must not** hacer push automáticamente al terminar implementación.
+- Al terminar tareas, el flujo correcto es: `cu-start` -> `cu-verify` -> confirmación explícita del usuario para `git add/commit/push` -> recién ahí actualizar ROADMAP a `✅ Completo`.
+- Si `cu-start` marcó ROADMAP como completo por error, debe revertir ese estado a `🔄 En progreso` inmediatamente.
 
 ## Implementation guidelines
 

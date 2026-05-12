@@ -18,9 +18,10 @@ export interface Product {
 	categoryName: string;
 	brandId?: string | null;
 	brandName?: string | null;
+	supplierId: string;
+	supplierName: string;
 	unitOfMeasure: string | null;
 	minimumStock: number;
-	supplier: string | null;
 	stockCurrent: number;
 	images: ProductImage[];
 	createdAt: string;
@@ -32,6 +33,7 @@ export interface ProductFilters {
 	status?: "true" | "false" | "ALL";
 	categoryId?: string;
 	brandId?: string;
+	supplierId?: string;
 	minPrice?: number;
 	maxPrice?: number;
 	page?: number;
@@ -63,9 +65,9 @@ export interface CreateProductPayload {
 	brandMode: "existing" | "new";
 	brandId?: string;
 	newBrandName?: string;
+	supplierId: string;
 	unitOfMeasure?: string;
 	minimumStock?: number;
-	supplier?: string;
 }
 
 export interface UpdateProductPayload {
@@ -79,9 +81,9 @@ export interface UpdateProductPayload {
 	brandMode?: "existing" | "new";
 	brandId?: string;
 	newBrandName?: string;
+	supplierId?: string;
 	unitOfMeasure?: string;
 	minimumStock?: number;
-	supplier?: string;
 }
 
 export interface UpdatePricingPayload {

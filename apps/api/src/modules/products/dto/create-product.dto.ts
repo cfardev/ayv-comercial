@@ -44,6 +44,10 @@ export class CreateProductDto {
 	@IsNotEmpty()
 	categoryId!: string;
 
+	@IsString()
+	@IsNotEmpty()
+	supplierId!: string;
+
 	@IsIn(["existing", "new"])
 	brandMode!: "existing" | "new";
 
@@ -73,9 +77,4 @@ export class CreateProductDto {
 	@IsInt()
 	@Min(0)
 	minimumStock?: number;
-
-	@IsOptional()
-	@IsString()
-	@MaxLength(200)
-	supplier?: string;
 }

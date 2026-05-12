@@ -20,6 +20,7 @@ export const productFormSchema = z
 		cost: z.coerce.number().min(0.01, "El costo debe ser mayor a 0"),
 		price: z.coerce.number().min(0.01, "El precio debe ser mayor a 0"),
 		categoryId: z.string().min(1, "Elige una categoría"),
+		supplierId: z.string().min(1, "Elige un proveedor"),
 		brandMode: z.enum(["existing", "new"]),
 		brandId: z.string(),
 		newBrandName: z.string(),
@@ -30,7 +31,6 @@ export const productFormSchema = z
 			.int()
 			.min(0, "No puede ser negativo")
 			.default(0),
-		supplier: z.string().max(200, "Máximo 200 caracteres").optional(),
 	})
 	.superRefine((data, ctx) => {
 		if (data.brandMode === "existing") {

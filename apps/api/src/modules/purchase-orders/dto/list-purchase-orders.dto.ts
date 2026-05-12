@@ -1,6 +1,6 @@
 import { IsOptional, IsString } from "class-validator";
 
-export class ListProductsDto {
+export class ListPurchaseOrdersDto {
 	@IsOptional()
 	@IsString()
 	search?: string;
@@ -11,23 +11,11 @@ export class ListProductsDto {
 
 	@IsOptional()
 	@IsString()
-	categoryId?: string;
+	fromDate?: string;
 
 	@IsOptional()
 	@IsString()
-	brandId?: string;
-
-	@IsOptional()
-	@IsString()
-	supplierId?: string;
-
-	@IsOptional()
-	@IsString()
-	minPrice?: string;
-
-	@IsOptional()
-	@IsString()
-	maxPrice?: string;
+	toDate?: string;
 
 	@IsOptional()
 	@IsString()

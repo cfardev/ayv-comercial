@@ -16,6 +16,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useCategories } from "@/modules/categories/hooks/use-categories.js";
+import { useSuppliers } from "@/modules/suppliers/hooks/use-suppliers.js";
 import type { Product } from "../types/api.js";
 import { type ProductFormValues, productFormSchema } from "../types/schema.js";
 import { BrandCombobox } from "./brand-combobox.js";
@@ -23,6 +24,7 @@ import {
 	ProductImageDropzone,
 	type ProductImageValue,
 } from "./product-image-dropzone.js";
+import { SupplierCombobox } from "./supplier-combobox.js";
 
 function PageFormFooter(props: ComponentPropsWithoutRef<"div">) {
 	return (
@@ -67,6 +69,17 @@ export function ProductForm({
 		[categoriesData?.data],
 	);
 
+	const { data: suppliersData } = useSuppliers({
+		status: "true",
+		limit: 100,
+		page: 1,
+	});
+
+	const suppliers = useMemo(
+		() => suppliersData?.data ?? [],
+		[suppliersData?.data],
+	);
+
 	const defaultValues = useMemo<ProductFormValues>(() => {
 		if (product) {
 			const imgs: ProductImageValue[] = [...product.images]
@@ -84,13 +97,13 @@ export function ProductForm({
 				cost: Number(product.cost),
 				price: Number(product.price),
 				categoryId: product.categoryId,
+				supplierId: product.supplierId,
 				brandMode: product.brandId ? "existing" : "new",
 				brandId: product.brandId ?? "",
 				newBrandName: "",
 				images: imgs,
 				unitOfMeasure: product.unitOfMeasure ?? "",
 				minimumStock: product.minimumStock,
-				supplier: product.supplier ?? "",
 			};
 		}
 
@@ -101,13 +114,13 @@ export function ProductForm({
 			cost: 0.01,
 			price: 0.02,
 			categoryId: "",
+			supplierId: "",
 			brandMode: "existing",
 			brandId: "",
 			newBrandName: "",
 			images: [],
 			unitOfMeasure: "",
 			minimumStock: 0,
-			supplier: "",
 		};
 	}, [product]);
 
@@ -177,7 +190,7 @@ export function ProductForm({
 	const priceId = `${idPrefix}-price`;
 	const unitOfMeasureId = `${idPrefix}-unit-of-measure`;
 	const minimumStockId = `${idPrefix}-minimum-stock`;
-	const supplierId = `${idPrefix}-supplier`;
+	const supplierFieldId = `${idPrefix}-supplier`;
 	const newBrandId = `${idPrefix}-new-brand-name`;
 
 	return (
@@ -415,6 +428,38 @@ export function ProductForm({
 
 			<div className="grid grid-cols-3 gap-3">
 				<div className="space-y-2">
+					<Label htmlFor={supplierFieldId}>
+						Proveedor <span className="text-destructive">*</span>
+					</Label>
+					<Controller
+						control={form.control}
+						name="supplierId"
+						render={({ field }) => (
+							<div id={supplierFieldId}>
+								<SupplierCombobox
+									value={field.value}
+									onValueChange={(id: string) => {
+										field.onChange(id);
+										form.clearErrors("supplierId");
+									}}
+									disabled={Boolean(isLoading)}
+									fallbackLabel={
+										product?.supplierId === field.value
+											? (product?.supplierName ?? "")
+											: undefined
+									}
+									suppliers={suppliers}
+								/>
+							</div>
+						)}
+					/>
+					{form.formState.errors.supplierId && (
+						<p className="text-sm text-destructive">
+							{form.formState.errors.supplierId.message}
+						</p>
+					)}
+				</div>
+				<div className="space-y-2">
 					<Label htmlFor={unitOfMeasureId}>Unidad de medida</Label>
 					<Input
 						id={unitOfMeasureId}
@@ -439,19 +484,6 @@ export function ProductForm({
 					{form.formState.errors.minimumStock && (
 						<p className="text-sm text-destructive">
 							{form.formState.errors.minimumStock.message}
-						</p>
-					)}
-				</div>
-				<div className="space-y-2">
-					<Label htmlFor={supplierId}>Proveedor</Label>
-					<Input
-						id={supplierId}
-						placeholder="Opcional"
-						{...form.register("supplier")}
-					/>
-					{form.formState.errors.supplier && (
-						<p className="text-sm text-destructive">
-							{form.formState.errors.supplier.message}
 						</p>
 					)}
 				</div>

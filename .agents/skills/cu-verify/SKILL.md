@@ -1,6 +1,6 @@
 ---
 name: cu-verify
-description: Verifies that all implementation checkboxes for a given use case (CU) are actually implemented in the codebase. Scans code for each task, reports gaps, and optionally commits and pushes when everything passes.
+description: Verifies that all implementation checkboxes for a given use case (CU) are actually implemented in the codebase. Scans code for each task, reports gaps, and only after explicit user confirmation performs git add/commit/push and marks ROADMAP complete.
 metadata:
   author: ayv-comercial team
   version: "2026.1.0"
@@ -105,18 +105,31 @@ If user confirms, implement each missing task and mark its checkbox.
 
 If no gaps:
 
-> Todas las tareas están implementadas. ¿Deseas marcar CUxx como `✅ Completo` en el ROADMAP y hacer commit?
+> Todas las tareas están implementadas.
+>
+> ¿Deseas que ejecute ahora, en este orden, `git add`, `git commit` y `git push`?
+>
+> Si confirmas, **antes del commit/push** se actualizará `docs/ROADMAP.md` a `✅ Completo`.
 
-### Step 6 — Finalize (optional, on user confirmation)
+### Step 6 — Finalize (optional, on explicit user confirmation)
+
+Prerequisite: user must explicitly confirm execution of `git add`, `git commit`, and `git push`.
 
 1. Update unchecked checkboxes to `- [x]` in the CU file (for any tasks implemented during this session).
 2. Update `docs/ROADMAP.md`: set CU status to `✅ Completo`.
-3. Stage and commit:
+3. Stage changes (`git add ...`) only after user confirmation.
+4. Commit:
    ```
    docs: mark CUxx complete and verify implementation
    ```
-4. Push: `git push`
-5. Report: branch + commit hash.
+5. Push: `git push`
+6. Report: branch + commit hash.
+
+### Guardrails (strict)
+
+- Never set ROADMAP to `✅ Completo` before verification passes.
+- Never set ROADMAP to `✅ Completo` unless user explicitly approved `git add/commit/push` flow.
+- Never push without explicit user confirmation.
 
 ## Verification heuristics
 

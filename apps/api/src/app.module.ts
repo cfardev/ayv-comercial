@@ -19,6 +19,7 @@ import { BrandsModule } from "./modules/brands/brands.module.js";
 import { CategoriesModule } from "./modules/categories/categories.module.js";
 import { CustomersModule } from "./modules/customers/customers.module.js";
 import { ProductsModule } from "./modules/products/products.module.js";
+import { PurchaseOrdersModule } from "./modules/purchase-orders/purchase-orders.module.js";
 import { SuppliersModule } from "./modules/suppliers/suppliers.module.js";
 import { UploadthingModule } from "./modules/uploadthing/uploadthing.module.js";
 import { UsersModule } from "./modules/users/users.module.js";
@@ -48,6 +49,7 @@ import { UsersModule } from "./modules/users/users.module.js";
 		UsersModule,
 		CategoriesModule,
 		ProductsModule,
+		PurchaseOrdersModule,
 		BrandsModule,
 		SuppliersModule,
 		CustomersModule,

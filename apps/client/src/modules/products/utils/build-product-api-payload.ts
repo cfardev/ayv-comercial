@@ -35,10 +35,10 @@ export function buildCreateProductPayload(
 		cost: values.cost,
 		price: values.price,
 		categoryId: values.categoryId,
+		supplierId: values.supplierId,
 		images: mapImages(values),
 		unitOfMeasure: values.unitOfMeasure || undefined,
 		minimumStock: values.minimumStock,
-		supplier: values.supplier || undefined,
 		...mapBrand(values),
 	};
 }
@@ -53,10 +53,10 @@ export function buildUpdateProductPayload(
 		cost: values.cost,
 		price: values.price,
 		categoryId: values.categoryId,
+		supplierId: values.supplierId,
 		images: mapImages(values),
 		unitOfMeasure: values.unitOfMeasure || undefined,
 		minimumStock: values.minimumStock,
-		supplier: values.supplier || undefined,
 		...mapBrand(values),
 	};
 }
