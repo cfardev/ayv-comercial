@@ -97,6 +97,7 @@ const pageTitles: Record<string, string> = {
 	"/pedidos": "Pedidos",
 	"/purchase-orders": "Ordenes de compra",
 	"/inventario": "Inventario",
+	"/inventario/entries": "Entradas de inventario",
 	"/despachos": "Despachos",
 	"/productos": "Productos",
 	"/productos/nuevo": "Nuevo producto",

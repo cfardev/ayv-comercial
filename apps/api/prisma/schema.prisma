@@ -94,6 +94,7 @@ model User {
 
   sales              Sale[]
   inventoryMovements InventoryMovement[]
+  inventoryEntries   InventoryEntry[]
   auditLogs          UserAuditLog[]      @relation("AuditLogUser")
   performedActions   UserAuditLog[]      @relation("AuditLogActor")
   priceChanges       PriceHistory[]
@@ -177,6 +178,7 @@ model Product {
   images             ProductImage[]
   inventory          Inventory[]
   inventoryMovements InventoryMovement[]
+  inventoryEntryItems InventoryEntryItem[]
   saleItems          SaleItem[]
   priceHistory       PriceHistory[]
   purchaseOrderItems PurchaseOrderItem[]
@@ -225,6 +227,8 @@ model InventoryMovement {
   previousQuantity Int?          @map("previous_quantity")
   newQuantity      Int?          @map("new_quantity")
   reason           String?       @map("reason")
+  referenceId      String?       @map("reference_id")
+  referenceType    String?       @map("reference_type")
   userId           String        @map("user_id")
   createdAt        DateTime      @default(now()) @map("created_at")
 
@@ -234,7 +238,43 @@ model InventoryMovement {
   @@index([productId])
   @@index([createdAt])
   @@index([userId])
+  @@index([referenceId])
   @@map("inventory_movements")
+}
+
+model InventoryEntry {
+  id              String             @id @default(cuid()) @map("id")
+  entryNumber     String             @unique @map("entry_number")
+  purchaseOrderId String             @map("purchase_order_id")
+  entryDate       DateTime           @default(now()) @map("entry_date")
+  notes           String?            @map("notes")
+  createdBy       String             @map("created_by")
+  createdAt       DateTime           @default(now()) @map("created_at")
+
+  purchaseOrder   PurchaseOrder      @relation(fields: [purchaseOrderId], references: [id])
+  creator         User               @relation(fields: [createdBy], references: [id])
+  items           InventoryEntryItem[]
+
+  @@index([purchaseOrderId])
+  @@index([createdBy])
+  @@index([createdAt])
+  @@map("inventory_entries")
+}
+
+model InventoryEntryItem {
+  id                 String          @id @default(cuid()) @map("id")
+  inventoryEntryId   String          @map("inventory_entry_id")
+  productId          String          @map("product_id")
+  quantityReceived   Int             @map("quantity_received")
+  lotNumber          String?         @map("lot_number")
+  expirationDate     DateTime?       @map("expiration_date")
+
+  inventoryEntry     InventoryEntry  @relation(fields: [inventoryEntryId], references: [id], onDelete: Cascade)
+  product            Product         @relation(fields: [productId], references: [id])
+
+  @@index([inventoryEntryId])
+  @@index([productId])
+  @@map("inventory_entry_items")
 }
 
 model Customer {
@@ -377,6 +417,7 @@ model PurchaseOrder {
 
   supplier Supplier            @relation(fields: [supplierId], references: [id])
   items    PurchaseOrderItem[]
+  entries  InventoryEntry[]
   creator  User                @relation(fields: [createdBy], references: [id])
 
   @@index([supplierId])
