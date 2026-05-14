@@ -25,19 +25,51 @@ const prisma = new PrismaClient({ adapter });
 const BCRYPT_ROUNDS = 12;
 
 async function main() {
+	console.log("🗑️  Clearing existing data...");
+
+	// Delete in dependency order (leaves first, roots last).
+	// Wrapped in try/catch so it works even if some tables don't exist yet (pending migrations).
+	async function safeDelete(model: string, fn: () => Promise<unknown>) {
+		try {
+			await fn();
+		} catch {
+			console.log(`  ⚠️  Table ${model} does not exist, skipping`);
+		}
+	}
+
+	await safeDelete("loginAttempt", () => prisma.loginAttempt.deleteMany());
+	await safeDelete("userAuditLog", () => prisma.userAuditLog.deleteMany());
+	await safeDelete("inventoryMovement", () =>
+		prisma.inventoryMovement.deleteMany(),
+	);
+	await safeDelete("inventoryEntryItem", () =>
+		prisma.inventoryEntryItem.deleteMany(),
+	);
+	await safeDelete("inventoryEntry", () => prisma.inventoryEntry.deleteMany());
+	await safeDelete("inventory", () => prisma.inventory.deleteMany());
+	await safeDelete("priceHistory", () => prisma.priceHistory.deleteMany());
+	await safeDelete("dispatchOrder", () => prisma.dispatchOrder.deleteMany());
+	await safeDelete("order", () => prisma.order.deleteMany());
+	await safeDelete("invoice", () => prisma.invoice.deleteMany());
+	await safeDelete("saleItem", () => prisma.saleItem.deleteMany());
+	await safeDelete("sale", () => prisma.sale.deleteMany());
+	await safeDelete("customer", () => prisma.customer.deleteMany());
+	await safeDelete("purchaseOrderItem", () =>
+		prisma.purchaseOrderItem.deleteMany(),
+	);
+	await safeDelete("purchaseOrder", () => prisma.purchaseOrder.deleteMany());
+	await safeDelete("productImage", () => prisma.productImage.deleteMany());
+	await safeDelete("product", () => prisma.product.deleteMany());
+	await safeDelete("category", () => prisma.category.deleteMany());
+	await safeDelete("brand", () => prisma.brand.deleteMany());
+	await safeDelete("supplier", () => prisma.supplier.deleteMany());
+	await safeDelete("user", () => prisma.user.deleteMany());
+
+	console.log("✅ All tables cleared");
+
 	const password = await bcrypt.hash("admin1234", BCRYPT_ROUNDS);
 	const sellerPassword = await bcrypt.hash("seller1234", BCRYPT_ROUNDS);
 	const inventoryPassword = await bcrypt.hash("inventory1234", BCRYPT_ROUNDS);
-
-	// Check if seed has already been run
-	const existingAdmin = await prisma.user.findUnique({
-		where: { email: "admin@test.com" },
-	});
-
-	if (existingAdmin) {
-		console.log("Seed already ran — admin user exists, skipping...");
-		return;
-	}
 
 	// ── Users ──────────────────────────────────────────────────────────────
 	const admin = await prisma.user.create({
