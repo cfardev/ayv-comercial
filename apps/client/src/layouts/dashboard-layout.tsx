@@ -267,7 +267,7 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 export function DashboardLayout({ children }: { children: ReactNode }) {
 	const location = useLocation();
 	const currentPath = location.pathname;
-	const pageTitle = pageTitles[currentPath] ?? "A&V";
+	const pageTitle = pageTitles[currentPath] ?? "A&V Comercial";
 
 	return (
 		<TooltipProvider>
