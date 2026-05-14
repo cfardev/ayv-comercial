@@ -33,14 +33,14 @@ export class ProductsService {
 		status: boolean;
 		categoryId: string;
 		brandId: string | null;
-		supplierId: string;
+		supplierId: string | null;
 		unitOfMeasure: string | null;
 		minimumStock: number;
 		createdAt: Date;
 		updatedAt: Date;
 		category: { name: string };
 		brand: { name: string } | null;
-		supplier: { name: string };
+		supplier: { name: string } | null;
 		images: {
 			id: string;
 			url: string;
@@ -65,8 +65,8 @@ export class ProductsService {
 			categoryName: row.category.name,
 			brandId: row.brandId,
 			brandName: row.brand?.name ?? null,
-			supplierId: row.supplierId,
-			supplierName: row.supplier.name,
+			supplierId: row.supplierId ?? "",
+			supplierName: row.supplier?.name ?? "Proveedor no disponible",
 			unitOfMeasure: row.unitOfMeasure,
 			minimumStock: row.minimumStock,
 			stockCurrent: row._stockCurrent ?? 0,

@@ -97,6 +97,7 @@ const pageTitles: Record<string, string> = {
 	"/pedidos": "Pedidos",
 	"/purchase-orders": "Ordenes de compra",
 	"/inventario": "Inventario",
+	"/inventario/entries": "Entradas de inventario",
 	"/despachos": "Despachos",
 	"/productos": "Productos",
 	"/productos/nuevo": "Nuevo producto",
@@ -266,7 +267,7 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 export function DashboardLayout({ children }: { children: ReactNode }) {
 	const location = useLocation();
 	const currentPath = location.pathname;
-	const pageTitle = pageTitles[currentPath] ?? "A&V";
+	const pageTitle = pageTitles[currentPath] ?? "A&V Comercial";
 
 	return (
 		<TooltipProvider>

@@ -35,6 +35,8 @@ export const PERMISSION_KEYS = {
 	PURCHASE_ORDERS_READ: "purchase-orders:read",
 	PURCHASE_ORDERS_CREATE: "purchase-orders:create",
 	PURCHASE_ORDERS_UPDATE: "purchase-orders:update",
+	INVENTORY_ENTRIES_READ: "inventory-entries:read",
+	INVENTORY_ENTRIES_CREATE: "inventory-entries:create",
 } as const;
 
 export type PermissionKey =
