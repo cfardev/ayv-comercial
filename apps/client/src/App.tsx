@@ -10,6 +10,7 @@ import { MarcasPage } from "@/pages/marcas-page.js";
 import { ProductoCreatePage } from "@/pages/producto-create-page.js";
 import { ProductosPage } from "@/pages/productos-page.js";
 import { ProveedoresPage } from "@/pages/proveedores-page.js";
+import { PurchaseOrderCreatePage } from "@/pages/purchase-order-create-page";
 import { PurchaseOrdersPage } from "@/pages/purchase-orders-page";
 import { UsersPage } from "@/pages/usuarios-page.js";
 
@@ -27,6 +28,10 @@ function DashboardRoutes() {
 			<Routes>
 				<Route index element={<DashboardHomePage />} />
 				<Route path="pedidos" element={<Placeholder title="Pedidos" />} />
+				<Route
+					path="purchase-orders/new"
+					element={<PurchaseOrderCreatePage />}
+				/>
 				<Route path="purchase-orders" element={<PurchaseOrdersPage />} />
 				<Route path="inventario" element={<Placeholder title="Inventario" />} />
 				<Route path="inventario/entries" element={<InventoryEntriesPage />} />
