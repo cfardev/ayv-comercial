@@ -78,6 +78,7 @@ const navOperaciones: DashboardNavItem[] = [
 		icon: IconFileInvoice,
 	},
 	{ title: "Inventario", url: "/inventario", icon: IconPackages },
+	{ title: "Existencias", url: "/inventario/stock", icon: IconBox },
 	{ title: "Despachos", url: "/despachos", icon: IconTruck },
 ];
 
@@ -98,6 +99,7 @@ const pageTitles: Record<string, string> = {
 	"/purchase-orders": "Ordenes de compra",
 	"/inventario": "Inventario",
 	"/inventario/entries": "Entradas de inventario",
+	"/inventario/stock": "Existencias",
 	"/despachos": "Despachos",
 	"/productos": "Productos",
 	"/productos/nuevo": "Nuevo producto",

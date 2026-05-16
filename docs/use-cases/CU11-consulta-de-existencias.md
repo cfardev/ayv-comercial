@@ -54,7 +54,7 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 
 ## Reglas de negocio
 
-- A: El stock actual se actualiza en tiempo real tras cada movimiento de inventario.
+- A: El stock actual se calcula en tiempo de consulta como la suma de cantidades de movimientos de inventario (`SUM(quantity)` en la tabla `inventory`), no como campo persistido.
 - A: El stock mínimo es configurable por producto (referencia CU07).
 - A: Se consideran tres estados: normal (stock >= mínimo), bajo (0 < stock < mínimo), agotado (stock = 0).
 - A: Los productos inactivos se muestran solo si el filtro incluye estados inactivos.
@@ -75,29 +75,30 @@ El actor selecciona la opción "Consulta de existencias" o "Stock" desde el men�
 
 ## Implementación técnica
 
-> **Dependencias:** CU07 (modelo `Product` con `currentStock`, `minStock`), CU10 (movimientos actualizan stock)  
+> **Dependencias:** CU07 (modelo `Product` con `minStock`; `currentStock` derivado desde movimientos), CU10 (movimientos actualizan stock)  
 > **Orden sugerido de desarrollo:** #12
 
 ### Base de datos
 
-- [ ] Verificar que el modelo `Product` tiene `currentStock` y `minStock` (creados en CU07)
-- [ ] Calcular estado del stock como campo derivado en la capa de servicio: `NORMAL` (currentStock >= minStock), `LOW` (0 < currentStock < minStock), `OUT_OF_STOCK` (currentStock = 0)
+- [x] Verificar que el modelo `Product` tiene `minStock` (creado en CU07 como `minimumStock`)
+- [x] `currentStock` **no es un campo persistido** — se calcula en tiempo de consulta agregando `SUM(quantity)` de los movimientos de inventario (`inventory` table). Esto garantiza coherencia con CU10 sin duplicar estado.
+- [x] Calcular estado del stock como campo derivado en la capa de servicio: `NORMAL` (currentStock >= minStock), `LOW` (0 < currentStock < minStock), `OUT_OF_STOCK` (currentStock = 0)
 
 ### API (NestJS)
 
-- [ ] `GET /inventory/stock` — listar existencias paginado; filtros: `search` (código, nombre), `categoryId`, `brandId`, `supplierId`, `stockStatus` (NORMAL | LOW | OUT_OF_STOCK), `isActive`; guard: todos los roles autenticados
-- [ ] Incluir en respuesta: `code`, `name`, `categoryName`, `brandName`, `supplierName`, `currentStock`, `minStock`, `stockStatus`, `updatedAt`
-- [ ] Ocultar campo `cost` para usuarios con rol `SELLER`
-- [ ] Soporte de ordenamiento por cualquier columna (query param `sortBy`, `sortOrder`)
-- [ ] `GET /inventory/stock/:productId` — detalle de existencia de un producto
+- [x] `GET /inventory/stock` — listar existencias paginado; filtros: `search` (código, nombre), `categoryId`, `brandId`, `supplierId`, `stockStatus` (NORMAL | LOW | OUT_OF_STOCK), `isActive`; guard: todos los roles autenticados
+- [x] Incluir en respuesta: `code`, `name`, `categoryName`, `brandName`, `supplierName`, `currentStock`, `minStock`, `stockStatus`, `updatedAt`
+- [x] Ocultar campo `cost` para usuarios con rol `SELLER`
+- [x] Soporte de ordenamiento por cualquier columna (query param `sortBy`, `sortOrder`)
+- [x] `GET /inventory/stock/:productId` — detalle de existencia de un producto
 
 ### Frontend (React)
 
-- [ ] Crear página `/inventory/stock` accesible para todos los roles autenticados
-- [ ] Tabla paginada con columnas: código, nombre, categoría, marca, proveedor, stock actual, stock mínimo, estado, última actualización
-- [ ] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
-- [ ] Chips visuales de estado: verde (NORMAL), amarillo (LOW), rojo (OUT_OF_STOCK)
-- [ ] Buscador por código, nombre o categoría (debounce)
-- [ ] Filtros por estado de stock, categoría, marca, proveedor
-- [ ] Soporte de ordenamiento por clic en columna de la tabla
-- [ ] Integrar con TanStack Query (`useQuery`) con refetch automático configurable
+- [x] Crear página `/inventory/stock` accesible para todos los roles autenticados
+- [x] Tabla paginada con columnas: código, nombre, categoría, marca, proveedor, stock actual, stock mínimo, estado, última actualización
+- [x] Mostrar columna de costo solo para `ADMIN` e `INVENTORY_MANAGER`
+- [x] Chips visuales de estado: verde (NORMAL), amarillo (LOW), rojo (OUT_OF_STOCK)
+- [x] Buscador por código, nombre o categoría (debounce)
+- [x] Filtros por estado de stock, categoría, marca, proveedor
+- [x] Soporte de ordenamiento por clic en columna de la tabla
+- [x] Integrar con TanStack Query (`useQuery`) con refetch automático configurable

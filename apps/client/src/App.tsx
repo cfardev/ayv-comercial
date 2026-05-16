@@ -12,6 +12,7 @@ import { ProductosPage } from "@/pages/productos-page.js";
 import { ProveedoresPage } from "@/pages/proveedores-page.js";
 import { PurchaseOrderCreatePage } from "@/pages/purchase-order-create-page";
 import { PurchaseOrdersPage } from "@/pages/purchase-orders-page";
+import { StockPage } from "@/pages/stock-page";
 import { UsersPage } from "@/pages/usuarios-page.js";
 
 function Placeholder({ title }: { title: string }) {
@@ -35,6 +36,8 @@ function DashboardRoutes() {
 				<Route path="purchase-orders" element={<PurchaseOrdersPage />} />
 				<Route path="inventario" element={<Placeholder title="Inventario" />} />
 				<Route path="inventario/entries" element={<InventoryEntriesPage />} />
+				<Route path="inventario/stock" element={<StockPage />} />
+				<Route path="inventory/stock" element={<StockPage />} />
 				<Route path="despachos" element={<Placeholder title="Despachos" />} />
 				<Route path="productos/nuevo" element={<ProductoCreatePage />} />
 				<Route path="productos" element={<ProductosPage />} />

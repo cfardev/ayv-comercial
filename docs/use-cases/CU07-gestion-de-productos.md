@@ -139,11 +139,12 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 
 ### Base de datos
 
-- [x] Crear modelo Prisma `Product` con campos: `id`, `code` (único), `name`, `description?`, `categoryId`, `brandId`, `supplierId`, `unitOfMeasure`, `cost` (Decimal), `salePrice` (Decimal), `minStock` (Int, default 0), `currentStock` (Int, default 0), `isActive`, `createdAt`, `updatedAt`; con `@@map("products")`
+- [x] Crear modelo Prisma `Product` con campos: `id`, `code` (único), `name`, `description?`, `categoryId`, `brandId`, `supplierId`, `unitOfMeasure`, `cost` (Decimal), `price` (Decimal), `minStock` (Int, default 0), `isActive`, `createdAt`, `updatedAt`; con `@@map("products")`
 - [x] Agregar índice único en `code`
 - [x] Agregar relación `Product` → `Category` (FK `categoryId`), `Product` → `Brand` (FK `brandId`) y `Product` → `Supplier` (FK `supplierId`)
 - [x] Agregar relaciones inversas en `Category`, `Brand` y `Supplier` (`products Product[]`)
 - [x] Crear migración de base de datos
+- [x] `currentStock` **no es un campo persistido** en Product — se calcula en tiempo de consulta agregando `SUM(quantity)` de la tabla `inventory` (ver CU11). Esto evita duplicar estado y garantiza coherencia con los movimientos de inventario (CU10).
 
 ### API (NestJS)
 
@@ -154,8 +155,8 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - [x] `PATCH /products/:id` — editar; validar `code` único si cambia; verificar categoría, marca y proveedor activos; guard `ADMIN | INVENTORY_MANAGER`
 - [x] `PATCH /products/:id/deactivate` — cambiar `isActive = false`; mostrar advertencia si tiene ventas; guard `ADMIN | INVENTORY_MANAGER`
 - [x] `PATCH /products/:id/activate` — cambiar `isActive = true`; guard `ADMIN | INVENTORY_MANAGER`
-- [x] Validar que `salePrice > cost` (advertencia, no error bloqueante)
-- [x] `DTO CreateProductDto` y `UpdateProductDto` con `class-validator`: `@IsPositive` en `cost` y `salePrice`, `@Min(0)` en `minStock`
+- [x] Validar que `price > cost` (advertencia, no error bloqueante)
+- [x] `DTO CreateProductDto` y `UpdateProductDto` con `class-validator`: `@IsPositive` en `cost` y `price`, `@Min(0)` en `minStock`
 - [x] Registrar operaciones con usuario responsable y timestamp
 - [x] No exponer `cost` a usuarios con rol `SELLER` (filtrar campo en la respuesta)
 
@@ -168,7 +169,7 @@ El actor selecciona la opción "Gestión de productos" desde el menú de inventa
 - [x] Filtros por categoría, marca, proveedor, estado; activo por defecto
 - [x] Botón "Nuevo producto" → formulario con todos los campos; selectores de categoría, marca y proveedor que solo muestran activos
 - [x] Selector de proveedor tipo input + dropdown (combobox) obligatorio para crear/editar productos; sin texto libre
-- [x] Advertencia visual si `salePrice <= cost` al completar el formulario
+- [x] Advertencia visual si `price <= cost` al completar el formulario
 - [x] Botón "Editar" → formulario pre-poblado
 - [x] Botón "Desactivar" / "Activar" con diálogo de confirmación
 - [x] Integrar con TanStack Query; invalidar caché tras mutaciones
