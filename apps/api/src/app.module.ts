@@ -19,6 +19,7 @@ import { BrandsModule } from "./modules/brands/brands.module.js";
 import { CategoriesModule } from "./modules/categories/categories.module.js";
 import { CustomersModule } from "./modules/customers/customers.module.js";
 import { InventoryEntriesModule } from "./modules/inventory-entries/inventory-entries.module.js";
+import { InventoryMovementsModule } from "./modules/inventory-movements/inventory-movements.module.js";
 import { InventoryStockModule } from "./modules/inventory-stock/inventory-stock.module.js";
 import { ProductsModule } from "./modules/products/products.module.js";
 import { PurchaseOrdersModule } from "./modules/purchase-orders/purchase-orders.module.js";
@@ -53,6 +54,7 @@ import { UsersModule } from "./modules/users/users.module.js";
 		ProductsModule,
 		PurchaseOrdersModule,
 		InventoryEntriesModule,
+		InventoryMovementsModule,
 		InventoryStockModule,
 		BrandsModule,
 		SuppliersModule,

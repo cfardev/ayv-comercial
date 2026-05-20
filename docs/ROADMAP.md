@@ -29,7 +29,7 @@ Completar los CU en orden numérico de la columna **#** evita implementar un CU 
 | 10 | [CU09](./use-cases/CU09-gestion-de-ordenes-de-compra.md) | Gestión de órdenes de compra | CU06, CU07 | ✅ Completo |
 | 11 | [CU10](./use-cases/CU10-registro-de-entrada-de-inventario.md) | Registro de entrada de inventario | CU07, CU06, CU09 | ✅ Completo |
 | 12 | [CU11](./use-cases/CU11-consulta-de-existencias.md) | Consulta de existencias | CU07, CU10 | 🔄 En progreso |
-| 13 | [CU13](./use-cases/CU13-consulta-de-movimientos-de-inventario.md) | Consulta de movimientos | CU10 | ⬜ Pendiente |
+| 13 | [CU13](./use-cases/CU13-consulta-de-movimientos-de-inventario.md) | Consulta de movimientos | CU10 | 🔄 En progreso |
 | 14 | [CU15](./use-cases/CU15-registro-de-venta.md) | Registro de venta | CU07, CU11, CU14 | ⬜ Pendiente |
 | 15 | [CU16](./use-cases/CU16-calculo-del-total-de-venta.md) | Cálculo del total de venta | CU15 | ⬜ Pendiente |
 | 16 | [CU17](./use-cases/CU17-generacion-de-factura.md) | Generación de factura | CU15, CU16 | ⬜ Pendiente |
