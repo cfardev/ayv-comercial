@@ -25,7 +25,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context";
 import {
 	hasPermissionOrSystemAdmin,
@@ -83,7 +85,8 @@ export function PurchaseOrdersPage() {
 	const [statusFilter, setStatusFilter] = useState<
 		"ACTIVE" | PurchaseOrderStatus
 	>("ACTIVE");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 	const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 	const debouncedSearch = useDebounce(search, 300);
 
@@ -96,7 +99,7 @@ export function PurchaseOrdersPage() {
 		search: debouncedSearch || undefined,
 		status,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
 	const updateStatus = useUpdatePurchaseOrderStatus();
@@ -138,7 +141,7 @@ export function PurchaseOrdersPage() {
 						value={search}
 						onChange={(event) => {
 							setSearch(event.target.value);
-							setPage(1);
+							resetPage();
 						}}
 						className="pl-9"
 					/>
@@ -268,34 +271,15 @@ export function PurchaseOrdersPage() {
 				onClose={() => setSelectedOrderId(null)}
 			/>
 
-			{(data?.totalPages ?? 1) > 1 ? (
-				<div className="flex items-center justify-between text-sm text-muted-foreground">
-					<span>{data?.total ?? 0} ordenes en total</span>
-					<div className="flex gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							className="cursor-pointer"
-							disabled={page <= 1}
-							onClick={() => setPage((current) => current - 1)}
-						>
-							Anterior
-						</Button>
-						<span className="flex items-center px-2">
-							{page} / {data?.totalPages ?? 1}
-						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							className="cursor-pointer"
-							disabled={page >= (data?.totalPages ?? 1)}
-							onClick={() => setPage((current) => current + 1)}
-						>
-							Siguiente
-						</Button>
-					</div>
-				</div>
-			) : null}
+			<DataTablePagination
+				page={page}
+				totalPages={data?.totalPages ?? 1}
+				total={data?.total ?? 0}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="orden"
+			/>
 		</div>
 	);
 }

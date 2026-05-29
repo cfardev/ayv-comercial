@@ -1,5 +1,6 @@
 import { IconCalendar, IconFileSpreadsheet, IconFileText } from "@tabler/icons-react";
 import { useState } from "react";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context.js";
 import {
 	hasPermissionOrSystemAdmin,
@@ -72,7 +74,8 @@ export function InventoryMovementsPage() {
 	const [productId, setProductId] = useState("");
 	const [supplierId, setSupplierId] = useState("");
 	const [createdBy, setCreatedBy] = useState("");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 	const [sortBy, setSortBy] = useState("createdAt");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 	const [selectedMovementId, setSelectedMovementId] = useState<string | null>(
@@ -90,7 +93,7 @@ export function InventoryMovementsPage() {
 		sortBy,
 		sortOrder,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
 	const items = movementsData?.data ?? [];
@@ -117,7 +120,7 @@ export function InventoryMovementsPage() {
 		setProductId("");
 		setSupplierId("");
 		setCreatedBy("");
-		setPage(1);
+		resetPage();
 	}
 
 	async function handleExport(format: "excel" | "pdf") {
@@ -182,7 +185,7 @@ export function InventoryMovementsPage() {
 					value={movementType}
 					onValueChange={(v) => {
 						setMovementType(v as MovementType | "ALL");
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[180px]">
@@ -205,7 +208,7 @@ export function InventoryMovementsPage() {
 					value={productId}
 					onValueChange={(v) => {
 						setProductId(v);
-						setPage(1);
+						resetPage();
 					}}
 				/>
 
@@ -213,7 +216,7 @@ export function InventoryMovementsPage() {
 					value={supplierId}
 					onValueChange={(v) => {
 						setSupplierId(v);
-						setPage(1);
+						resetPage();
 					}}
 				/>
 
@@ -221,7 +224,7 @@ export function InventoryMovementsPage() {
 					value={createdBy}
 					onValueChange={(v) => {
 						setCreatedBy(v);
-						setPage(1);
+						resetPage();
 					}}
 				/>
 
@@ -234,7 +237,7 @@ export function InventoryMovementsPage() {
 						value={startDate}
 						onChange={(e) => {
 							setStartDate(e.target.value);
-							setPage(1);
+							resetPage();
 						}}
 					/>
 				</div>
@@ -248,7 +251,7 @@ export function InventoryMovementsPage() {
 						value={endDate}
 						onChange={(e) => {
 							setEndDate(e.target.value);
-							setPage(1);
+							resetPage();
 						}}
 					/>
 				</div>
@@ -300,33 +303,15 @@ export function InventoryMovementsPage() {
 				onRowClick={handleRowClick}
 			/>
 
-			{totalPages > 1 ? (
-				<div className="flex items-center justify-center gap-2">
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="cursor-pointer"
-						disabled={page <= 1}
-						onClick={() => setPage((p) => Math.max(1, p - 1))}
-					>
-						Anterior
-					</Button>
-					<span className="text-sm text-muted-foreground">
-						Página {page} de {totalPages}
-					</span>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="cursor-pointer"
-						disabled={page >= totalPages}
-						onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-					>
-						Siguiente
-					</Button>
-				</div>
-			) : null}
+			<DataTablePagination
+				page={page}
+				totalPages={totalPages}
+				total={total}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="movimiento"
+			/>
 
 			<MovementDetailDialog
 				movementId={selectedMovementId}

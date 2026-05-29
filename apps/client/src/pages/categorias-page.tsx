@@ -9,7 +9,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { CategoriesTable } from "@/modules/categories/components/categories-table.js";
 import { CategoryFormDialog } from "@/modules/categories/components/category-form-dialog.js";
 import {
@@ -36,7 +38,8 @@ export function CategoriasPage() {
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
 	const [status, setStatus] = useState<StatusFilter>("true");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 
 	const [formOpen, setFormOpen] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
@@ -51,7 +54,7 @@ export function CategoriasPage() {
 		search: debouncedSearch || undefined,
 		status: status === "ALL" ? undefined : status,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
 	const createCategory = useCreateCategory();
@@ -182,7 +185,7 @@ export function CategoriasPage() {
 						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value);
-							setPage(1);
+							resetPage();
 						}}
 						className="pl-9"
 					/>
@@ -191,7 +194,7 @@ export function CategoriasPage() {
 					value={status}
 					onValueChange={(val) => {
 						setStatus(val as StatusFilter);
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-[160px] cursor-pointer">
@@ -220,37 +223,15 @@ export function CategoriasPage() {
 				isLoading={categoriesLoading}
 			/>
 
-			{/* Pagination */}
-			{totalPages > 1 && (
-				<div className="flex items-center justify-between text-sm text-muted-foreground">
-					<span>
-						{total} categoría{total !== 1 ? "s" : ""} en total
-					</span>
-					<div className="flex gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page <= 1}
-							onClick={() => setPage((p) => p - 1)}
-							className="cursor-pointer"
-						>
-							Anterior
-						</Button>
-						<span className="flex items-center px-2">
-							{page} / {totalPages}
-						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= totalPages}
-							onClick={() => setPage((p) => p + 1)}
-							className="cursor-pointer"
-						>
-							Siguiente
-						</Button>
-					</div>
-				</div>
-			)}
+			<DataTablePagination
+				page={page}
+				totalPages={totalPages}
+				total={total}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="categoría"
+			/>
 
 			{/* Form dialog */}
 			<CategoryFormDialog
