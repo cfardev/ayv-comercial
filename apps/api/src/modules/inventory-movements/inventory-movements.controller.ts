@@ -19,9 +19,7 @@ interface AuthenticatedRequest extends Request {
 @Controller("inventory/movements")
 @UseGuards(PermissionsGuard)
 export class InventoryMovementsController {
-	constructor(
-		private readonly movementsService: InventoryMovementsService,
-	) {}
+	constructor(private readonly movementsService: InventoryMovementsService) {}
 
 	@Get()
 	@RequirePermissions(PERMISSION_KEYS.INVENTORY_MOVEMENTS_READ)

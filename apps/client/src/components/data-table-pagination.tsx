@@ -1,8 +1,4 @@
 import {
-	PAGE_SIZE_OPTIONS,
-	type PageSize,
-} from "@/hooks/use-pagination-state";
-import {
 	Pagination,
 	PaginationContent,
 	PaginationItem,
@@ -16,6 +12,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { PAGE_SIZE_OPTIONS, type PageSize } from "@/hooks/use-pagination-state";
 
 interface DataTablePaginationProps {
 	page: number;
@@ -91,9 +88,7 @@ export function DataTablePagination({
 						<PaginationItem>
 							<PaginationNext
 								disabled={page >= safeTotalPages}
-								onClick={() =>
-									onPageChange(Math.min(safeTotalPages, page + 1))
-								}
+								onClick={() => onPageChange(Math.min(safeTotalPages, page + 1))}
 							/>
 						</PaginationItem>
 					</PaginationContent>

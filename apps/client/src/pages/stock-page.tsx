@@ -1,5 +1,6 @@
 import { IconSearch } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -8,7 +9,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
 import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context.js";

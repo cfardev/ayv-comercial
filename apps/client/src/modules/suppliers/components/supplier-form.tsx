@@ -134,7 +134,9 @@ export function SupplierForm({
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor={`${idPrefix}-contact-name`}>Persona de contacto</Label>
+					<Label htmlFor={`${idPrefix}-contact-name`}>
+						Persona de contacto
+					</Label>
 					<Input
 						id={`${idPrefix}-contact-name`}
 						placeholder="Ej. Ana Pérez"
@@ -193,7 +195,9 @@ export function SupplierForm({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor={`${idPrefix}-conditions`}>Condiciones comerciales</Label>
+				<Label htmlFor={`${idPrefix}-conditions`}>
+					Condiciones comerciales
+				</Label>
 				<Textarea
 					id={`${idPrefix}-conditions`}
 					placeholder="Observaciones, plazos o acuerdos comerciales"

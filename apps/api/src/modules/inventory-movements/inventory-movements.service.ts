@@ -170,7 +170,19 @@ export class InventoryMovementsService {
 				userId: actorId,
 				actorId,
 				action: "INVENTORY_MOVEMENTS_LIST",
-				details: { filters: { movementType: filters.movementType, startDate: filters.startDate, endDate: filters.endDate, productId: filters.productId, supplierId: filters.supplierId, createdBy: filters.createdBy }, total, page, limit },
+				details: {
+					filters: {
+						movementType: filters.movementType,
+						startDate: filters.startDate,
+						endDate: filters.endDate,
+						productId: filters.productId,
+						supplierId: filters.supplierId,
+						createdBy: filters.createdBy,
+					},
+					total,
+					page,
+					limit,
+				},
 			},
 		});
 

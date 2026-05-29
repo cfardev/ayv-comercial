@@ -8,11 +8,7 @@ import {
 
 const VALID_SORT_ORDERS = ["asc", "desc"] as const;
 
-const VALID_SORT_FIELDS = [
-	"createdAt",
-	"productName",
-	"quantity",
-] as const;
+const VALID_SORT_FIELDS = ["createdAt", "productName", "quantity"] as const;
 
 const VALID_MOVEMENT_TYPES = ["ENTRY", "EXIT", "ADJUSTMENT"] as const;
 

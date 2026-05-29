@@ -167,7 +167,13 @@ function DashboardSidebar({ currentPath }: { currentPath: string }) {
 			PERMISSION_KEYS.INVENTORY_MOVEMENTS_READ,
 			user?.role?.slug,
 		)
-			? [{ title: "Movimientos", url: "/inventario/movements", icon: IconChartBar }]
+			? [
+					{
+						title: "Movimientos",
+						url: "/inventario/movements",
+						icon: IconChartBar,
+					},
+				]
 			: []),
 	];
 

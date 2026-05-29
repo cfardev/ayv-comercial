@@ -1,4 +1,8 @@
-import { IconCalendar, IconFileSpreadsheet, IconFileText } from "@tabler/icons-react";
+import {
+	IconCalendar,
+	IconFileSpreadsheet,
+	IconFileText,
+} from "@tabler/icons-react";
 import { useState } from "react";
 import { DataTablePagination } from "@/components/data-table-pagination";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +34,7 @@ import {
 } from "@/modules/inventory-movements/components/index.js";
 import { MovementsTable } from "@/modules/inventory-movements/components/movements-table.js";
 import {
+	fetchAllMovementsForExport,
 	useInventoryMovementDetail,
 	useInventoryMovements,
 } from "@/modules/inventory-movements/hooks/use-inventory-movements.js";
@@ -41,7 +46,6 @@ import {
 	exportMovementsToExcel,
 	exportMovementsToPdf,
 } from "@/modules/inventory-movements/utils/export-movements.js";
-import { fetchAllMovementsForExport } from "@/modules/inventory-movements/hooks/use-inventory-movements.js";
 
 const MOVEMENT_TYPE_LABELS: Record<MovementType, string> = {
 	ENTRY: "Entrada",
@@ -175,8 +179,8 @@ export function InventoryMovementsPage() {
 					Movimientos de inventario
 				</h1>
 				<p className="text-muted-foreground text-sm">
-					Historial completo de entradas, salidas y ajustes de productos ({total}{" "}
-					en esta vista).
+					Historial completo de entradas, salidas y ajustes de productos (
+					{total} en esta vista).
 				</p>
 			</div>
 

@@ -1,6 +1,7 @@
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +20,6 @@ import {
 } from "@/lib/permission-keys.js";
 import { useBrandsList } from "@/modules/brands/hooks/use-brands.js";
 import { useCategories } from "@/modules/categories/hooks/use-categories.js";
-import { DataTablePagination } from "@/components/data-table-pagination";
 import { ProductsTable } from "@/modules/products/components/products-table.js";
 import { UpdatePricingDialog } from "@/modules/products/components/update-pricing-dialog.js";
 import {

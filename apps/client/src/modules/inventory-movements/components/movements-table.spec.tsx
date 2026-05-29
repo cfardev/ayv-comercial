@@ -4,7 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { InventoryMovement } from "../types/api.js";
 import { MovementsTable } from "./movements-table.js";
 
-const makeMovement = (overrides?: Partial<InventoryMovement>): InventoryMovement => ({
+const makeMovement = (
+	overrides?: Partial<InventoryMovement>,
+): InventoryMovement => ({
 	id: "mov-1",
 	productId: "prod-1",
 	productCode: "PROD-001",
@@ -24,6 +26,7 @@ const makeMovement = (overrides?: Partial<InventoryMovement>): InventoryMovement
 });
 
 let container: HTMLDivElement;
+let reactRoot: ReturnType<typeof createRoot> | null = null;
 
 beforeEach(() => {
 	container = document.createElement("div");
@@ -31,11 +34,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-	// Unmount and cleanup
-	const root = (container as any).__root;
-	if (root) {
-		root.unmount();
-	}
+	reactRoot?.unmount();
+	reactRoot = null;
 	document.body.removeChild(container);
 	vi.restoreAllMocks();
 });
@@ -43,10 +43,9 @@ afterEach(() => {
 function renderTable(
 	props: React.ComponentProps<typeof MovementsTable>,
 ): HTMLDivElement {
-	const root = createRoot(container);
-	(container as any).__root = root;
+	reactRoot = createRoot(container);
 	flushSync(() => {
-		root.render(<MovementsTable {...props} />);
+		reactRoot?.render(<MovementsTable {...props} />);
 	});
 	return container;
 }

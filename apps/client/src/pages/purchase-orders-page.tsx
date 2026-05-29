@@ -1,6 +1,7 @@
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -25,7 +26,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
 import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context";

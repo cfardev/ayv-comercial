@@ -42,9 +42,7 @@ async function fetchMovements(
 	return res.json() as Promise<PaginatedResponse<InventoryMovement>>;
 }
 
-async function fetchMovementDetail(
-	id: string,
-): Promise<InventoryMovement> {
+async function fetchMovementDetail(id: string): Promise<InventoryMovement> {
 	const res = await authFetch(`${API_BASE}/inventory/movements/${id}`);
 	if (!res.ok) {
 		const data = await res.json().catch(() => ({}));
@@ -56,9 +54,7 @@ async function fetchMovementDetail(
 	return res.json() as Promise<InventoryMovement>;
 }
 
-export const inventoryMovementsQueryKeyRoot = [
-	"inventory-movements",
-] as const;
+export const inventoryMovementsQueryKeyRoot = ["inventory-movements"] as const;
 
 const EXPORT_PAGE_SIZE = 100;
 
@@ -66,7 +62,8 @@ export async function fetchAllMovementsForExport(
 	filters: Omit<InventoryMovementFilters, "page" | "limit">,
 ): Promise<InventoryMovement[]> {
 	const baseParams = new URLSearchParams();
-	if (filters.movementType) baseParams.set("movementType", filters.movementType);
+	if (filters.movementType)
+		baseParams.set("movementType", filters.movementType);
 	if (filters.startDate) baseParams.set("startDate", filters.startDate);
 	if (filters.endDate) baseParams.set("endDate", filters.endDate);
 	if (filters.productId) baseParams.set("productId", filters.productId);

@@ -1,7 +1,7 @@
 import { Test, type TestingModule } from "@nestjs/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { InventoryMovementsService } from "./inventory-movements.service.js";
 import { PrismaService } from "../../common/prisma/prisma.service.js";
+import { InventoryMovementsService } from "./inventory-movements.service.js";
 
 /**
  * Minimal mock shape for the Prisma client used by InventoryMovementsService.
@@ -147,8 +147,12 @@ describe("InventoryMovementsService", () => {
 
 			await service.findOne("mov-1", actorId);
 
-			const whereArg = prisma.inventoryMovement.findFirst.mock.calls[0][0].where;
-			expect(whereArg).toMatchObject({ id: "mov-1", product: { status: true } });
+			const whereArg =
+				prisma.inventoryMovement.findFirst.mock.calls[0][0].where;
+			expect(whereArg).toMatchObject({
+				id: "mov-1",
+				product: { status: true },
+			});
 		});
 
 		it("throws NotFoundException when movement belongs to inactive product", async () => {

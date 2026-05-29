@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchAllMovementsForExport } from "./use-inventory-movements.js";
 import type { InventoryMovement, PaginatedResponse } from "../types/api.js";
+import { fetchAllMovementsForExport } from "./use-inventory-movements.js";
 
 // Mock authFetch before importing the module under test
 const mockAuthFetch = vi.fn();
@@ -130,6 +130,8 @@ describe("fetchAllMovementsForExport", () => {
 			json: () => Promise.resolve({ message: "Unauthorized" }),
 		});
 
-		await expect(fetchAllMovementsForExport({})).rejects.toThrow("Unauthorized");
+		await expect(fetchAllMovementsForExport({})).rejects.toThrow(
+			"Unauthorized",
+		);
 	});
 });

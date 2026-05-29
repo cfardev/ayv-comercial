@@ -1,6 +1,6 @@
-import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import type { InventoryMovement, MovementType } from "../types/api.js";
 
 const MOVEMENT_TYPE_LABELS: Record<MovementType, string> = {

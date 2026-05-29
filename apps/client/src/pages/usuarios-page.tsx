@@ -1,5 +1,6 @@
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
 import { usePaginationState } from "@/hooks/use-pagination-state";
 import type { UserRole } from "@/lib/user-roles.js";

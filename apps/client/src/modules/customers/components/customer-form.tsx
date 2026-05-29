@@ -172,9 +172,7 @@ export function CustomerForm({
 					<Input
 						id={`${idPrefix}-tax-id`}
 						placeholder={
-							personType === "NATURAL"
-								? "Ej. 1234567890"
-								: "Ej. 1234567890001"
+							personType === "NATURAL" ? "Ej. 1234567890" : "Ej. 1234567890001"
 						}
 						{...form.register("taxId")}
 					/>

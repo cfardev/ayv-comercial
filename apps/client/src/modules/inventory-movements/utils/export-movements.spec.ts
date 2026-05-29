@@ -26,15 +26,17 @@ vi.mock("jspdf-autotable", () => ({
 	default: vi.fn(),
 }));
 
-import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import {
 	exportMovementsToExcel,
 	exportMovementsToPdf,
 } from "./export-movements.js";
 
-const makeMovement = (overrides?: Partial<InventoryMovement>): InventoryMovement => ({
+const makeMovement = (
+	overrides?: Partial<InventoryMovement>,
+): InventoryMovement => ({
 	id: "mov-1",
 	productId: "prod-1",
 	productCode: "PROD-001",

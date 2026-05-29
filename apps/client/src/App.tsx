@@ -48,7 +48,10 @@ function DashboardRoutes() {
 					element={<InventoryEntryCreatePage />}
 				/>
 				<Route path="inventario/stock" element={<StockPage />} />
-				<Route path="inventario/movements" element={<InventoryMovementsPage />} />
+				<Route
+					path="inventario/movements"
+					element={<InventoryMovementsPage />}
+				/>
 				<Route path="inventory/stock" element={<StockPage />} />
 				<Route path="despachos" element={<Placeholder title="Despachos" />} />
 				<Route path="productos/nuevo" element={<ProductoCreatePage />} />
@@ -60,10 +63,7 @@ function DashboardRoutes() {
 				<Route path="categorias" element={<CategoriasPage />} />
 				<Route path="marcas" element={<MarcasPage />} />
 				<Route path="proveedores/nuevo" element={<ProveedorCreatePage />} />
-				<Route
-					path="proveedores/:id/editar"
-					element={<ProveedorEditPage />}
-				/>
+				<Route path="proveedores/:id/editar" element={<ProveedorEditPage />} />
 				<Route path="proveedores" element={<ProveedoresPage />} />
 				<Route path="usuarios" element={<UsersPage />} />
 				<Route path="reportes" element={<Placeholder title="Reportes" />} />
