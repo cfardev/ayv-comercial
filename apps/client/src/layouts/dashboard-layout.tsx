@@ -69,7 +69,7 @@ function getInitials(fullName: string): string {
 		.toUpperCase();
 }
 
-const navOperaciones: DashboardNavItem[] = [
+const navOperacionesBase: DashboardNavItem[] = [
 	{ title: "Panel", url: "/", icon: IconLayoutDashboard },
 	{ title: "Pedidos", url: "/pedidos", icon: IconFileInvoice },
 	{
@@ -100,10 +100,14 @@ const pageTitles: Record<string, string> = {
 	"/inventario": "Inventario",
 	"/inventario/entries": "Entradas de inventario",
 	"/inventario/stock": "Existencias",
+	"/inventario/movements": "Movimientos de inventario",
 	"/despachos": "Despachos",
 	"/productos": "Productos",
 	"/productos/nuevo": "Nuevo producto",
 	"/categorias": "Categorías",
+	"/clientes/nuevo": "Nuevo cliente",
+	"/proveedores/nuevo": "Nuevo proveedor",
+	"/inventario/entries/nuevo": "Nueva entrada",
 	"/marcas": "Marcas",
 	"/proveedores": "Proveedores",
 	"/clientes": "Clientes",
@@ -155,6 +159,17 @@ function NavGroup({
 function DashboardSidebar({ currentPath }: { currentPath: string }) {
 	const { user, logout } = useAuth();
 	const { setOpenMobile } = useSidebar();
+
+	const navOperaciones: DashboardNavItem[] = [
+		...navOperacionesBase,
+		...(hasPermissionOrSystemAdmin(
+			user?.permissions,
+			PERMISSION_KEYS.INVENTORY_MOVEMENTS_READ,
+			user?.role?.slug,
+		)
+			? [{ title: "Movimientos", url: "/inventario/movements", icon: IconChartBar }]
+			: []),
+	];
 
 	const navReportes: DashboardNavItem[] = [
 		{ title: "Reportes", url: "/reportes", icon: IconChartBar },

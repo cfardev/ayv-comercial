@@ -10,7 +10,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import type { UserRole } from "@/lib/user-roles.js";
 import { USER_ROLE_OPTIONS } from "@/lib/user-roles.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
@@ -41,7 +43,8 @@ export function UsersPage() {
 	const debouncedSearch = useDebounce(search, 300);
 	const [status, setStatus] = useState<UserStatus | "ALL">("ACTIVE");
 	const [roleFilter, setRoleFilter] = useState<UserRole | "ALL">("ALL");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 
 	const [formOpen, setFormOpen] = useState(false);
 	const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -56,7 +59,7 @@ export function UsersPage() {
 		status,
 		role: roleFilter !== "ALL" ? roleFilter : undefined,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
 	const createUser = useCreateUser();
@@ -153,7 +156,7 @@ export function UsersPage() {
 						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value);
-							setPage(1);
+							resetPage();
 						}}
 						className="pl-9"
 					/>
@@ -165,7 +168,7 @@ export function UsersPage() {
 						value={status}
 						onValueChange={(value) => {
 							setStatus(value as UserStatus | "ALL");
-							setPage(1);
+							resetPage();
 						}}
 					>
 						<SelectTrigger className="w-[150px]">
@@ -187,7 +190,7 @@ export function UsersPage() {
 						value={roleFilter}
 						onValueChange={(value) => {
 							setRoleFilter(value as UserRole | "ALL");
-							setPage(1);
+							resetPage();
 						}}
 					>
 						<SelectTrigger className="w-[200px]">
@@ -214,29 +217,15 @@ export function UsersPage() {
 				isLoading={usersLoading}
 			/>
 
-			{usersData && usersData.totalPages > 1 && (
-				<div className="flex items-center justify-center gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setPage((p) => Math.max(1, p - 1))}
-						disabled={page === 1}
-					>
-						Anterior
-					</Button>
-					<span className="text-sm text-muted-foreground">
-						Página {page} de {usersData.totalPages}
-					</span>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setPage((p) => p + 1)}
-						disabled={page >= usersData.totalPages}
-					>
-						Siguiente
-					</Button>
-				</div>
-			)}
+			<DataTablePagination
+				page={page}
+				totalPages={usersData?.totalPages ?? 1}
+				total={usersData?.total ?? 0}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="usuario"
+			/>
 
 			<UserFormDialog
 				open={formOpen}

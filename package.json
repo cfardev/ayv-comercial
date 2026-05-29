@@ -7,7 +7,7 @@
 		"prepare": "husky",
 		"build": "turbo run build",
 		"start": "pnpm --filter @ayv-comercial/client run build && pnpm --filter @ayv-comercial/api run build && pnpm --filter @ayv-comercial/api run start:prod",
-		"dev": "turbo run dev --log-order stream",
+		"dev": "turbo run dev --ui tui --filter=@ayv-comercial/api --filter=@ayv-comercial/client",
 		"typecheck": "turbo run typecheck",
 		"lint": "turbo run lint",
 		"test": "turbo run test",

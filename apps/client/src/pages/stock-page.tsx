@@ -1,6 +1,5 @@
 import { IconSearch } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -9,7 +8,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context.js";
 import {
 	hasPermissionOrSystemAdmin,
@@ -45,7 +46,8 @@ export function StockPage() {
 	const [categoryId, setCategoryId] = useState<string | "ALL">("ALL");
 	const [brandId, setBrandId] = useState<string | "ALL">("ALL");
 	const [supplierId, setSupplierId] = useState<string | "ALL">("ALL");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 	const [sortBy, setSortBy] = useState("name");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
@@ -82,7 +84,7 @@ export function StockPage() {
 		sortBy,
 		sortOrder,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
 	const items = stockData?.data ?? [];
@@ -119,7 +121,7 @@ export function StockPage() {
 						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value);
-							setPage(1);
+							resetPage();
 						}}
 					/>
 				</div>
@@ -128,7 +130,7 @@ export function StockPage() {
 					value={stockStatus}
 					onValueChange={(v) => {
 						setStockStatus(v as StockStatus | "ALL");
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[180px]">
@@ -151,7 +153,7 @@ export function StockPage() {
 					value={categoryId}
 					onValueChange={(v) => {
 						setCategoryId(v as string | "ALL");
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[200px]">
@@ -173,7 +175,7 @@ export function StockPage() {
 					value={brandId}
 					onValueChange={(v) => {
 						setBrandId(v as string | "ALL");
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[180px]">
@@ -195,7 +197,7 @@ export function StockPage() {
 					value={supplierId}
 					onValueChange={(v) => {
 						setSupplierId(v as string | "ALL");
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[200px]">
@@ -223,33 +225,15 @@ export function StockPage() {
 				onSort={handleSort}
 			/>
 
-			{totalPages > 1 ? (
-				<div className="flex items-center justify-center gap-2">
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="cursor-pointer"
-						disabled={page <= 1}
-						onClick={() => setPage((p) => Math.max(1, p - 1))}
-					>
-						Anterior
-					</Button>
-					<span className="text-sm text-muted-foreground">
-						Página {page} de {totalPages}
-					</span>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="cursor-pointer"
-						disabled={page >= totalPages}
-						onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-					>
-						Siguiente
-					</Button>
-				</div>
-			) : null}
+			<DataTablePagination
+				page={page}
+				totalPages={totalPages}
+				total={total}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="producto"
+			/>
 		</div>
 	);
 }

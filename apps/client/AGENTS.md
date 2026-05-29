@@ -81,6 +81,7 @@ src/
 
 - All clickable elements (buttons, links, interactive cards, etc.) must include `cursor-pointer` utility class
 - Do not place large forms inside `Dialog`. If a form has more than 4 fields, it must be implemented as a dedicated page/route instead of a modal.
+- Every table must have a Pagination component with changeable page size.
 
 ### Async Data Loading
 

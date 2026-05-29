@@ -73,22 +73,23 @@ El actor selecciona la opción "Movimientos de inventario" o "Historial de inven
 
 ### Base de datos
 
-- [ ] Verificar que el modelo `InventoryMovement` (creado en CU10) contiene: `id`, `productId`, `movementType`, `quantity`, `previousStock`, `newStock`, `referenceId?`, `referenceType?`, `createdBy`, `createdAt`
-- [ ] Agregar relación `InventoryMovement` → `Product` y `InventoryMovement` → `User` para joins en consulta
+- [x] Verificar que el modelo `InventoryMovement` (creado en CU10) contiene: `id`, `productId`, `movementType`, `quantity`, `previousStock`, `newStock`, `referenceId?`, `referenceType?`, `createdBy`, `createdAt`
+- [x] Agregar relación `InventoryMovement` → `Product` y `InventoryMovement` → `User` para joins en consulta
 
 ### API (NestJS)
 
-- [ ] `GET /inventory/movements` — listar movimientos paginado; filtros: `movementType`, rango de fechas (`startDate`, `endDate`), `productId`, `supplierId`, `createdBy`; guard: todos los roles autenticados
-- [ ] Incluir en respuesta: fecha/hora, tipo, producto (nombre + código), proveedor, cantidad, documento de referencia, usuario responsable, stock anterior, stock nuevo
-- [ ] Ocultar campos de costo en respuesta para rol `SELLER`
-- [ ] Soporte de ordenamiento por fecha, producto o cantidad
-- [ ] `GET /inventory/movements/:id` — detalle de un movimiento (incluir motivo si es ajuste)
+- [x] `GET /inventory/movements` — listar movimientos paginado; filtros: `movementType`, rango de fechas (`startDate`, `endDate`), `productId`, `supplierId`, `createdBy`; guard: todos los roles autenticados
+- [x] Incluir en respuesta: fecha/hora, tipo, producto (nombre + código), proveedor, cantidad, documento de referencia, usuario responsable, stock anterior, stock nuevo
+- [x] Ocultar campos de costo en respuesta para rol `SELLER`
+- [x] Soporte de ordenamiento por fecha, producto o cantidad
+- [x] `GET /inventory/movements/:id` — detalle de un movimiento (incluir motivo si es ajuste)
 
 ### Frontend (React)
 
-- [ ] Crear página `/inventory/movements` protegida para todos los roles autenticados
-- [ ] Tabla paginada con columnas: fecha/hora, tipo, producto, proveedor, cantidad, documento de referencia, usuario
-- [ ] Chips de tipo de movimiento: entrada (verde), salida (rojo)
-- [ ] Filtros por tipo de movimiento, rango de fechas, producto, proveedor y usuario
-- [ ] Click en fila para ver detalle (modal o página): incluir motivo del ajuste y valores antes/después
-- [ ] Integrar con TanStack Query (`useQuery`)
+- [x] Crear página `/inventario/movements` protegida para todos los roles autenticados
+- [x] Tabla paginada con columnas: fecha/hora, tipo, producto, proveedor, cantidad, documento de referencia, usuario
+- [x] Chips de tipo de movimiento: entrada (verde), salida (rojo)
+- [x] Filtros por tipo de movimiento, rango de fechas, producto, proveedor y usuario
+- [x] Click en fila para ver detalle (modal o página): incluir motivo del ajuste y valores antes/después
+- [x] Integrar con TanStack Query (`useQuery`)
+- [x] Botones de exportación a Excel y PDF (exporta el dataset completo filtrado, no solo la página visible)

@@ -38,6 +38,7 @@ export const PERMISSION_KEYS = {
 	INVENTORY_ENTRIES_READ: "inventory-entries:read",
 	INVENTORY_ENTRIES_CREATE: "inventory-entries:create",
 	INVENTORY_STOCK_READ: "inventory-stock:read",
+	INVENTORY_MOVEMENTS_READ: "inventory-movements:read",
 } as const;
 
 export type PermissionKey =

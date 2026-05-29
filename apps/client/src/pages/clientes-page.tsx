@@ -1,5 +1,7 @@
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,14 +12,12 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce.js";
-import { CustomerFormDialog } from "@/modules/customers/components/customer-form-dialog.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { CustomersTable } from "@/modules/customers/components/customers-table.js";
 import {
 	useActivateCustomer,
-	useCreateCustomer,
 	useCustomers,
 	useDeactivateCustomer,
-	useUpdateCustomer,
 } from "@/modules/customers/hooks/use-customers.js";
 import type { Customer } from "@/modules/customers/types/api.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
@@ -40,14 +40,13 @@ const personTypeOptions: { value: PersonTypeFilter; label: string }[] = [
 const DEBOUNCE_DELAY = 300;
 
 export function ClientesPage() {
+	const navigate = useNavigate();
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
 	const [status, setStatus] = useState<StatusFilter>("true");
 	const [personType, setPersonType] = useState<PersonTypeFilter>("ALL");
-	const [page, setPage] = useState(1);
-	const [formOpen, setFormOpen] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
-	const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 	const [confirmDialog, setConfirmDialog] = useState<{
 		open: boolean;
 		customer: Customer | null;
@@ -59,11 +58,9 @@ export function ClientesPage() {
 		personType: personType !== "ALL" ? personType : undefined,
 		isActive: status,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
-	const createCustomer = useCreateCustomer();
-	const updateCustomer = useUpdateCustomer();
 	const deactivateCustomer = useDeactivateCustomer();
 	const activateCustomer = useActivateCustomer();
 
@@ -71,16 +68,8 @@ export function ClientesPage() {
 	const total = customersData?.total ?? 0;
 	const totalPages = customersData?.totalPages ?? 1;
 
-	function handleCreate() {
-		setFormError(null);
-		setEditingCustomer(null);
-		setFormOpen(true);
-	}
-
 	function handleEdit(customer: Customer) {
-		setFormError(null);
-		setEditingCustomer(customer);
-		setFormOpen(true);
+		navigate(`/clientes/${customer.id}/editar`, { state: { customer } });
 	}
 
 	function handleDeactivate(customer: Customer) {
@@ -89,36 +78,6 @@ export function ClientesPage() {
 
 	function handleActivate(customer: Customer) {
 		setConfirmDialog({ open: true, customer, action: "activate" });
-	}
-
-	function handleFormSubmit(data: {
-		personType: "NATURAL" | "JURIDICA";
-		fullName: string;
-		taxId: string;
-		address?: string;
-		phone?: string;
-		email?: string;
-	}) {
-		setFormError(null);
-
-		if (editingCustomer) {
-			updateCustomer.mutate(
-				{
-					id: editingCustomer.id,
-					data,
-				},
-				{
-					onSuccess: () => setFormOpen(false),
-					onError: (error) => setFormError(error.message),
-				},
-			);
-			return;
-		}
-
-		createCustomer.mutate(data, {
-			onSuccess: () => setFormOpen(false),
-			onError: (error) => setFormError(error.message),
-		});
 	}
 
 	function handleConfirm() {
@@ -166,9 +125,11 @@ export function ClientesPage() {
 						Gestiona el maestro de clientes para ventas y facturación.
 					</p>
 				</div>
-				<Button onClick={handleCreate} className="cursor-pointer">
-					<IconPlus className="mr-2 h-4 w-4" />
-					Nuevo cliente
+				<Button asChild className="cursor-pointer">
+					<Link to="/clientes/nuevo">
+						<IconPlus className="mr-2 h-4 w-4" />
+						Nuevo cliente
+					</Link>
 				</Button>
 			</div>
 
@@ -180,7 +141,7 @@ export function ClientesPage() {
 						value={search}
 						onChange={(event) => {
 							setSearch(event.target.value);
-							setPage(1);
+							resetPage();
 						}}
 						className="pl-9"
 					/>
@@ -189,7 +150,7 @@ export function ClientesPage() {
 					value={personType}
 					onValueChange={(value) => {
 						setPersonType(value as PersonTypeFilter);
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-[180px] cursor-pointer">
@@ -211,7 +172,7 @@ export function ClientesPage() {
 					value={status}
 					onValueChange={(value) => {
 						setStatus(value as StatusFilter);
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-[140px] cursor-pointer">
@@ -239,50 +200,14 @@ export function ClientesPage() {
 				isLoading={customersLoading}
 			/>
 
-			{totalPages > 1 ? (
-				<div className="flex items-center justify-between text-sm text-muted-foreground">
-					<span>
-						{total} cliente{total !== 1 ? "s" : ""} en total
-					</span>
-					<div className="flex gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page <= 1}
-							onClick={() => setPage((current) => current - 1)}
-							className="cursor-pointer"
-						>
-							Anterior
-						</Button>
-						<span className="flex items-center px-2">
-							{page} / {totalPages}
-						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= totalPages}
-							onClick={() => setPage((current) => current + 1)}
-							className="cursor-pointer"
-						>
-							Siguiente
-						</Button>
-					</div>
-				</div>
-			) : null}
-
-			<CustomerFormDialog
-				open={formOpen}
-				onOpenChange={(open) => {
-					setFormOpen(open);
-					if (!open) {
-						setEditingCustomer(null);
-						setFormError(null);
-					}
-				}}
-				customer={editingCustomer}
-				onSubmit={handleFormSubmit}
-				errorMessage={formError}
-				isLoading={createCustomer.isPending || updateCustomer.isPending}
+			<DataTablePagination
+				page={page}
+				totalPages={totalPages}
+				total={total}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="cliente"
 			/>
 
 			<ConfirmDialog

@@ -25,7 +25,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context";
 import {
 	hasPermissionOrSystemAdmin,
@@ -83,7 +85,8 @@ export function PurchaseOrdersPage() {
 	const [statusFilter, setStatusFilter] = useState<
 		"ACTIVE" | PurchaseOrderStatus
 	>("ACTIVE");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 	const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 	const debouncedSearch = useDebounce(search, 300);
 
@@ -96,7 +99,7 @@ export function PurchaseOrdersPage() {
 		search: debouncedSearch || undefined,
 		status,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
 	const updateStatus = useUpdatePurchaseOrderStatus();
@@ -138,7 +141,7 @@ export function PurchaseOrdersPage() {
 						value={search}
 						onChange={(event) => {
 							setSearch(event.target.value);
-							setPage(1);
+							resetPage();
 						}}
 						className="pl-9"
 					/>
@@ -268,34 +271,15 @@ export function PurchaseOrdersPage() {
 				onClose={() => setSelectedOrderId(null)}
 			/>
 
-			{(data?.totalPages ?? 1) > 1 ? (
-				<div className="flex items-center justify-between text-sm text-muted-foreground">
-					<span>{data?.total ?? 0} ordenes en total</span>
-					<div className="flex gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							className="cursor-pointer"
-							disabled={page <= 1}
-							onClick={() => setPage((current) => current - 1)}
-						>
-							Anterior
-						</Button>
-						<span className="flex items-center px-2">
-							{page} / {data?.totalPages ?? 1}
-						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							className="cursor-pointer"
-							disabled={page >= (data?.totalPages ?? 1)}
-							onClick={() => setPage((current) => current + 1)}
-						>
-							Siguiente
-						</Button>
-					</div>
-				</div>
-			) : null}
+			<DataTablePagination
+				page={page}
+				totalPages={data?.totalPages ?? 1}
+				total={data?.total ?? 0}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="orden"
+			/>
 		</div>
 	);
 }
@@ -316,34 +300,38 @@ function PurchaseOrderDetailDialog({
 				if (!open) onClose();
 			}}
 		>
-			<DialogContent>
+			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle>Detalle de orden</DialogTitle>
 				</DialogHeader>
 				{selected ? (
-					<div className="space-y-3">
+					<div className="min-w-0 space-y-3">
 						<p className="text-sm">
 							{selected.referenceNumber} - {selected.supplierName}
 						</p>
-						<div className="rounded-md border">
+						<div className="overflow-x-auto rounded-md border">
 							<Table>
 								<TableHeader>
 									<TableRow>
 										<TableHead>Producto</TableHead>
-										<TableHead>Cantidad</TableHead>
-										<TableHead>Unitario</TableHead>
-										<TableHead>Subtotal</TableHead>
+										<TableHead className="text-right">Cantidad</TableHead>
+										<TableHead className="text-right">Unitario</TableHead>
+										<TableHead className="text-right">Subtotal</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
 									{selected.items?.map((item) => (
 										<TableRow key={item.id}>
-											<TableCell>{item.productName}</TableCell>
-											<TableCell>{item.quantityOrdered}</TableCell>
-											<TableCell>
+											<TableCell className="max-w-[200px] truncate">
+												{item.productName}
+											</TableCell>
+											<TableCell className="text-right tabular-nums whitespace-nowrap">
+												{item.quantityOrdered}
+											</TableCell>
+											<TableCell className="text-right tabular-nums whitespace-nowrap">
 												{item.unitCost ? `$${item.unitCost.toFixed(2)}` : "—"}
 											</TableCell>
-											<TableCell>
+											<TableCell className="text-right tabular-nums whitespace-nowrap">
 												{item.subtotal ? `$${item.subtotal.toFixed(2)}` : "—"}
 											</TableCell>
 										</TableRow>

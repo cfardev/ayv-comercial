@@ -9,7 +9,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { useDebounce } from "@/hooks/use-debounce.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context.js";
 import {
 	hasPermissionOrSystemAdmin,
@@ -49,7 +51,8 @@ export function MarcasPage() {
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
 	const [status, setStatus] = useState<StatusFilter>("true");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 
 	const [formOpen, setFormOpen] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
@@ -64,7 +67,7 @@ export function MarcasPage() {
 		search: debouncedSearch || undefined,
 		status,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
 	const createBrand = useCreateBrand();
@@ -194,7 +197,7 @@ export function MarcasPage() {
 						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value);
-							setPage(1);
+							resetPage();
 						}}
 						className="pl-9"
 					/>
@@ -203,7 +206,7 @@ export function MarcasPage() {
 					value={status}
 					onValueChange={(val) => {
 						setStatus(val as StatusFilter);
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-[160px] cursor-pointer">
@@ -231,36 +234,15 @@ export function MarcasPage() {
 				isLoading={brandsLoading}
 			/>
 
-			{totalPages > 1 && (
-				<div className="flex items-center justify-between text-sm text-muted-foreground">
-					<span>
-						{total} marca{total !== 1 ? "s" : ""} en total
-					</span>
-					<div className="flex gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page <= 1}
-							onClick={() => setPage((p) => p - 1)}
-							className="cursor-pointer"
-						>
-							Anterior
-						</Button>
-						<span className="flex items-center px-2">
-							{page} / {totalPages}
-						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= totalPages}
-							onClick={() => setPage((p) => p + 1)}
-							className="cursor-pointer"
-						>
-							Siguiente
-						</Button>
-					</div>
-				</div>
-			)}
+			<DataTablePagination
+				page={page}
+				totalPages={totalPages}
+				total={total}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="marca"
+			/>
 
 			<BrandFormDialog
 				open={formOpen}

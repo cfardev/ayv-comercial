@@ -1,5 +1,7 @@
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,14 +12,12 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce.js";
-import { SupplierFormDialog } from "@/modules/suppliers/components/supplier-form-dialog.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { SuppliersTable } from "@/modules/suppliers/components/suppliers-table.js";
 import {
-	useCreateSupplier,
 	useDeactivateSupplier,
 	useReactivateSupplier,
 	useSuppliers,
-	useUpdateSupplier,
 } from "@/modules/suppliers/hooks/use-suppliers.js";
 import type { Supplier } from "@/modules/suppliers/types/api.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
@@ -33,13 +33,12 @@ const statusOptions: { value: StatusFilter; label: string }[] = [
 const DEBOUNCE_DELAY = 300;
 
 export function ProveedoresPage() {
+	const navigate = useNavigate();
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
 	const [status, setStatus] = useState<StatusFilter>("true");
-	const [page, setPage] = useState(1);
-	const [formOpen, setFormOpen] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
-	const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 	const [confirmDialog, setConfirmDialog] = useState<{
 		open: boolean;
 		supplier: Supplier | null;
@@ -50,11 +49,9 @@ export function ProveedoresPage() {
 		search: debouncedSearch || undefined,
 		status,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
-	const createSupplier = useCreateSupplier();
-	const updateSupplier = useUpdateSupplier();
 	const deactivateSupplier = useDeactivateSupplier();
 	const reactivateSupplier = useReactivateSupplier();
 
@@ -62,16 +59,8 @@ export function ProveedoresPage() {
 	const total = suppliersData?.total ?? 0;
 	const totalPages = suppliersData?.totalPages ?? 1;
 
-	function handleCreate() {
-		setFormError(null);
-		setEditingSupplier(null);
-		setFormOpen(true);
-	}
-
 	function handleEdit(supplier: Supplier) {
-		setFormError(null);
-		setEditingSupplier(supplier);
-		setFormOpen(true);
+		navigate(`/proveedores/${supplier.id}/editar`, { state: { supplier } });
 	}
 
 	function handleDeactivate(supplier: Supplier) {
@@ -80,37 +69,6 @@ export function ProveedoresPage() {
 
 	function handleReactivate(supplier: Supplier) {
 		setConfirmDialog({ open: true, supplier, action: "reactivate" });
-	}
-
-	function handleFormSubmit(data: {
-		name: string;
-		taxId: string;
-		contactName?: string;
-		phone?: string;
-		email?: string;
-		address?: string;
-		commercialConditions?: string;
-	}) {
-		setFormError(null);
-
-		if (editingSupplier) {
-			updateSupplier.mutate(
-				{
-					id: editingSupplier.id,
-					data,
-				},
-				{
-					onSuccess: () => setFormOpen(false),
-					onError: (error) => setFormError(error.message),
-				},
-			);
-			return;
-		}
-
-		createSupplier.mutate(data, {
-			onSuccess: () => setFormOpen(false),
-			onError: (error) => setFormError(error.message),
-		});
 	}
 
 	function handleConfirm() {
@@ -158,9 +116,11 @@ export function ProveedoresPage() {
 						Gestiona el maestro de proveedores para abastecimiento.
 					</p>
 				</div>
-				<Button onClick={handleCreate} className="cursor-pointer">
-					<IconPlus className="mr-2 h-4 w-4" />
-					Nuevo proveedor
+				<Button asChild className="cursor-pointer">
+					<Link to="/proveedores/nuevo">
+						<IconPlus className="mr-2 h-4 w-4" />
+						Nuevo proveedor
+					</Link>
 				</Button>
 			</div>
 
@@ -172,7 +132,7 @@ export function ProveedoresPage() {
 						value={search}
 						onChange={(event) => {
 							setSearch(event.target.value);
-							setPage(1);
+							resetPage();
 						}}
 						className="pl-9"
 					/>
@@ -181,7 +141,7 @@ export function ProveedoresPage() {
 					value={status}
 					onValueChange={(value) => {
 						setStatus(value as StatusFilter);
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-[160px] cursor-pointer">
@@ -209,50 +169,14 @@ export function ProveedoresPage() {
 				isLoading={suppliersLoading}
 			/>
 
-			{totalPages > 1 ? (
-				<div className="flex items-center justify-between text-sm text-muted-foreground">
-					<span>
-						{total} proveedor{total !== 1 ? "es" : ""} en total
-					</span>
-					<div className="flex gap-2">
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page <= 1}
-							onClick={() => setPage((current) => current - 1)}
-							className="cursor-pointer"
-						>
-							Anterior
-						</Button>
-						<span className="flex items-center px-2">
-							{page} / {totalPages}
-						</span>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= totalPages}
-							onClick={() => setPage((current) => current + 1)}
-							className="cursor-pointer"
-						>
-							Siguiente
-						</Button>
-					</div>
-				</div>
-			) : null}
-
-			<SupplierFormDialog
-				open={formOpen}
-				onOpenChange={(open) => {
-					setFormOpen(open);
-					if (!open) {
-						setEditingSupplier(null);
-						setFormError(null);
-					}
-				}}
-				supplier={editingSupplier}
-				onSubmit={handleFormSubmit}
-				errorMessage={formError}
-				isLoading={createSupplier.isPending || updateSupplier.isPending}
+			<DataTablePagination
+				page={page}
+				totalPages={totalPages}
+				total={total}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="proveedor"
 			/>
 
 			<ConfirmDialog

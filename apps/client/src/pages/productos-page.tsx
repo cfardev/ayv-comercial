@@ -11,6 +11,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce.js";
+import { usePaginationState } from "@/hooks/use-pagination-state";
 import { useAuth } from "@/lib/auth-context.js";
 import {
 	hasPermissionOrSystemAdmin,
@@ -18,7 +19,7 @@ import {
 } from "@/lib/permission-keys.js";
 import { useBrandsList } from "@/modules/brands/hooks/use-brands.js";
 import { useCategories } from "@/modules/categories/hooks/use-categories.js";
-import { ProductFormDialog } from "@/modules/products/components/product-form-dialog.js";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { ProductsTable } from "@/modules/products/components/products-table.js";
 import { UpdatePricingDialog } from "@/modules/products/components/update-pricing-dialog.js";
 import {
@@ -27,14 +28,11 @@ import {
 	useProducts,
 	useReactivateProduct,
 	useUpdatePricing,
-	useUpdateProduct,
 } from "@/modules/products/hooks/use-products.js";
 import type {
 	Product,
 	UpdatePricingPayload,
 } from "@/modules/products/types/api.js";
-import type { ProductFormValues } from "@/modules/products/types/schema.js";
-import { buildUpdateProductPayload } from "@/modules/products/utils/build-product-api-payload.js";
 import { ConfirmDialog } from "@/modules/users/components/confirm-dialog.js";
 
 type StatusFilter = "ALL" | "true" | "false";
@@ -86,11 +84,9 @@ export function ProductosPage() {
 	const [status, setStatus] = useState<StatusFilter>("true");
 	const [categoryId, setCategoryId] = useState<string | "ALL">("ALL");
 	const [brandId, setBrandId] = useState<string | "ALL">("ALL");
-	const [page, setPage] = useState(1);
+	const { page, setPage, pageSize, setPageSize, resetPage } =
+		usePaginationState();
 
-	const [editDialogOpen, setEditDialogOpen] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
-	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 	const [confirmDialog, setConfirmDialog] = useState<{
 		open: boolean;
 		product: Product | null;
@@ -134,10 +130,9 @@ export function ProductosPage() {
 		categoryId: categoryId === "ALL" ? undefined : categoryId,
 		brandId: brandId === "ALL" ? undefined : brandId,
 		page,
-		limit: 20,
+		limit: pageSize,
 	});
 
-	const updateProduct = useUpdateProduct();
 	const deactivateProduct = useDeactivateProduct();
 	const reactivateProduct = useReactivateProduct();
 	const updatePricing = useUpdatePricing();
@@ -162,9 +157,7 @@ export function ProductosPage() {
 	}, [deactivationInfo, pendingDeactivateId, products]);
 
 	function handleEdit(product: Product) {
-		setFormError(null);
-		setEditingProduct(product);
-		setEditDialogOpen(true);
+		navigate(`/productos/${product.id}/editar`);
 	}
 
 	function handleOpenPricingDialog(product: Product) {
@@ -266,25 +259,6 @@ export function ProductosPage() {
 	const isConfirmLoading =
 		deactivateProduct.isPending || reactivateProduct.isPending;
 
-	async function onSubmitEditForm(values: ProductFormValues) {
-		setFormError(null);
-		const productBeingEdited = editingProduct;
-		if (!productBeingEdited) return;
-
-		try {
-			await updateProduct.mutateAsync({
-				id: productBeingEdited.id,
-				data: buildUpdateProductPayload(values),
-			});
-			setEditDialogOpen(false);
-			setEditingProduct(null);
-		} catch (e) {
-			setFormError(e instanceof Error ? e.message : "Error al guardar");
-		}
-	}
-
-	const formBusy = updateProduct.isPending;
-
 	return (
 		<div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
 			<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -315,7 +289,7 @@ export function ProductosPage() {
 						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value);
-							setPage(1);
+							resetPage();
 						}}
 					/>
 				</div>
@@ -323,7 +297,7 @@ export function ProductosPage() {
 					value={categoryId}
 					onValueChange={(v) => {
 						setCategoryId(v as string | "ALL");
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[200px]">
@@ -344,7 +318,7 @@ export function ProductosPage() {
 					value={brandId}
 					onValueChange={(v) => {
 						setBrandId(v as string | "ALL");
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[180px]">
@@ -365,7 +339,7 @@ export function ProductosPage() {
 					value={status}
 					onValueChange={(v) => {
 						setStatus(v as StatusFilter);
-						setPage(1);
+						resetPage();
 					}}
 				>
 					<SelectTrigger className="w-full cursor-pointer md:w-[160px]">
@@ -399,47 +373,14 @@ export function ProductosPage() {
 				isLoading={productsLoading}
 			/>
 
-			{totalPages > 1 ? (
-				<div className="flex items-center justify-center gap-2">
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="cursor-pointer"
-						disabled={page <= 1}
-						onClick={() => setPage((p) => Math.max(1, p - 1))}
-					>
-						Anterior
-					</Button>
-					<span className="text-sm text-muted-foreground">
-						Página {page} de {totalPages}
-					</span>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="cursor-pointer"
-						disabled={page >= totalPages}
-						onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-					>
-						Siguiente
-					</Button>
-				</div>
-			) : null}
-
-			<ProductFormDialog
-				open={editDialogOpen}
-				onOpenChange={(open) => {
-					setEditDialogOpen(open);
-					if (!open) {
-						setEditingProduct(null);
-						setFormError(null);
-					}
-				}}
-				product={editingProduct}
-				onSubmit={onSubmitEditForm}
-				errorMessage={formError}
-				isLoading={formBusy}
+			<DataTablePagination
+				page={page}
+				totalPages={totalPages}
+				total={total}
+				pageSize={pageSize}
+				onPageChange={setPage}
+				onPageSizeChange={setPageSize}
+				itemLabel="producto"
 			/>
 
 			<ConfirmDialog
