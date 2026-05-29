@@ -27,6 +27,8 @@ export function ProveedorEditPage() {
 		return <Navigate to="/proveedores" replace />;
 	}
 
+	const supplierId = id;
+
 	function goBack() {
 		navigate("/proveedores");
 	}
@@ -34,7 +36,7 @@ export function ProveedorEditPage() {
 	function onSubmit(data: SupplierFormSubmitData) {
 		setFormError(null);
 		updateSupplier.mutate(
-			{ id: supplier!.id, data },
+			{ id: supplierId, data },
 			{
 				onSuccess: () => navigate("/proveedores"),
 				onError: (error) => setFormError(error.message),

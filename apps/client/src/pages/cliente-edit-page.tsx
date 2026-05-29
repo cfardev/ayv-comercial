@@ -27,6 +27,8 @@ export function ClienteEditPage() {
 		return <Navigate to="/clientes" replace />;
 	}
 
+	const customerId = id;
+
 	function goBack() {
 		navigate("/clientes");
 	}
@@ -34,7 +36,7 @@ export function ClienteEditPage() {
 	function onSubmit(data: CustomerFormSubmitData) {
 		setFormError(null);
 		updateCustomer.mutate(
-			{ id: customer!.id, data },
+			{ id: customerId, data },
 			{
 				onSuccess: () => navigate("/clientes"),
 				onError: (error) => setFormError(error.message),
