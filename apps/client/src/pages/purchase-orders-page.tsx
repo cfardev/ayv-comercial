@@ -300,34 +300,38 @@ function PurchaseOrderDetailDialog({
 				if (!open) onClose();
 			}}
 		>
-			<DialogContent>
+			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle>Detalle de orden</DialogTitle>
 				</DialogHeader>
 				{selected ? (
-					<div className="space-y-3">
+					<div className="min-w-0 space-y-3">
 						<p className="text-sm">
 							{selected.referenceNumber} - {selected.supplierName}
 						</p>
-						<div className="rounded-md border">
+						<div className="overflow-x-auto rounded-md border">
 							<Table>
 								<TableHeader>
 									<TableRow>
 										<TableHead>Producto</TableHead>
-										<TableHead>Cantidad</TableHead>
-										<TableHead>Unitario</TableHead>
-										<TableHead>Subtotal</TableHead>
+										<TableHead className="text-right">Cantidad</TableHead>
+										<TableHead className="text-right">Unitario</TableHead>
+										<TableHead className="text-right">Subtotal</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
 									{selected.items?.map((item) => (
 										<TableRow key={item.id}>
-											<TableCell>{item.productName}</TableCell>
-											<TableCell>{item.quantityOrdered}</TableCell>
-											<TableCell>
+											<TableCell className="max-w-[200px] truncate">
+												{item.productName}
+											</TableCell>
+											<TableCell className="text-right tabular-nums whitespace-nowrap">
+												{item.quantityOrdered}
+											</TableCell>
+											<TableCell className="text-right tabular-nums whitespace-nowrap">
 												{item.unitCost ? `$${item.unitCost.toFixed(2)}` : "—"}
 											</TableCell>
-											<TableCell>
+											<TableCell className="text-right tabular-nums whitespace-nowrap">
 												{item.subtotal ? `$${item.subtotal.toFixed(2)}` : "—"}
 											</TableCell>
 										</TableRow>
