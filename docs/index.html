@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Procesos</title>
+		<link rel="stylesheet" href="/docs/vendor/diagram-js.css" />
+		<link rel="stylesheet" href="/docs/vendor/bpmn-js.css" />
+		<link rel="stylesheet" href="/docs/vendor/bpmn-font/css/bpmn-embedded.css" />
+		<link rel="stylesheet" href="/docs/styles.css" />
+	</head>
+	<body>
+		<aside class="sidebar">
+			<h1>Procesos</h1>
+			<nav id="process-list" aria-label="Procesos"></nav>
+		</aside>
+		<main class="workspace">
+			<div class="toolbar">
+				<button type="button" id="zoom-in">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<circle cx="11" cy="11" r="7" />
+						<path d="M20 20l-3.5-3.5M11 8v6M8 11h6" />
+					</svg>
+					Acercar
+				</button>
+				<button type="button" id="zoom-out">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<circle cx="11" cy="11" r="7" />
+						<path d="M20 20l-3.5-3.5M8 11h6" />
+					</svg>
+					Alejar
+				</button>
+				<button type="button" id="fit">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+					</svg>
+					Ver completo
+				</button>
+				<button type="button" id="fullscreen">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+					</svg>
+					Pantalla completa
+				</button>
+				<button type="button" id="download">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<rect x="4" y="4" width="16" height="16" rx="2" />
+						<circle cx="9" cy="9" r="1.5" />
+						<path d="M4 16l4.5-4.5L14 17l2-2 4 4" />
+					</svg>
+					Descargar imagen
+				</button>
+				<span class="hint">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M12 3v18M3 12h18M8 7l4-4 4 4M8 17l4 4 4-4" />
+					</svg>
+					Arrastra para moverte
+				</span>
+			</div>
+			<section class="stage" id="stage">
+				<div id="canvas"></div>
+				<p id="status" role="status"></p>
+			</section>
+		</main>
+		<script src="/docs/vendor/bpmn-navigated-viewer.production.min.js"></script>
+		<script src="/docs/catalog.js"></script>
+		<script src="/docs/viewer.js"></script>
+	</body>
+</html>

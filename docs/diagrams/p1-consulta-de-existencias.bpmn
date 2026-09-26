@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_ConsultaExistencias" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.30.1">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_1" name="Consulta de existencias" processRef="Process_Consulta" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Consulta" name="Consulta de existencias" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Cliente" name="Cliente">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Consulta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Recibe</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Vendedor" name="Vendedor">
+        <bpmn:flowNodeRef>Task_Recibir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Contactar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Responder</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Roxana" name="Roxana">
+        <bpmn:flowNodeRef>Task_Revisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Stock</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Indicar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SinStock</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_1" name="Inicio">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Consulta" name="Consulta producto/marca">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Recibir" name="Recibir consulta del cliente">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Contactar" name="Contactar a Roxana para confirmar stock">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Revisar" name="Revisar en cuál de las 2 bodegas está">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Stock" name="¿Hay stock?" default="Flow_No">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_Si</bpmn:outgoing>
+      <bpmn:outgoing>Flow_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_Indicar" name="Indicar cantidad, bodega y precio vigente">
+      <bpmn:incoming>Flow_Si</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_SinStock" name="Informar sin stock o registro desactualizado">
+      <bpmn:incoming>Flow_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_1" name="Fin">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_Consulta" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Consulta" targetRef="Task_Recibir" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_Recibir" targetRef="Task_Contactar" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_Contactar" targetRef="Task_Revisar" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_Revisar" targetRef="Gateway_Stock" />
+    <bpmn:sequenceFlow id="Flow_Si" name="Sí" sourceRef="Gateway_Stock" targetRef="Task_Indicar" />
+    <bpmn:sequenceFlow id="Flow_No" name="No" sourceRef="Gateway_Stock" targetRef="Task_SinStock" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_Indicar" targetRef="Task_Responder" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_SinStock" targetRef="Task_Responder" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_Responder" targetRef="Task_Recibe" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_Recibe" targetRef="EndEvent_1" />
+    <bpmn:userTask id="Task_Recibe" name="Recibe respuesta">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Responder" name="Responder disponibilidad; ofrecer alternativas o cerrar consulta">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_1_di" bpmnElement="Participant_1" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1540" height="480" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Roxana_di" bpmnElement="Lane_Roxana" isHorizontal="true">
+        <dc:Bounds x="190" y="360" width="1510" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Vendedor_di" bpmnElement="Lane_Vendedor" isHorizontal="true">
+        <dc:Bounds x="190" y="220" width="1510" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Cliente_di" bpmnElement="Lane_Cliente" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1510" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="252" y="132" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="256" y="175" width="28" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Consulta_di" bpmnElement="Task_Consulta">
+        <dc:Bounds x="340" y="110" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Recibir_di" bpmnElement="Task_Recibir">
+        <dc:Bounds x="520" y="250" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Contactar_di" bpmnElement="Task_Contactar">
+        <dc:Bounds x="700" y="250" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Revisar_di" bpmnElement="Task_Revisar">
+        <dc:Bounds x="890" y="420" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Stock_di" bpmnElement="Gateway_Stock" isMarkerVisible="true">
+        <dc:Bounds x="1095" y="435" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1049" y="423" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Indicar_di" bpmnElement="Task_Indicar">
+        <dc:Bounds x="1200" y="370" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SinStock_di" bpmnElement="Task_SinStock">
+        <dc:Bounds x="1200" y="470" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1622" y="132" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1631" y="175" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Recibe_di" bpmnElement="Task_Recibe">
+        <dc:Bounds x="1430" y="110" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Responder_di" bpmnElement="Task_Responder">
+        <dc:Bounds x="1430" y="250" width="160" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="288" y="150" />
+        <di:waypoint x="340" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="480" y="150" />
+        <di:waypoint x="480" y="290" />
+        <di:waypoint x="520" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="660" y="290" />
+        <di:waypoint x="700" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="850" y="290" />
+        <di:waypoint x="850" y="460" />
+        <di:waypoint x="890" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="1040" y="460" />
+        <di:waypoint x="1095" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Si_di" bpmnElement="Flow_Si">
+        <di:waypoint x="1120" y="435" />
+        <di:waypoint x="1120" y="410" />
+        <di:waypoint x="1200" y="410" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1128" y="388" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_No_di" bpmnElement="Flow_No">
+        <di:waypoint x="1120" y="485" />
+        <di:waypoint x="1120" y="510" />
+        <di:waypoint x="1200" y="510" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1126" y="518" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1360" y="410" />
+        <di:waypoint x="1510" y="410" />
+        <di:waypoint x="1510" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1360" y="510" />
+        <di:waypoint x="1510" y="510" />
+        <di:waypoint x="1510" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="1510" y="250" />
+        <di:waypoint x="1510" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="1570" y="150" />
+        <di:waypoint x="1622" y="150" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

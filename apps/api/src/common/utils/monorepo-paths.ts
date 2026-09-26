@@ -32,4 +32,6 @@ const MONOREPO_ROOT = findMonorepoRoot(__dirname);
 
 export const CLIENT_DIST_PATH = join(MONOREPO_ROOT, "dist", "client");
 
+export const DOCS_PATH = join(MONOREPO_ROOT, "docs");
+
 export const MONOREPO_ROOT_ENV_FILE = join(MONOREPO_ROOT, ".env");

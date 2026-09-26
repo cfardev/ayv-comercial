@@ -13,6 +13,7 @@ import { createPinoHttpOptions } from "./common/logging/pino-http.config.js";
 import { PrismaModule } from "./common/prisma/prisma.module.js";
 import {
 	CLIENT_DIST_PATH,
+	DOCS_PATH,
 	MONOREPO_ROOT_ENV_FILE,
 } from "./common/utils/monorepo-paths.js";
 import { BrandsModule } from "./modules/brands/brands.module.js";
@@ -60,10 +61,17 @@ import { UsersModule } from "./modules/users/users.module.js";
 		SuppliersModule,
 		CustomersModule,
 		UploadthingModule,
-		ServeStaticModule.forRoot({
-			rootPath: CLIENT_DIST_PATH,
-			exclude: ["/api", "/api/*path"],
-		}),
+		ServeStaticModule.forRoot(
+			{
+				rootPath: DOCS_PATH,
+				serveRoot: "/docs",
+				renderPath: "/index.html",
+			},
+			{
+				rootPath: CLIENT_DIST_PATH,
+				exclude: ["/api", "/api/*path", "/docs", "/docs/*path"],
+			},
+		),
 	],
 	controllers: [AppController],
 	providers: [
